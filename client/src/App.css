@@ -1,0 +1,4 @@
+div:first-child {
+  font-size: 2em;
+  color: var(--main-blue);
+}
