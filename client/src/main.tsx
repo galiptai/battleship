@@ -9,10 +9,12 @@ import {
   RouterProvider,
   Navigate,
 } from "react-router-dom";
+import Local from "./pages/Local.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements([
     <Route path="/" element={<App />} />,
+    <Route path="/local" element={<Local />} />,
     <Route path="*" element={<Navigate to="/" />} />,
   ])
 );

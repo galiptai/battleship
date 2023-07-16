@@ -3,6 +3,11 @@
   src: url("fonts/TASAOrbiterVF.woff2") format("woff2");
 }
 
+@font-face {
+  font-family: "TASAExplorer";
+  src: url("fonts/TASAExplorerVF.woff2") format("woff2");
+}
+
 :root {
   --main-blue: rgb(0, 8, 255);
 }
@@ -10,4 +15,12 @@
 html {
   font-family: "TasaOrbiter";
   background-color: black;
+  color: var(--main-blue);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
 }
