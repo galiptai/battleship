@@ -20,10 +20,7 @@ export class Ship {
   }
 
   setTiles(tiles: Tile[]) {
-    if (
-      tiles.length !== this.length ||
-      tiles.some((tile) => tile.placedShip !== null)
-    ) {
+    if (tiles.length !== this.length || tiles.some((tile) => tile.placedShip !== null)) {
       throw new Error("Ship can't be placed here!");
     } else {
       this.tiles = tiles;

@@ -14,12 +14,7 @@ type drawTileProps = {
   setHoverCoordinate: (coordinate: Coordinate | null) => void;
   highlighted: HighlightType | null;
 };
-export function DrawTile({
-  tile,
-  onClick,
-  setHoverCoordinate,
-  highlighted,
-}: drawTileProps) {
+export function DrawTile({ tile, onClick, setHoverCoordinate, highlighted }: drawTileProps) {
   let classes = "tile";
   if (highlighted !== null) {
     switch (highlighted) {

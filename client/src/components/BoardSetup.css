@@ -1,8 +1,9 @@
 .board-setup {
   display: flex;
   height: 100%;
-}
-
-.board-setup-board {
+  width: fit-content;
+  margin: auto;
   padding: 20px;
+  gap: 20px;
+  box-sizing: border-box;
 }

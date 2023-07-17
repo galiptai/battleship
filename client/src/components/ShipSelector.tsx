@@ -1,7 +1,7 @@
 import { Ship } from "../logic/Ship";
 import "./ShipSelector.css";
 
-type shipSelectorProps = {
+export type shipSelectorProps = {
   shipsToPlace: Ship[];
   selectedIndex: number;
   setSelectedIndex: (index: number) => void;
@@ -52,12 +52,7 @@ type shipSelectOptionProps = {
   setSelectedIndex: (index: number) => void;
 };
 
-function ShipSelectOption({
-  ship,
-  index,
-  selected,
-  setSelectedIndex,
-}: shipSelectOptionProps) {
+function ShipSelectOption({ ship, index, selected, setSelectedIndex }: shipSelectOptionProps) {
   const placed = ship.tiles.length !== 0;
   let classes = "ship-sel-opt";
   if (placed) {

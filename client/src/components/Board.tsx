@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Fragment } from "react";
 
 export type Board = {
+  player: string;
   height: number;
   width: number;
   ships: Ship[];
@@ -29,14 +30,8 @@ type drawBoardProps = {
   highlightAssigner: (hoverCoordinate: Coordinate | null) => Highlight;
 };
 
-export function DrawBoard({
-  board,
-  onClick,
-  highlightAssigner,
-}: drawBoardProps) {
-  const [hoverCoordinate, setHoverCoordinate] = useState<Coordinate | null>(
-    null
-  );
+export function DrawBoard({ board, onClick, highlightAssigner }: drawBoardProps) {
+  const [hoverCoordinate, setHoverCoordinate] = useState<Coordinate | null>(null);
 
   const highlight = highlightAssigner(hoverCoordinate);
   return (
@@ -54,9 +49,7 @@ export function DrawBoard({
               tile={tile}
               onClick={() => onClick(highlight)}
               setHoverCoordinate={setHoverCoordinate}
-              highlighted={
-                highlight.tiles.includes(tile) ? highlight.type : null
-              }
+              highlighted={highlight.tiles.includes(tile) ? highlight.type : null}
             />
           ))}
         </Fragment>

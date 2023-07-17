@@ -10,6 +10,8 @@
 
 :root {
   --main-blue: rgb(0, 8, 255);
+  --blue-active: rgb(0, 200, 255);
+  --blue-disabled: rgb(0, 0, 100);
 }
 
 html {

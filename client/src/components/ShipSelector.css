@@ -27,11 +27,11 @@
 }
 
 .ship-sel-selected {
-  background-color: aqua;
+  background-color: var(--blue-active);
   color: black;
   font-weight: 600;
 }
 
 .ship-sel-placed {
-  color: rgba(0, 0, 255, 0.356);
+  color: var(--blue-disabled);
 }

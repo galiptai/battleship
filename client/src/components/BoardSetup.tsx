@@ -1,19 +1,26 @@
 import { useState } from "react";
 import { Board, Coordinate, DrawBoard, Highlight } from "./Board";
-import { ShipSelector } from "./ShipSelector";
 import { Ship } from "../logic/Ship";
-import { getShips } from "../logic/gameLogic";
+import { checkNeighborsEmpty, createEmptyBoard, getShips, verifyBoard } from "../logic/gameLogic";
 import "./BoardSetup.css";
+import { SetupMenu } from "./SetupMenu";
 
 type boardSetupProps = {
-  board: Board;
-  setBoard: (board: Board) => void;
+  setVerifiedBoard: (board: Board) => void;
 };
 
-export function BoardSetup({ board, setBoard }: boardSetupProps) {
+export function BoardSetup({ setVerifiedBoard }: boardSetupProps) {
+  const [board, setBoard] = useState<Board>(createEmptyBoard());
   const [shipsToPlace] = useState<Ship[]>(getShips());
   const [selectedShipIndex, setSelectedShipIndex] = useState<number>(-1);
   const [horizontal, setHorizontal] = useState<boolean>(false);
+  const [verified, setVerified] = useState<boolean>(false);
+
+  function onReadyClick() {
+    if (verifyBoard(board)) {
+      setVerifiedBoard(board);
+    }
+  }
 
   function onBoardClick(selection: Highlight) {
     if (selectedShipIndex !== -1 && selection.type == "valid") {
@@ -23,13 +30,12 @@ export function BoardSetup({ board, setBoard }: boardSetupProps) {
       newBoard.ships.push(ship);
       setBoard(newBoard);
       setSelectedShipIndex(-1);
+      setVerified(verifyBoard(newBoard));
     } else if (
       selectedShipIndex === -1 &&
       selection.tiles.some((tile) => tile.placedShip !== null)
     ) {
-      const shipIndex = board.ships.findIndex((ship) =>
-        ship.tiles.includes(selection.tiles[0])
-      );
+      const shipIndex = board.ships.findIndex((ship) => ship.tiles.includes(selection.tiles[0]));
       if (shipIndex === -1) {
         return;
       }
@@ -37,8 +43,8 @@ export function BoardSetup({ board, setBoard }: boardSetupProps) {
       ship.removeTiles();
       const newBoard = { ...board };
       newBoard.ships.splice(shipIndex, 1);
-      board.ships.findIndex((ship) => ship.tiles.includes(selection.tiles[0]));
       setBoard(newBoard);
+      setVerified(verifyBoard(newBoard));
     }
   }
 
@@ -73,7 +79,8 @@ export function BoardSetup({ board, setBoard }: boardSetupProps) {
     }
     if (
       highlight.tiles.length < ship.length ||
-      highlight.tiles.some((tile) => tile.placedShip !== null)
+      highlight.tiles.some((tile) => tile.placedShip !== null) ||
+      !checkNeighborsEmpty(board, highlight.tiles)
     ) {
       highlight.type = "invalid";
     } else {
@@ -93,12 +100,14 @@ export function BoardSetup({ board, setBoard }: boardSetupProps) {
           highlightAssigner={highlightAssigner}
         />
       </div>
-      <ShipSelector
+      <SetupMenu
         shipsToPlace={shipsToPlace}
         selectedIndex={selectedShipIndex}
         setSelectedIndex={setSelectedShipIndex}
         horizontal={horizontal}
         setHorizontal={setHorizontal}
+        verified={verified}
+        onReadyClick={onReadyClick}
       />
     </div>
   );
