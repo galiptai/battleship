@@ -15,16 +15,31 @@ export function BoardSetup({ board, setBoard }: boardSetupProps) {
   const [selectedShipIndex, setSelectedShipIndex] = useState<number>(-1);
   const [horizontal, setHorizontal] = useState<boolean>(false);
 
-  function onClick(selection: Highlight) {
-    if (selection.type === "invalid" || selection.tiles.length === 0) {
-      return;
+  function onBoardClick(selection: Highlight) {
+    if (selectedShipIndex !== -1 && selection.type == "valid") {
+      const ship = shipsToPlace[selectedShipIndex];
+      ship.setTiles([...selection.tiles]);
+      const newBoard = { ...board };
+      newBoard.ships.push(ship);
+      setBoard(newBoard);
+      setSelectedShipIndex(-1);
+    } else if (
+      selectedShipIndex === -1 &&
+      selection.tiles.some((tile) => tile.placedShip !== null)
+    ) {
+      const shipIndex = board.ships.findIndex((ship) =>
+        ship.tiles.includes(selection.tiles[0])
+      );
+      if (shipIndex === -1) {
+        return;
+      }
+      const ship = board.ships[shipIndex];
+      ship.removeTiles();
+      const newBoard = { ...board };
+      newBoard.ships.splice(shipIndex, 1);
+      board.ships.findIndex((ship) => ship.tiles.includes(selection.tiles[0]));
+      setBoard(newBoard);
     }
-    const ship = shipsToPlace[selectedShipIndex];
-    ship.setTiles([...selection.tiles]);
-    const newBoard = { ...board };
-    newBoard.ships.push(ship);
-    setBoard({ ...board });
-    setSelectedShipIndex(-1);
   }
 
   function highlightAssigner(baseCoordinate: Coordinate | null): Highlight {
@@ -32,9 +47,16 @@ export function BoardSetup({ board, setBoard }: boardSetupProps) {
       type: "neutral",
       tiles: [],
     };
-    if (selectedShipIndex === -1 || baseCoordinate === null) {
+
+    if (baseCoordinate === null) {
       return highlight;
     }
+
+    if (selectedShipIndex === -1) {
+      highlight.tiles.push(board.tiles[baseCoordinate.y][baseCoordinate.x]);
+      return highlight;
+    }
+
     const ship = shipsToPlace[selectedShipIndex];
     const yLimit = Math.min(
       board.height - 1,
@@ -67,7 +89,7 @@ export function BoardSetup({ board, setBoard }: boardSetupProps) {
         <DrawBoard
           board={board}
           setBoard={setBoard}
-          onClick={onClick}
+          onClick={onBoardClick}
           highlightAssigner={highlightAssigner}
         />
       </div>

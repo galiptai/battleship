@@ -32,4 +32,11 @@ export class Ship {
       }
     }
   }
+
+  removeTiles() {
+    for (const tile of this.tiles) {
+      tile.placedShip = null;
+    }
+    this.tiles = [];
+  }
 }
