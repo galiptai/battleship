@@ -1,3 +1,8 @@
-.boardSetup {
+.board-setup {
   display: flex;
+  height: 100%;
+}
+
+.board-setup-board {
+  padding: 20px;
 }

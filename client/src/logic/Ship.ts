@@ -10,12 +10,26 @@ export enum ShipType {
 
 export class Ship {
   type: ShipType;
-  lenght: number;
+  length: number;
   tiles: Tile[];
 
   constructor(type: ShipType, length: number, tiles: Tile[]) {
     this.type = type;
-    this.lenght = length;
+    this.length = length;
     this.tiles = tiles;
+  }
+
+  setTiles(tiles: Tile[]) {
+    if (
+      tiles.length !== this.length ||
+      tiles.some((tile) => tile.placedShip !== null)
+    ) {
+      throw new Error("Ship can't be placed here!");
+    } else {
+      this.tiles = tiles;
+      for (const tile of tiles) {
+        tile.placedShip = this.type;
+      }
+    }
   }
 }

@@ -1,0 +1,37 @@
+.ship-selector {
+  user-select: none;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+.ship-sel-opts {
+  display: grid;
+}
+
+.ship-sel-opt {
+  margin: 5px;
+  padding: 5px;
+}
+
+.ship-sel-opt:hover:not(.ship-sel-placed) {
+  cursor: pointer;
+}
+
+.ship-sel-opt:hover:not(.ship-sel-selected, .ship-sel-placed) {
+  background-color: var(--main-blue);
+  color: white;
+}
+
+.ship-sel-selected {
+  background-color: aqua;
+  color: black;
+  font-weight: 600;
+}
+
+.ship-sel-placed {
+  color: rgba(0, 0, 255, 0.356);
+}
