@@ -2,7 +2,7 @@ import { Board } from "../components/Board";
 import { Tile } from "../components/Tile";
 import { Ship, ShipType } from "./Ship";
 
-export function createEmptyBoard(height = 10, width = 10): Board {
+export function createEmptyBoard(height = 10, width = 10, name = "Player"): Board {
   const tiles: Tile[][] = [];
   for (let y = 0; y < height; y++) {
     const row: Tile[] = [];
@@ -13,7 +13,7 @@ export function createEmptyBoard(height = 10, width = 10): Board {
   }
   const ships: Ship[] = [];
   return {
-    player: "Player",
+    player: name,
     height,
     width,
     tiles,
@@ -51,6 +51,9 @@ export function checkNeighborsEmpty(board: Board, tiles: Tile[], range = 1): boo
 }
 
 export function verifyBoard(board: Board): boolean {
+  if (board.player === "") {
+    return false;
+  }
   if (board.ships.length !== 5) {
     return false;
   }

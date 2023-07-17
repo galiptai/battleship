@@ -7,10 +7,14 @@ export default function Local() {
   const [p2Board, setP2Board] = useState<Board | null>(null);
 
   if (p1Board === null) {
-    return <BoardSetup key="P1" setVerifiedBoard={setP1Board} />;
+    return <BoardSetup key="P1" starterName={"Player 1"} setVerifiedBoard={setP1Board} />;
   } else if (p2Board === null) {
-    return <BoardSetup key="P2" setVerifiedBoard={setP2Board} />;
+    return <BoardSetup key="P2" starterName={"Player 2"} setVerifiedBoard={setP2Board} />;
   } else {
-    return <div>GAME</div>;
+    return (
+      <div>
+        {p1Board.player} VS {p2Board.player}
+      </div>
+    );
   }
 }

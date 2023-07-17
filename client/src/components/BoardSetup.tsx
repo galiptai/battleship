@@ -6,11 +6,12 @@ import "./BoardSetup.css";
 import { SetupMenu } from "./SetupMenu";
 
 type boardSetupProps = {
+  starterName: string;
   setVerifiedBoard: (board: Board) => void;
 };
 
-export function BoardSetup({ setVerifiedBoard }: boardSetupProps) {
-  const [board, setBoard] = useState<Board>(createEmptyBoard());
+export function BoardSetup({ starterName, setVerifiedBoard }: boardSetupProps) {
+  const [board, setBoard] = useState<Board>(createEmptyBoard(10, 10, starterName));
   const [shipsToPlace] = useState<Ship[]>(getShips());
   const [selectedShipIndex, setSelectedShipIndex] = useState<number>(-1);
   const [horizontal, setHorizontal] = useState<boolean>(false);
@@ -101,12 +102,15 @@ export function BoardSetup({ setVerifiedBoard }: boardSetupProps) {
         />
       </div>
       <SetupMenu
+        board={board}
+        setBoard={setBoard}
         shipsToPlace={shipsToPlace}
         selectedIndex={selectedShipIndex}
         setSelectedIndex={setSelectedShipIndex}
         horizontal={horizontal}
         setHorizontal={setHorizontal}
         verified={verified}
+        setVerified={setVerified}
         onReadyClick={onReadyClick}
       />
     </div>

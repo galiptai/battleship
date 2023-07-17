@@ -1,0 +1,19 @@
+.name-input {
+  font-size: 2rem;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: flex-end;
+}
+
+.name-input > input {
+  all: unset;
+  border: 2px solid var(--main-blue);
+  padding: 3px;
+  text-align: end;
+  box-sizing: border-box;
+}
+
+.name-input-invalid {
+  border: 2px solid red !important;
+}

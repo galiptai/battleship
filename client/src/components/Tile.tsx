@@ -15,17 +15,18 @@ type drawTileProps = {
   highlighted: HighlightType | null;
 };
 export function DrawTile({ tile, onClick, setHoverCoordinate, highlighted }: drawTileProps) {
-  let classes = "tile";
+  const placed = tile.placedShip !== null;
+  let overlay = "tile-overlay";
   if (highlighted !== null) {
     switch (highlighted) {
       case "neutral":
-        classes = classes + " tile-highlight";
+        overlay = overlay + " tile-highlight";
         break;
       case "valid":
-        classes = classes + " tile-valid";
+        overlay = overlay + " tile-valid";
         break;
       case "invalid":
-        classes = classes + " tile-invalid";
+        overlay = overlay + " tile-invalid";
         break;
     }
   }
@@ -35,12 +36,14 @@ export function DrawTile({ tile, onClick, setHoverCoordinate, highlighted }: dra
       onClick={() => onClick()}
       onPointerEnter={() => setHoverCoordinate(tile.coordinate)}
       onPointerLeave={() => setHoverCoordinate(null)}
-      className={classes}
+      className={`tile ${placed ? "tile-placed" : ""}`}
     >
-      <div>
-        X:{tile.coordinate.x} Y:{tile.coordinate.y}
+      <div className={overlay}>
+        <div>
+          Y:{tile.coordinate.y} X:{tile.coordinate.x}
+        </div>
+        <div>{placed ? tile.placedShip : ""}</div>
       </div>
-      <div>{tile.placedShip !== null ? tile.placedShip : ""}</div>
     </div>
   );
 }

@@ -1,18 +1,28 @@
 .tile {
+  user-select: none;
   aspect-ratio: 1/1;
   border: 2px solid white;
 }
 
 .tile-highlight {
-  background-color: rgba(128, 128, 128, 0.5);
+  background-color: rgba(128, 128, 128, 0.75);
   cursor: pointer;
 }
 
 .tile-valid {
-  background-color: rgb(0, 255, 0);
+  background-color: rgba(0, 255, 0, 0.75);
   cursor: pointer;
 }
 
 .tile-invalid {
-  background-color: rgb(255, 0, 0);
+  background-color: rgba(255, 0, 0, 0.75);
+}
+
+.tile-overlay {
+  height: 100%;
+  width: 100%;
+}
+
+.tile-placed {
+  background-color: gray;
 }
