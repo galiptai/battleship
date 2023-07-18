@@ -85,20 +85,22 @@ export function BoardSetup({ starterName, setVerifiedBoard }: boardSetupProps) {
   return (
     <div className="board-setup">
       <div className="board-setup-board">
-        <DrawBoard board={board} onClick={onBoardClick} highlightAssigner={highlightAssigner} />
+        <DrawBoard board={board} onClick={onBoardClick} highlightAssigner={highlightAssigner} showShips="all" />
       </div>
-      <SetupMenu
-        board={board}
-        setBoard={setBoard}
-        shipsToPlace={shipsToPlace}
-        selectedIndex={selectedShipIndex}
-        setSelectedIndex={setSelectedShipIndex}
-        horizontal={horizontal}
-        setHorizontal={setHorizontal}
-        verified={verified}
-        setVerified={setVerified}
-        onReadyClick={onReadyClick}
-      />
+      <div className="board-setup-side">
+        <SetupMenu
+          board={board}
+          setBoard={setBoard}
+          shipsToPlace={shipsToPlace}
+          selectedIndex={selectedShipIndex}
+          setSelectedIndex={setSelectedShipIndex}
+          horizontal={horizontal}
+          setHorizontal={setHorizontal}
+          verified={verified}
+          setVerified={setVerified}
+          onReadyClick={onReadyClick}
+        />
+      </div>
     </div>
   );
 }

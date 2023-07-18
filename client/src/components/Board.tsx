@@ -23,13 +23,17 @@ export type Highlight = {
   tiles: Tile[];
   type: HighlightType;
 };
+
+export type ShowShips = "all" | "hit";
+
 type drawBoardProps = {
   board: Board;
   onClick: (selection: Highlight) => void;
   highlightAssigner: (hoverCoordinate: Coordinate | null) => Highlight;
+  showShips: ShowShips;
 };
 
-export function DrawBoard({ board, onClick, highlightAssigner }: drawBoardProps) {
+export function DrawBoard({ board, onClick, highlightAssigner, showShips }: drawBoardProps) {
   const [hoverCoordinate, setHoverCoordinate] = useState<Coordinate | null>(null);
 
   const highlight = highlightAssigner(hoverCoordinate);
@@ -49,6 +53,7 @@ export function DrawBoard({ board, onClick, highlightAssigner }: drawBoardProps)
               onClick={() => onClick(highlight)}
               setHoverCoordinate={setHoverCoordinate}
               highlighted={highlight.tiles.includes(tile) ? highlight.type : null}
+              showShip={showShips}
             />
           ))}
         </Fragment>

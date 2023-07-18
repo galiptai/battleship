@@ -1,13 +1,17 @@
 .board-setup {
   display: flex;
-  height: 100%;
-  width: fit-content;
-  margin: auto;
+  justify-content: space-evenly;
   padding: 20px;
-  gap: 20px;
+  height: 100%;
   box-sizing: border-box;
+  gap: 20px;
 }
 
 .board-setup-board {
+  display: flex;
+}
+
+.board-setup-side {
   height: 100%;
+  max-width: 40%;
 }

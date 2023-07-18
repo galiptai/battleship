@@ -20,12 +20,14 @@ export function PlayScreen({ playerBoard, setPlayerBoard, opponentBoard, setOppo
   return (
     <div className="play-screen">
       <div className="play-opponent-board">
-        <DrawBoard board={opponentBoard} onClick={onClick} highlightAssigner={highlightAssigner} />
+        <DrawBoard board={opponentBoard} onClick={onClick} highlightAssigner={highlightAssigner} showShips="hit" />
       </div>
-      <div className="play-player-board">
-        <DrawBoard board={playerBoard} onClick={onClick} highlightAssigner={highlightAssigner} />
+      <div className="play-side">
+        <div className="play-player-board">
+          <DrawBoard board={playerBoard} onClick={onClick} highlightAssigner={highlightAssigner} showShips="hit" />
+        </div>
+        <div className="play-log">LOG GOES HERE</div>
       </div>
-      <div className="play-log">LOG GOES HERE</div>
     </div>
   );
 }

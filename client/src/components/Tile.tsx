@@ -1,4 +1,4 @@
-import { Coordinate, HighlightType } from "./Board";
+import { Coordinate, HighlightType, ShowShips } from "./Board";
 import { ShipType } from "../logic/Ship";
 import "./Tile.css";
 
@@ -13,8 +13,9 @@ type drawTileProps = {
   onClick: () => void;
   setHoverCoordinate: (coordinate: Coordinate | null) => void;
   highlighted: HighlightType | null;
+  showShip: ShowShips;
 };
-export function DrawTile({ tile, onClick, setHoverCoordinate, highlighted }: drawTileProps) {
+export function DrawTile({ tile, onClick, setHoverCoordinate, highlighted, showShip }: drawTileProps) {
   const placed = tile.placedShip !== null;
   let overlay = "tile-overlay";
   if (highlighted !== null) {
