@@ -8,23 +8,7 @@
 }
 
 .setup-ready-btn {
-  all: unset;
-  font-family: "TASAExplorer";
   font-weight: 900;
   font-size: 2em;
-  background-color: var(--main-blue);
-  color: black;
   padding: 2em;
-  text-align: center;
-}
-
-.setup-ready-btn:disabled {
-  background-color: black;
-  color: var(--blue-disabled);
-}
-
-.setup-ready-btn:hover:not(:disabled) {
-  color: white;
-  cursor: pointer;
-  background-color: var(--blue-active);
 }

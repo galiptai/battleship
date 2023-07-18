@@ -26,3 +26,22 @@ body,
   height: 100%;
   margin: 0;
 }
+
+button {
+  all: unset;
+  font-family: "TASAExplorer";
+  background-color: var(--main-blue);
+  color: black;
+  text-align: center;
+}
+
+button:disabled {
+  background-color: black;
+  color: var(--blue-disabled);
+}
+
+button:hover:not(:disabled) {
+  color: white;
+  cursor: pointer;
+  background-color: var(--blue-active);
+}

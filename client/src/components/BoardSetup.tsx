@@ -32,10 +32,7 @@ export function BoardSetup({ starterName, setVerifiedBoard }: boardSetupProps) {
       setBoard(newBoard);
       setSelectedShipIndex(-1);
       setVerified(verifyBoard(newBoard));
-    } else if (
-      selectedShipIndex === -1 &&
-      selection.tiles.some((tile) => tile.placedShip !== null)
-    ) {
+    } else if (selectedShipIndex === -1 && selection.tiles.some((tile) => tile.placedShip !== null)) {
       const shipIndex = board.ships.findIndex((ship) => ship.tiles.includes(selection.tiles[0]));
       if (shipIndex === -1) {
         return;
@@ -65,15 +62,9 @@ export function BoardSetup({ starterName, setVerifiedBoard }: boardSetupProps) {
     }
 
     const ship = shipsToPlace[selectedShipIndex];
-    const yLimit = Math.min(
-      board.height - 1,
-      baseCoordinate.y + (horizontal ? 0 : ship.length - 1)
-    );
+    const yLimit = Math.min(board.height - 1, baseCoordinate.y + (horizontal ? 0 : ship.length - 1));
     for (let y = baseCoordinate.y; y <= yLimit; y++) {
-      const xLimit = Math.min(
-        board.width - 1,
-        baseCoordinate.x + (horizontal ? ship.length - 1 : 0)
-      );
+      const xLimit = Math.min(board.width - 1, baseCoordinate.x + (horizontal ? ship.length - 1 : 0));
       for (let x = baseCoordinate.x; x <= xLimit; x++) {
         highlight.tiles.push(board.tiles[y][x]);
       }
@@ -94,12 +85,7 @@ export function BoardSetup({ starterName, setVerifiedBoard }: boardSetupProps) {
   return (
     <div className="board-setup">
       <div className="board-setup-board">
-        <DrawBoard
-          board={board}
-          setBoard={setBoard}
-          onClick={onBoardClick}
-          highlightAssigner={highlightAssigner}
-        />
+        <DrawBoard board={board} onClick={onBoardClick} highlightAssigner={highlightAssigner} />
       </div>
       <SetupMenu
         board={board}

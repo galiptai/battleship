@@ -25,7 +25,6 @@ export type Highlight = {
 };
 type drawBoardProps = {
   board: Board;
-  setBoard: (board: Board) => void;
   onClick: (selection: Highlight) => void;
   highlightAssigner: (hoverCoordinate: Coordinate | null) => Highlight;
 };
