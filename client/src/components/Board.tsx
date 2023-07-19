@@ -17,7 +17,13 @@ export type Coordinate = {
   x: number;
 };
 
-export type HighlightType = "neutral" | "valid" | "invalid";
+export type Guess = {
+  coordinate: Coordinate;
+  hit: boolean;
+  player: string;
+};
+
+export type HighlightType = "neutral" | "valid" | "invalid" | "none";
 
 export type Highlight = {
   tiles: Tile[];
@@ -52,7 +58,7 @@ export function DrawBoard({ board, onClick, highlightAssigner, showShips }: draw
               tile={tile}
               onClick={() => onClick(highlight)}
               setHoverCoordinate={setHoverCoordinate}
-              highlighted={highlight.tiles.includes(tile) ? highlight.type : null}
+              highlighted={highlight.tiles.includes(tile) ? highlight.type : "none"}
               showShip={showShips}
             />
           ))}

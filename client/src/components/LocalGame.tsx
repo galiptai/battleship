@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Board } from "./Board";
+import { Board, Coordinate, Guess, Highlight } from "./Board";
 import { SwitchScreen } from "./SwitchScreen";
 import { PlayScreen } from "./PlayScreen";
+import { PlayMenu } from "./PlayMenu";
 
 type localGameProps = {
   p1Board: Board;
@@ -10,28 +11,90 @@ type localGameProps = {
   setP2Board: (board: Board) => void;
 };
 export function LocalGame({ p1Board, setP1Board, p2Board, setP2Board }: localGameProps) {
+  const [guesses, setGuesses] = useState<Guess[]>([]);
   const [p1Turn, setP1Turn] = useState<boolean>(true);
   const [displaySwitch, setDisplaySwitch] = useState<boolean>(true);
+  const [canGuess, setCanGuess] = useState<boolean>(false);
+
+  function onOppBoardClick(selection: Highlight) {
+    if (selection.type !== "neutral" || selection.tiles.length === 0) {
+      return;
+    }
+    const board = p1Turn ? p2Board : p1Board;
+    const tile = selection.tiles[0];
+    const setBoard = p1Turn ? setP2Board : setP1Board;
+    tile.hit = true;
+    setBoard({ ...board });
+    const player = p1Turn ? p1Board.player : p2Board.player;
+    guesses.push({
+      coordinate: tile.coordinate,
+      hit: tile.placedShip !== null,
+      player,
+    });
+    setGuesses([...guesses]);
+    setCanGuess(false);
+  }
+
+  function oppBoardHighlightAssigner(hoverCoordinate: Coordinate | null): Highlight {
+    const highlight: Highlight = {
+      type: "none",
+      tiles: [],
+    };
+    if (hoverCoordinate === null || !canGuess) {
+      return highlight;
+    }
+    const board = p1Turn ? p2Board : p1Board;
+    const tile = board.tiles[hoverCoordinate.y][hoverCoordinate.x];
+    if (!tile.hit) {
+      highlight.type = "neutral";
+      highlight.tiles.push(tile);
+    }
+
+    return highlight;
+  }
+
+  function onPassClick() {
+    setDisplaySwitch(true);
+    setP1Turn(!p1Turn);
+  }
 
   if (displaySwitch) {
-    return <SwitchScreen player={p1Turn ? p1Board.player : p2Board.player} setDisplaySwitch={setDisplaySwitch} />;
+    return (
+      <SwitchScreen
+        player={p1Turn ? p1Board.player : p2Board.player}
+        setDisplaySwitch={setDisplaySwitch}
+        setCanGuess={setCanGuess}
+      />
+    );
   } else if (p1Turn) {
     return (
       <PlayScreen
         playerBoard={p1Board}
-        setPlayerBoard={setP1Board}
         opponentBoard={p2Board}
-        setOpponentBoard={setP2Board}
-      />
+        onOppBoardClick={onOppBoardClick}
+        oppBoardHighlightAssigner={oppBoardHighlightAssigner}
+      >
+        <PlayMenu guesses={guesses} player1={p1Board.player} player2={p2Board.player}>
+          <button onClick={onPassClick} disabled={canGuess}>
+            PASS
+          </button>
+        </PlayMenu>
+      </PlayScreen>
     );
   } else {
     return (
       <PlayScreen
         playerBoard={p2Board}
-        setPlayerBoard={setP2Board}
         opponentBoard={p1Board}
-        setOpponentBoard={setP1Board}
-      />
+        onOppBoardClick={onOppBoardClick}
+        oppBoardHighlightAssigner={oppBoardHighlightAssigner}
+      >
+        <PlayMenu guesses={guesses} player1={p1Board.player} player2={p2Board.player}>
+          <button onClick={onPassClick} disabled={canGuess}>
+            PASS
+          </button>
+        </PlayMenu>
+      </PlayScreen>
     );
   }
 }
