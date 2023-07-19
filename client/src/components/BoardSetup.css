@@ -9,6 +9,8 @@
 
 .board-setup-board {
   display: flex;
+  align-items: center;
+  width: 40%;
 }
 
 .board-setup-side {

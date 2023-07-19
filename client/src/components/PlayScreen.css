@@ -10,19 +10,22 @@
 
 .play-side {
   height: 100%;
-  max-width: 40%;
+  width: 50%;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .play-opponent-board {
+  width: 40%;
   display: flex;
   align-items: center;
 }
 
 .play-player-board {
+  width: 50%;
   display: flex;
-  align-items: center;
 }
 
 .play-log {

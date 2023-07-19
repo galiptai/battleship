@@ -41,7 +41,7 @@ export function DrawBoard({ board, onClick, highlightAssigner, showShips }: draw
     <div
       className="board"
       style={{
-        gridTemplateColumns: `repeat(${board.width}, 1fr)`,
+        gridTemplateColumns: `repeat(${board.width}, minmax(20px, 1fr))`,
       }}
     >
       {board.tiles.map((row: Tile[], y) => (

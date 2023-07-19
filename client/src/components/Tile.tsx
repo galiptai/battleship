@@ -39,7 +39,13 @@ export function DrawTile({ tile, onClick, setHoverCoordinate, highlighted, showS
       onPointerLeave={() => setHoverCoordinate(null)}
       className={`tile ${placed ? "tile-placed" : ""}`}
     >
-      <div className={overlay}>
+      {tile.hit && (
+        <div className="tile-hit">
+          <img src="/X.svg" alt="X" />
+        </div>
+      )}
+      <div className={overlay}></div>
+      <div className="tile-data">
         <div>
           Y:{tile.coordinate.y} X:{tile.coordinate.x}
         </div>
