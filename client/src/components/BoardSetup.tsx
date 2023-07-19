@@ -32,7 +32,7 @@ export function BoardSetup({ starterName, setVerifiedBoard }: boardSetupProps) {
       setBoard(newBoard);
       setSelectedShipIndex(-1);
       setVerified(verifyBoard(newBoard));
-    } else if (selectedShipIndex === -1 && selection.tiles.some((tile) => tile.placedShip !== null)) {
+    } else if (selectedShipIndex === -1 && selection.type === "neutral") {
       const shipIndex = board.ships.findIndex((ship) => ship.tiles.includes(selection.tiles[0]));
       if (shipIndex === -1) {
         return;
@@ -48,7 +48,7 @@ export function BoardSetup({ starterName, setVerifiedBoard }: boardSetupProps) {
 
   function highlightAssigner(baseCoordinate: Coordinate | null): Highlight {
     const highlight: Highlight = {
-      type: "neutral",
+      type: "none",
       tiles: [],
     };
 
@@ -57,14 +57,26 @@ export function BoardSetup({ starterName, setVerifiedBoard }: boardSetupProps) {
     }
 
     if (selectedShipIndex === -1) {
-      highlight.tiles.push(board.tiles[baseCoordinate.y][baseCoordinate.x]);
-      return highlight;
+      const tile = board.tiles[baseCoordinate.y][baseCoordinate.x];
+      if (tile.placedShip === null) {
+        return highlight;
+      } else {
+        highlight.tiles.push(tile);
+        highlight.type = "neutral";
+        return highlight;
+      }
     }
 
     const ship = shipsToPlace[selectedShipIndex];
-    const yLimit = Math.min(board.height - 1, baseCoordinate.y + (horizontal ? 0 : ship.length - 1));
+    const yLimit = Math.min(
+      board.height - 1,
+      baseCoordinate.y + (horizontal ? 0 : ship.length - 1)
+    );
     for (let y = baseCoordinate.y; y <= yLimit; y++) {
-      const xLimit = Math.min(board.width - 1, baseCoordinate.x + (horizontal ? ship.length - 1 : 0));
+      const xLimit = Math.min(
+        board.width - 1,
+        baseCoordinate.x + (horizontal ? ship.length - 1 : 0)
+      );
       for (let x = baseCoordinate.x; x <= xLimit; x++) {
         highlight.tiles.push(board.tiles[y][x]);
       }
@@ -85,7 +97,12 @@ export function BoardSetup({ starterName, setVerifiedBoard }: boardSetupProps) {
   return (
     <div className="board-setup">
       <div className="board-setup-board">
-        <DrawBoard board={board} onClick={onBoardClick} highlightAssigner={highlightAssigner} showShips="all" />
+        <DrawBoard
+          board={board}
+          onClick={onBoardClick}
+          highlightAssigner={highlightAssigner}
+          showShips="all"
+        />
       </div>
       <div className="board-setup-side">
         <SetupMenu

@@ -1,13 +1,20 @@
 .tile {
   user-select: none;
   aspect-ratio: 1/1;
-  border: 2px solid white;
   min-width: 0;
   min-height: 0;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.play-tile {
+  border: 2px solid white;
+}
+
+.coord-tile {
+  font-size: 1.75em;
 }
 
 .tile-highlight {

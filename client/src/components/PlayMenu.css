@@ -24,11 +24,15 @@
 
 .guess-list {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 0.5fr 1fr 1fr;
 }
 
 .guess-list > div {
   text-align: center;
   min-height: 0;
   min-width: 0;
+}
+
+.guess-hit {
+  color: red;
 }

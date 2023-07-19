@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Guess } from "./Board";
 import "./PlayMenu.css";
+import { convertCoordinateToLetter } from "../logic/gameLogic";
 
 export type PlayMenuTabs = "Actions" | "Guesses" | "Chat";
 
@@ -32,7 +33,7 @@ export function PlayMenu({ guesses, player1, player2, children }: playMenuProps)
         style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}
       >
         {tabs.map((tab) => (
-          <button onClick={() => setCurrentTab(tab)}>{tab}</button>
+          <button onClick={() => setCurrentTab(tab)}>{tab.toUpperCase()}</button>
         ))}
       </div>
       {displayTab()}
@@ -48,12 +49,17 @@ function GuessList({ guesses, player1, player2 }: guessListProps) {
   return (
     <div className="guess-list-container">
       <div className="guess-list">
+        <div>Round</div>
         <div>{player1}</div>
         <div>{player2}</div>
-        {guesses.map((guess) => (
-          <div>
-            {guess.coordinate.x}:{guess.coordinate.y}
-          </div>
+        {guesses.map((guess, i) => (
+          <Fragment key={i}>
+            {i % 2 === 0 && <div>{Math.ceil((i + 1) / 2)}.</div>}
+            <div className={guess.hit ? "guess-hit" : ""}>
+              {convertCoordinateToLetter(guess.coordinate.x)}
+              {guess.coordinate.y + 1}
+            </div>
+          </Fragment>
         ))}
       </div>
     </div>

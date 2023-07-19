@@ -48,7 +48,7 @@ export function DrawTile({
       onClick={() => onClick()}
       onPointerEnter={() => setHoverCoordinate(tile.coordinate)}
       onPointerLeave={() => setHoverCoordinate(null)}
-      className={`tile ${placed}`}
+      className={`tile play-tile ${placed}`}
     >
       {tile.hit && (
         <div className="tile-hit">
@@ -64,4 +64,11 @@ export function DrawTile({
       </div>
     </div>
   );
+}
+
+type drawCoordTileProps = {
+  character: number | string;
+};
+export function DrawCoordTile({ character }: drawCoordTileProps) {
+  return <div className="tile coord-tile">{character}</div>;
 }

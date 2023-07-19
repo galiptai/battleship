@@ -1,8 +1,9 @@
 import { Ship } from "../logic/Ship";
-import { Tile, DrawTile } from "./Tile";
+import { Tile, DrawTile, DrawCoordTile } from "./Tile";
 import "./Board.css";
 import { useState } from "react";
 import { Fragment } from "react";
+import { createLetterArray } from "../logic/gameLogic";
 
 export type Board = {
   player: string;
@@ -47,11 +48,15 @@ export function DrawBoard({ board, onClick, highlightAssigner, showShips }: draw
     <div
       className="board"
       style={{
-        gridTemplateColumns: `repeat(${board.width}, minmax(20px, 1fr))`,
+        gridTemplateColumns: `repeat(${board.width + 1}, minmax(20px, 1fr))`,
       }}
     >
+      {createLetterArray(board.width).map((letter) => (
+        <DrawCoordTile key={letter} character={letter} />
+      ))}
       {board.tiles.map((row: Tile[], y) => (
         <Fragment key={y}>
+          <DrawCoordTile character={y + 1} />
           {row.map((tile, x) => (
             <DrawTile
               key={x}
