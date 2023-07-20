@@ -1,11 +1,11 @@
 import { Coordinate, HighlightType, ShowShips } from "./Board";
-import { ShipType } from "../../logic/Ship";
+import { Ship } from "../../logic/Ship";
 import "./Tile.css";
 
 export type Tile = {
   coordinate: Coordinate;
   hit: boolean;
-  placedShip: ShipType | null;
+  placedShip: Ship | null;
 };
 
 type drawTileProps = {
@@ -60,7 +60,7 @@ export function DrawTile({
         <div>
           Y:{tile.coordinate.y} X:{tile.coordinate.x}
         </div>
-        <div>{placed ? tile.placedShip : ""}</div>
+        <div>{placed ? tile.placedShip?.type : ""}</div>
       </div>
     </div>
   );

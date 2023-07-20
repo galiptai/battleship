@@ -33,19 +33,19 @@ export function BoardSetup({ starterName, setVerifiedBoard }: boardSetupProps) {
       const ship = shipsToPlace[selectedShipIndex];
       ship.setTiles([...selection.tiles]);
       const newBoard = { ...board };
-      newBoard.ships.push(ship);
+      newBoard.ships.add(ship);
       setBoard(newBoard);
       setSelectedShipIndex(-1);
       setVerified(verifyBoard(newBoard));
     } else if (selectedShipIndex === -1 && selection.type === "neutral") {
-      const shipIndex = board.ships.findIndex((ship) => ship.tiles.includes(selection.tiles[0]));
-      if (shipIndex === -1) {
-        return;
+      const tile = selection.tiles[0];
+      if (tile.placedShip === null) {
+        throw new Error("This tile has no ship on it.");
       }
-      const ship = board.ships[shipIndex];
+      const ship = tile.placedShip;
       ship.removeTiles();
       const newBoard = { ...board };
-      newBoard.ships.splice(shipIndex, 1);
+      newBoard.ships.delete(ship);
       setBoard(newBoard);
       setVerified(verifyBoard(newBoard));
     }

@@ -1,5 +1,5 @@
-import { Board } from "../components/Board";
-import { Tile } from "../components/Tile";
+import { Board } from "../components/gameplay/Board";
+import { Tile } from "../components/gameplay/Tile";
 import { Ship, ShipType } from "./Ship";
 
 export function createEmptyBoard(height = 10, width = 10, name = "Player"): Board {
@@ -11,7 +11,7 @@ export function createEmptyBoard(height = 10, width = 10, name = "Player"): Boar
     }
     tiles[y] = row;
   }
-  const ships: Ship[] = [];
+  const ships: Set<Ship> = new Set();
   return {
     player: name,
     height,
@@ -23,10 +23,10 @@ export function createEmptyBoard(height = 10, width = 10, name = "Player"): Boar
 
 export function getShips(): Ship[] {
   const ships: Ship[] = [];
-  ships.push(new Ship(ShipType.CAR, 5, []));
-  ships.push(new Ship(ShipType.BAT, 4, []));
-  ships.push(new Ship(ShipType.CRU, 3, []));
-  ships.push(new Ship(ShipType.SUB, 3, []));
+  // ships.push(new Ship(ShipType.CAR, 5, []));
+  // ships.push(new Ship(ShipType.BAT, 4, []));
+  // ships.push(new Ship(ShipType.CRU, 3, []));
+  // ships.push(new Ship(ShipType.SUB, 3, []));
   ships.push(new Ship(ShipType.DES, 2, []));
   return ships;
 }
@@ -54,10 +54,7 @@ export function verifyBoard(board: Board): boolean {
   if (board.player === "") {
     return false;
   }
-  if (board.ships.length !== 5) {
-    return false;
-  }
-  if (new Set(board.ships).size !== 5) {
+  if (board.ships.size !== 1) {
     return false;
   }
   for (const ship of board.ships) {
@@ -86,4 +83,9 @@ export function createLetterArray(width: number): string[] {
   }
   letters.unshift("");
   return letters;
+}
+
+export function checkAllBoatsSank(board: Board): boolean {
+  console.log("boo");
+  return [...board.ships].every((ship) => ship.isSank());
 }

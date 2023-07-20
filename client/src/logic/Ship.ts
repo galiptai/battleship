@@ -1,4 +1,4 @@
-import { Tile } from "../components/Tile";
+import { Tile } from "../components/gameplay/Tile";
 
 export enum ShipType {
   "CAR" = "Carrier",
@@ -25,7 +25,7 @@ export class Ship {
     } else {
       this.tiles = tiles;
       for (const tile of tiles) {
-        tile.placedShip = this.type;
+        tile.placedShip = this;
       }
     }
   }
@@ -35,5 +35,9 @@ export class Ship {
       tile.placedShip = null;
     }
     this.tiles = [];
+  }
+
+  isSank(): boolean {
+    return this.tiles.every((tile) => tile.hit);
   }
 }

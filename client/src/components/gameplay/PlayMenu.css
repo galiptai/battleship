@@ -1,7 +1,7 @@
 .play-menu {
   border: 4px solid var(--main-blue);
   font-size: 1.5em;
-  height: 80%;
+  height: 90%;
   width: 100%;
 }
 
@@ -52,7 +52,7 @@
   width: 100%;
   display: flex;
   flex-flow: wrap;
-  padding: 4px;
+  padding: 10px;
   align-items: stretch;
   justify-content: center;
   box-sizing: border-box;

@@ -3,14 +3,24 @@ import { Board, Coordinate, Guess, Highlight } from "../gameplay/Board";
 import { SwitchScreen } from "./SwitchScreen";
 import { PlayScreen } from "../gameplay/PlayScreen";
 import { PlayMenu } from "../gameplay/PlayMenu";
+import { EndOverlay } from "../gameplay/EndOverlay";
+import { checkAllBoatsSank } from "../../logic/gameLogic";
 
 type localGameProps = {
   p1Board: Board;
   setP1Board: (board: Board) => void;
   p2Board: Board;
   setP2Board: (board: Board) => void;
+  setGameOver: (gameOver: boolean) => void;
 };
-export function LocalGame({ p1Board, setP1Board, p2Board, setP2Board }: localGameProps) {
+
+export function LocalGame({
+  p1Board,
+  setP1Board,
+  p2Board,
+  setP2Board,
+  setGameOver,
+}: localGameProps) {
   const [guesses, setGuesses] = useState<Guess[]>([]);
   const [p1Turn, setP1Turn] = useState<boolean>(true);
   const [displaySwitch, setDisplaySwitch] = useState<boolean>(true);
@@ -67,34 +77,48 @@ export function LocalGame({ p1Board, setP1Board, p2Board, setP2Board }: localGam
       />
     );
   } else if (p1Turn) {
+    let win = false;
+    if (!canGuess && checkAllBoatsSank(p2Board)) {
+      win = true;
+    }
     return (
-      <PlayScreen
-        playerBoard={p1Board}
-        opponentBoard={p2Board}
-        onOppBoardClick={onOppBoardClick}
-        oppBoardHighlightAssigner={oppBoardHighlightAssigner}
-      >
-        <PlayMenu guesses={guesses} player1={p1Board.player} player2={p2Board.player}>
-          <button onClick={onPassClick} disabled={canGuess}>
-            PASS
-          </button>
-        </PlayMenu>
-      </PlayScreen>
+      <>
+        <PlayScreen
+          playerBoard={p1Board}
+          opponentBoard={p2Board}
+          onOppBoardClick={onOppBoardClick}
+          oppBoardHighlightAssigner={oppBoardHighlightAssigner}
+        >
+          <PlayMenu guesses={guesses} player1={p1Board.player} player2={p2Board.player}>
+            <button onClick={onPassClick} disabled={canGuess || win}>
+              PASS
+            </button>
+          </PlayMenu>
+        </PlayScreen>
+        <EndOverlay display={win} won={true} />
+      </>
     );
   } else {
+    let win = false;
+    if (!canGuess && checkAllBoatsSank(p2Board)) {
+      win = true;
+    }
     return (
-      <PlayScreen
-        playerBoard={p2Board}
-        opponentBoard={p1Board}
-        onOppBoardClick={onOppBoardClick}
-        oppBoardHighlightAssigner={oppBoardHighlightAssigner}
-      >
-        <PlayMenu guesses={guesses} player1={p1Board.player} player2={p2Board.player}>
-          <button onClick={onPassClick} disabled={canGuess}>
-            PASS
-          </button>
-        </PlayMenu>
-      </PlayScreen>
+      <>
+        <PlayScreen
+          playerBoard={p2Board}
+          opponentBoard={p1Board}
+          onOppBoardClick={onOppBoardClick}
+          oppBoardHighlightAssigner={oppBoardHighlightAssigner}
+        >
+          <PlayMenu guesses={guesses} player1={p1Board.player} player2={p2Board.player}>
+            <button onClick={onPassClick} disabled={canGuess || win}>
+              PASS
+            </button>
+          </PlayMenu>
+        </PlayScreen>
+        <EndOverlay display={win} won={true} />
+      </>
     );
   }
 }

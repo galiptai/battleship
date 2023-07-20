@@ -9,7 +9,7 @@ export type Board = {
   player: string;
   height: number;
   width: number;
-  ships: Ship[];
+  ships: Set<Ship>;
   tiles: Tile[][];
 };
 

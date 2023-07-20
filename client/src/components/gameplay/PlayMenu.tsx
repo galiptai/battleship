@@ -1,11 +1,15 @@
 import { useRef, useState } from "react";
 import "./PlayMenu.css";
-import { GuessList, guessListProps } from "./GuessList";
+import { GuessList } from "./GuessList";
+import { Guess } from "./Board";
 export type PlayMenuTabs = "Actions" | "Guesses" | "Chat";
 
 type playMenuProps = {
   children?: JSX.Element | JSX.Element[];
-} & guessListProps;
+  player1: string;
+  player2: string;
+  guesses: Guess[];
+};
 
 export function PlayMenu({ guesses, player1, player2, children }: playMenuProps) {
   const [currentTab, setCurrentTab] = useState<PlayMenuTabs>("Guesses");
@@ -22,7 +26,12 @@ export function PlayMenu({ guesses, player1, player2, children }: playMenuProps)
         return <div className="play-menu-actions">{children}</div>;
       case "Guesses":
         return (
-          <GuessList box={content.current} guesses={guesses} player1={player1} player2={player2} />
+          <GuessList
+            container={content.current}
+            guesses={guesses}
+            player1={player1}
+            player2={player2}
+          />
         );
       case "Chat":
         return <div>Not implemented</div>;

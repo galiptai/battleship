@@ -12,3 +12,9 @@
 .guess-hit {
   color: red;
 }
+
+.guess-list-header {
+  position: sticky;
+  top: 0;
+  background-color: black;
+}
