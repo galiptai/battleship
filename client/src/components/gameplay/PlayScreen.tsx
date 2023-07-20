@@ -36,17 +36,15 @@ export function PlayScreen({
           showShips="hit"
         />
       </div>
-      <div className="play-side">
-        <div className="play-player-board">
-          <DrawBoard
-            board={playerBoard}
-            onClick={onClick}
-            highlightAssigner={highlightAssigner}
-            showShips="all"
-          />
-        </div>
-        <div className="play-menu-container">{children}</div>
+      <div className="play-player-board">
+        <DrawBoard
+          board={playerBoard}
+          onClick={onClick}
+          highlightAssigner={highlightAssigner}
+          showShips="all"
+        />
       </div>
+      <div className="play-menu-container">{children}</div>
     </div>
   );
 }

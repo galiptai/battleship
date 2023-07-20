@@ -1,9 +1,9 @@
-import { Ship } from "../logic/Ship";
+import { Ship } from "../../logic/Ship";
 import { Tile, DrawTile, DrawCoordTile } from "./Tile";
 import "./Board.css";
 import { useState } from "react";
 import { Fragment } from "react";
-import { createLetterArray } from "../logic/gameLogic";
+import { createLetterArray } from "../../logic/gameLogic";
 
 export type Board = {
   player: string;

@@ -1,5 +1,5 @@
-import { verifyBoard } from "../logic/gameLogic";
-import { Board } from "./Board";
+import { verifyBoard } from "../../logic/gameLogic";
+import { Board } from "../gameplay/Board";
 import "./NameInput.css";
 
 export type nameInputProps = {

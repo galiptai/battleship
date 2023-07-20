@@ -1,5 +1,5 @@
 import { Coordinate, HighlightType, ShowShips } from "./Board";
-import { ShipType } from "../logic/Ship";
+import { ShipType } from "../../logic/Ship";
 import "./Tile.css";
 
 export type Tile = {

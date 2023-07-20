@@ -1,4 +1,4 @@
-import { Ship } from "../logic/Ship";
+import { Ship } from "../../logic/Ship";
 import "./ShipSelector.css";
 
 export type shipSelectorProps = {

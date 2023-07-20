@@ -1,0 +1,52 @@
+.play-screen {
+  display: grid;
+  grid-template-areas:
+    ". . . . ."
+    ". opp . pla ."
+    ". opp . . ."
+    ". opp . log ."
+    ". . . . .";
+  grid-template-columns: 1fr minmax(50%, 90vh) 20px minmax(30%, 50vh) 1fr;
+  grid-template-rows: 1fr minmax(200px, 50vh) 20px minmax(300px, 40vh) 1fr;
+  padding: 20px;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.play-screen > div {
+  min-height: 0;
+  min-width: 0;
+}
+
+.play-side {
+  height: 100%;
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+}
+
+.play-opponent-board {
+  grid-area: opp;
+  display: flex;
+  align-items: center;
+  max-width: 90vh;
+}
+
+.play-player-board {
+  grid-area: pla;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 50vh;
+}
+
+.play-menu-container {
+  grid-area: log;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}

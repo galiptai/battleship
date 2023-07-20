@@ -9,7 +9,7 @@ import {
   RouterProvider,
   Navigate,
 } from "react-router-dom";
-import Local from "./pages/Local.tsx";
+import { Local } from "./components/local/Local.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements([

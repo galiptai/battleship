@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Board, Coordinate, Guess, Highlight } from "./Board";
+import { Board, Coordinate, Guess, Highlight } from "../gameplay/Board";
 import { SwitchScreen } from "./SwitchScreen";
-import { PlayScreen } from "./PlayScreen";
-import { PlayMenu } from "./PlayMenu";
+import { PlayScreen } from "../gameplay/PlayScreen";
+import { PlayMenu } from "../gameplay/PlayMenu";
 
 type localGameProps = {
   p1Board: Board;

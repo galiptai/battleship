@@ -1,7 +1,12 @@
 import { useState } from "react";
-import { Board, Coordinate, DrawBoard, Highlight } from "./Board";
-import { Ship } from "../logic/Ship";
-import { checkNeighborsEmpty, createEmptyBoard, getShips, verifyBoard } from "../logic/gameLogic";
+import { Board, Coordinate, DrawBoard, Highlight } from "../gameplay/Board";
+import { Ship } from "../../logic/Ship";
+import {
+  checkNeighborsEmpty,
+  createEmptyBoard,
+  getShips,
+  verifyBoard,
+} from "../../logic/gameLogic";
 import "./BoardSetup.css";
 import { SetupMenu } from "./SetupMenu";
 
