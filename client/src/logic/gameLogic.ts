@@ -23,10 +23,10 @@ export function createEmptyBoard(height = 10, width = 10, name = "Player"): Boar
 
 export function getShips(): Ship[] {
   const ships: Ship[] = [];
-  // ships.push(new Ship(ShipType.CAR, 5, []));
-  // ships.push(new Ship(ShipType.BAT, 4, []));
-  // ships.push(new Ship(ShipType.CRU, 3, []));
-  // ships.push(new Ship(ShipType.SUB, 3, []));
+  ships.push(new Ship(ShipType.CAR, 5, []));
+  ships.push(new Ship(ShipType.BAT, 4, []));
+  ships.push(new Ship(ShipType.CRU, 3, []));
+  ships.push(new Ship(ShipType.SUB, 3, []));
   ships.push(new Ship(ShipType.DES, 2, []));
   return ships;
 }
@@ -54,7 +54,7 @@ export function verifyBoard(board: Board): boolean {
   if (board.player === "") {
     return false;
   }
-  if (board.ships.size !== 1) {
+  if (board.ships.size !== 5) {
     return false;
   }
   for (const ship of board.ships) {

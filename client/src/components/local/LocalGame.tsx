@@ -100,7 +100,7 @@ export function LocalGame({
     );
   } else {
     let win = false;
-    if (!canGuess && checkAllBoatsSank(p2Board)) {
+    if (!canGuess && checkAllBoatsSank(p1Board)) {
       win = true;
     }
     return (
