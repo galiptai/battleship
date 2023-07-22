@@ -1,9 +1,9 @@
 import { Ship } from "../../logic/Ship";
 import { Tile, DrawTile, DrawCoordTile } from "./Tile";
 import "./Board.css";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Fragment } from "react";
-import { createLetterArray } from "../../logic/gameLogic";
+import { calculateBoardDimensions, createLetterArray } from "../../logic/renderFunctions";
 
 export type Board = {
   player: string;
@@ -33,6 +33,11 @@ export type Highlight = {
 
 export type ShowShips = "all" | "hit";
 
+export type Dimensions = {
+  height: number;
+  width: number;
+};
+
 type drawBoardProps = {
   board: Board;
   onClick: (selection: Highlight) => void;
@@ -42,33 +47,67 @@ type drawBoardProps = {
 
 export function DrawBoard({ board, onClick, highlightAssigner, showShips }: drawBoardProps) {
   const [hoverCoordinate, setHoverCoordinate] = useState<Coordinate | null>(null);
+  const [boardDimensions, setBoardDimensions] = useState<Dimensions>({ height: 0, width: 0 });
+  const container = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function resize() {
+      if (container.current) {
+        const containerSize = {
+          height: container.current.getBoundingClientRect().height,
+          width: container.current.getBoundingClientRect().width,
+        };
+        setBoardDimensions(calculateBoardDimensions(containerSize, board.height, board.width));
+      }
+    }
+
+    window.addEventListener("resize", resize);
+    return () => window.removeEventListener("resize", resize);
+  }, [board]);
+
+  useEffect(() => {
+    if (container.current) {
+      const containerSize = {
+        height: container.current.getBoundingClientRect().height,
+        width: container.current.getBoundingClientRect().width,
+      };
+      setBoardDimensions(calculateBoardDimensions(containerSize, board.height, board.width));
+    }
+  }, [board]);
 
   const highlight = highlightAssigner(hoverCoordinate);
   return (
-    <div
-      className="board"
-      style={{
-        gridTemplateColumns: `repeat(${board.width + 1}, minmax(20px, 1fr))`,
-      }}
-    >
-      {createLetterArray(board.width).map((letter) => (
-        <DrawCoordTile key={letter} character={letter} />
-      ))}
-      {board.tiles.map((row: Tile[], y) => (
-        <Fragment key={y}>
-          <DrawCoordTile character={y + 1} />
-          {row.map((tile, x) => (
-            <DrawTile
-              key={x}
-              tile={tile}
-              onClick={() => onClick(highlight)}
-              setHoverCoordinate={setHoverCoordinate}
-              highlighted={highlight.tiles.includes(tile) ? highlight.type : "none"}
-              showShip={showShips}
-            />
-          ))}
-        </Fragment>
-      ))}
+    <div className="board-container" ref={container}>
+      <div
+        className="board"
+        style={{
+          gridTemplateColumns: `repeat(${board.width + 1}, ${
+            boardDimensions.width / (board.width + 1)
+          }px)`,
+          height: boardDimensions.height,
+          width: boardDimensions.width,
+          fontSize: boardDimensions.height / (board.height + 1) / 3,
+        }}
+      >
+        {createLetterArray(board.width).map((letter) => (
+          <DrawCoordTile key={letter} character={letter} />
+        ))}
+        {board.tiles.map((row: Tile[], y) => (
+          <Fragment key={y}>
+            <DrawCoordTile character={y + 1} />
+            {row.map((tile, x) => (
+              <DrawTile
+                key={x}
+                tile={tile}
+                onClick={() => onClick(highlight)}
+                setHoverCoordinate={setHoverCoordinate}
+                highlighted={highlight.tiles.includes(tile) ? highlight.type : "none"}
+                showShip={showShips}
+              />
+            ))}
+          </Fragment>
+        ))}
+      </div>
     </div>
   );
 }

@@ -1,8 +1,11 @@
 .play-menu {
   border: 4px solid var(--main-blue);
   font-size: 1.5em;
-  height: 90%;
-  width: 100%;
+  height: 100%;
+  width: max-content;
+  flex: 1;
+  max-width: 600px;
+  box-sizing: border-box;
 }
 
 .play-menu-tabs {

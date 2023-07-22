@@ -12,6 +12,7 @@
   padding: 3px;
   text-align: end;
   box-sizing: border-box;
+  max-width: 100%;
 }
 
 .name-input-invalid {

@@ -26,6 +26,7 @@ export function NameInput({ board, setBoard, setVerified }: nameInputProps) {
         id="name"
         value={board.player}
         onChange={onChange}
+        maxLength={30}
       />
     </div>
   );

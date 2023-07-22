@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useRef } from "react";
 import { Guess } from "./Board";
-import { convertCoordinateToLetter } from "../../logic/gameLogic";
+import { convertCoordinateToLetter } from "../../logic/renderFunctions";
 import "./GuessList.css";
 
 type guessListProps = {

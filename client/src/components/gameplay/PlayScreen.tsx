@@ -8,6 +8,7 @@ type playScreenProps = {
   oppBoardHighlightAssigner: (hoverCoordinate: Coordinate | null) => Highlight;
   children?: JSX.Element;
 };
+
 export function PlayScreen({
   playerBoard,
   opponentBoard,
@@ -28,7 +29,7 @@ export function PlayScreen({
 
   return (
     <div className="play-screen">
-      <div className="play-opponent-board">
+      <div className="play-opponent-board-contatiner">
         <DrawBoard
           board={opponentBoard}
           onClick={onOppBoardClick}
@@ -36,7 +37,7 @@ export function PlayScreen({
           showShips="hit"
         />
       </div>
-      <div className="play-player-board">
+      <div className="play-player-board-contatiner">
         <DrawBoard
           board={playerBoard}
           onClick={onClick}

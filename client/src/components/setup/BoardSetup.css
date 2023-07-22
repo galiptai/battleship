@@ -1,19 +1,23 @@
 .board-setup {
-  display: flex;
-  justify-content: space-evenly;
+  display: grid;
+  grid-template-columns: 3fr minmax(300px, 1fr);
   padding: 20px;
   height: 100%;
+  width: 100%;
   box-sizing: border-box;
   gap: 20px;
 }
 
+.board-setup > div {
+  min-height: 0;
+  min-width: 0;
+}
 .board-setup-board {
-  display: flex;
-  align-items: center;
-  width: 40%;
+  height: 100%;
+  width: 100%;
 }
 
 .board-setup-side {
-  height: 100%;
-  max-width: 40%;
+  display: flex;
+  align-items: center;
 }

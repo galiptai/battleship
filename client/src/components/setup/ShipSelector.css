@@ -3,7 +3,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 20px;
   align-items: center;
   justify-content: center;
   font-size: 2rem;
@@ -16,26 +16,36 @@
 
 .ship-sel-title {
   font-size: 3rem;
+  font-weight: 700;
 }
 
 .ship-sel-horizontal {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  font-size: 1rem;
+  font-size: 0.75em;
+  font-weight: 700;
+}
+
+.ship-sel-horizontal > button {
+  width: 200px;
+  padding: 10px 0;
 }
 
 .ship-sel-opts {
   display: grid;
+  gap: 10px;
 }
 
 .ship-sel-opt {
-  margin: 5px;
   padding: 5px;
+  margin-left: auto;
+  width: fit-content;
 }
 
 .ship-sel-opt:hover:not(.ship-sel-placed) {
   cursor: pointer;
+  font-weight: 600;
 }
 
 .ship-sel-opt:hover:not(.ship-sel-selected, .ship-sel-placed) {

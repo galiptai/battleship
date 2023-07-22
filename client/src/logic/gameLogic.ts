@@ -65,26 +65,6 @@ export function verifyBoard(board: Board): boolean {
   return true;
 }
 
-export function convertCoordinateToLetter(coordinate: number): string {
-  if (coordinate < 0 || coordinate > 25) {
-    throw new Error("Coordinate can't be converted to letter");
-  }
-  const ASCIIShift = 65;
-  return String.fromCharCode(coordinate + ASCIIShift);
-}
-
-export function createLetterArray(width: number): string[] {
-  if (width > 26) {
-    throw new Error("Max board width exceeded");
-  }
-  const letters: string[] = [];
-  for (let i = 0; i < width; i++) {
-    letters.push(convertCoordinateToLetter(i));
-  }
-  letters.unshift("");
-  return letters;
-}
-
 export function checkAllBoatsSank(board: Board): boolean {
   console.log("boo");
   return [...board.ships].every((ship) => ship.isSank());

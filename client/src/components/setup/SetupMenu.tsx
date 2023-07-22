@@ -22,6 +22,7 @@ export function SetupMenu({
 }: setupMenuProps) {
   return (
     <div className="setup-menu">
+      <div className="setup-menu-title">PLACE YOUR SHIPS</div>
       <NameInput board={board} setBoard={setBoard} setVerified={setVerified} />
       <ShipSelector
         shipsToPlace={shipsToPlace}

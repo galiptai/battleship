@@ -20,14 +20,9 @@ export function ShipSelector({
     <div className="ship-selector">
       <div className="ship-sel-title">Ships</div>
       <div className="ship-sel-horizontal">
-        <label htmlFor="horizontal">Horziontal?</label>
-        <input
-          type="checkbox"
-          checked={horizontal}
-          name="horizontal"
-          id="horizontal"
-          onChange={(e) => setHorizontal(e.target.checked)}
-        />
+        <button onClick={() => setHorizontal(!horizontal)}>
+          {horizontal ? "HORIZONTAL" : "VERTICAL"}
+        </button>
       </div>
       <div
         className="ship-sel-opts"
