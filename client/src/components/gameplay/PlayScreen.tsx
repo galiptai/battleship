@@ -16,17 +16,6 @@ export function PlayScreen({
   oppBoardHighlightAssigner,
   children,
 }: playScreenProps) {
-  function onClick(selection: Highlight) {
-    return;
-  }
-
-  function highlightAssigner(hoverCoordinate: Coordinate | null): Highlight {
-    return {
-      type: "neutral",
-      tiles: [],
-    };
-  }
-
   return (
     <div className="play-screen">
       <div className="play-opponent-board-contatiner">
@@ -38,12 +27,7 @@ export function PlayScreen({
         />
       </div>
       <div className="play-player-board-contatiner">
-        <DrawBoard
-          board={playerBoard}
-          onClick={onClick}
-          highlightAssigner={highlightAssigner}
-          showShips="all"
-        />
+        <DrawBoard board={playerBoard} showShips="all" />
       </div>
       <div className="play-menu-container">{children}</div>
     </div>

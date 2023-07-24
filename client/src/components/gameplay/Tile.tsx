@@ -8,9 +8,9 @@ export type Tile = {
   placedShip: Ship | null;
 };
 
-type drawTileProps = {
+type DrawTileProps = {
   tile: Tile;
-  onClick: () => void;
+  onClick?: () => void;
   setHoverCoordinate: (coordinate: Coordinate | null) => void;
   highlighted: HighlightType;
   showShip: ShowShips;
@@ -21,7 +21,7 @@ export function DrawTile({
   setHoverCoordinate,
   highlighted,
   showShip,
-}: drawTileProps) {
+}: DrawTileProps) {
   let placed = "";
 
   if (tile.placedShip !== null && (showShip === "all" || (showShip === "hit" && tile.hit))) {
@@ -45,7 +45,7 @@ export function DrawTile({
 
   return (
     <div
-      onClick={() => onClick()}
+      onClick={onClick ? () => onClick() : undefined}
       onPointerEnter={() => setHoverCoordinate(tile.coordinate)}
       onPointerLeave={() => setHoverCoordinate(null)}
       className={`tile play-tile ${placed}`}
@@ -66,9 +66,9 @@ export function DrawTile({
   );
 }
 
-type drawCoordTileProps = {
+type DrawCoordTileProps = {
   character: number | string;
 };
-export function DrawCoordTile({ character }: drawCoordTileProps) {
+export function DrawCoordTile({ character }: DrawCoordTileProps) {
   return <div className="tile coord-tile">{character}</div>;
 }

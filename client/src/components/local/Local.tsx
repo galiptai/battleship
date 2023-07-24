@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { Board } from "../gameplay/Board";
+import { Board, Guess } from "../gameplay/Board";
 import { BoardSetup } from "../setup/BoardSetup";
 import { LocalGame } from "./LocalGame";
+import { ResultsScreen } from "../gameplay/ResultsScreen";
+import { checkAllBoatsSank } from "../../logic/gameLogic";
 
 export function Local() {
   const [p1Board, setP1Board] = useState<Board | null>(null);
   const [p2Board, setP2Board] = useState<Board | null>(null);
+  const [guesses, setGuesses] = useState<Guess[]>([]);
   const [gameOver, setGameOver] = useState<boolean>(false);
 
   if (p1Board === null) {
@@ -21,10 +24,18 @@ export function Local() {
         setP1Board={setP1Board}
         p2Board={p2Board}
         setP2Board={setP2Board}
+        guesses={guesses}
+        setGuesses={setGuesses}
         setGameOver={setGameOver}
       />
     );
   } else {
-    return <div>Game Over</div>;
+    let winner: string;
+    if (checkAllBoatsSank(p1Board)) {
+      winner = p2Board.player;
+    } else {
+      winner = p1Board.player;
+    }
+    return <ResultsScreen p1Board={p1Board} p2Board={p2Board} winner={winner} guesses={guesses} />;
   }
 }

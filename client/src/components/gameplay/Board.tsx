@@ -38,14 +38,14 @@ export type Dimensions = {
   width: number;
 };
 
-type drawBoardProps = {
+type DrawBoardProps = {
   board: Board;
-  onClick: (selection: Highlight) => void;
-  highlightAssigner: (hoverCoordinate: Coordinate | null) => Highlight;
+  onClick?: (selection: Highlight) => void;
+  highlightAssigner?: (hoverCoordinate: Coordinate | null) => Highlight;
   showShips: ShowShips;
 };
 
-export function DrawBoard({ board, onClick, highlightAssigner, showShips }: drawBoardProps) {
+export function DrawBoard({ board, onClick, highlightAssigner, showShips }: DrawBoardProps) {
   const [hoverCoordinate, setHoverCoordinate] = useState<Coordinate | null>(null);
   const [boardDimensions, setBoardDimensions] = useState<Dimensions>({ height: 0, width: 0 });
   const container = useRef<HTMLDivElement>(null);
@@ -75,7 +75,9 @@ export function DrawBoard({ board, onClick, highlightAssigner, showShips }: draw
     }
   }, [board]);
 
-  const highlight = highlightAssigner(hoverCoordinate);
+  const highlight: Highlight = highlightAssigner
+    ? highlightAssigner(hoverCoordinate)
+    : { type: "none", tiles: [] };
   return (
     <div className="board-container" ref={container}>
       <div
@@ -99,7 +101,7 @@ export function DrawBoard({ board, onClick, highlightAssigner, showShips }: draw
               <DrawTile
                 key={x}
                 tile={tile}
-                onClick={() => onClick(highlight)}
+                onClick={onClick ? () => onClick(highlight) : undefined}
                 setHoverCoordinate={setHoverCoordinate}
                 highlighted={highlight.tiles.includes(tile) ? highlight.type : "none"}
                 showShip={showShips}

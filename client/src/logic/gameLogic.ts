@@ -66,6 +66,5 @@ export function verifyBoard(board: Board): boolean {
 }
 
 export function checkAllBoatsSank(board: Board): boolean {
-  console.log("boo");
   return [...board.ships].every((ship) => ship.isSank());
 }

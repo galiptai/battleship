@@ -23,7 +23,6 @@ export function GuessList({ container, guesses, player1, player2 }: guessListPro
       guessBottom.current &&
       container.getBoundingClientRect().bottom >= guessBottom.current.getBoundingClientRect().top
     ) {
-      console.log(true);
       guessBottom.current?.scrollIntoView({ behavior: "smooth" });
     }
   });

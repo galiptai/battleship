@@ -10,6 +10,8 @@ type localGameProps = {
   p1Board: Board;
   setP1Board: (board: Board) => void;
   p2Board: Board;
+  guesses: Guess[];
+  setGuesses: (guesses: Guess[]) => void;
   setP2Board: (board: Board) => void;
   setGameOver: (gameOver: boolean) => void;
 };
@@ -19,9 +21,10 @@ export function LocalGame({
   setP1Board,
   p2Board,
   setP2Board,
+  guesses,
+  setGuesses,
   setGameOver,
 }: localGameProps) {
-  const [guesses, setGuesses] = useState<Guess[]>([]);
   const [p1Turn, setP1Turn] = useState<boolean>(true);
   const [displaySwitch, setDisplaySwitch] = useState<boolean>(true);
   const [canGuess, setCanGuess] = useState<boolean>(false);
@@ -95,7 +98,7 @@ export function LocalGame({
             </button>
           </PlayMenu>
         </PlayScreen>
-        <EndOverlay display={win} won={true} />
+        <EndOverlay display={win} won={true} setGameOver={setGameOver} />
       </>
     );
   } else {
@@ -117,7 +120,7 @@ export function LocalGame({
             </button>
           </PlayMenu>
         </PlayScreen>
-        <EndOverlay display={win} won={true} />
+        <EndOverlay display={win} won={true} setGameOver={setGameOver} />
       </>
     );
   }
