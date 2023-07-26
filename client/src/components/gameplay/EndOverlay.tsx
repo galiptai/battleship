@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import "./EndOverlay.css";
 
-type endOverLayProps = {
+type EndOverLayProps = {
   display: boolean;
   won: boolean;
   setGameOver: (boolean: boolean) => void;
 };
 
-export function EndOverlay({ display, won, setGameOver }: endOverLayProps) {
+export function EndOverlay({ display, won, setGameOver }: EndOverLayProps) {
   const navigate = useNavigate();
   if (display) {
     return (

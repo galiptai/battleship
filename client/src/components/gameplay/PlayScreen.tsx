@@ -1,11 +1,12 @@
-import { Board, Coordinate, DrawBoard, Highlight } from "./Board";
+import { Board } from "../../logic/Board";
+import { Coordinate, DrawBoard } from "./DrawBoard";
 import "./PlayScreen.css";
 
-type playScreenProps = {
+type PlayScreenProps = {
   playerBoard: Board;
   opponentBoard: Board;
-  onOppBoardClick: (selection: Highlight) => void;
-  oppBoardHighlightAssigner: (hoverCoordinate: Coordinate | null) => Highlight;
+  onOppBoardClick: (coordinate: Coordinate) => void;
+  oppBoardClickCheck: (coordinate: Coordinate) => boolean;
   children?: JSX.Element;
 };
 
@@ -13,20 +14,20 @@ export function PlayScreen({
   playerBoard,
   opponentBoard,
   onOppBoardClick,
-  oppBoardHighlightAssigner,
+  oppBoardClickCheck,
   children,
-}: playScreenProps) {
+}: PlayScreenProps) {
   return (
     <div className="play-screen">
-      <div className="play-opponent-board-contatiner">
+      <div className="play-opponent-board-container">
         <DrawBoard
           board={opponentBoard}
           onClick={onOppBoardClick}
-          highlightAssigner={oppBoardHighlightAssigner}
+          clickCheck={oppBoardClickCheck}
           showShips="hit"
         />
       </div>
-      <div className="play-player-board-contatiner">
+      <div className="play-player-board-container">
         <DrawBoard board={playerBoard} showShips="all" />
       </div>
       <div className="play-menu-container">{children}</div>

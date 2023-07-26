@@ -1,27 +1,18 @@
-import { Ship } from "../../logic/Ship";
 import { Tile, DrawTile, DrawCoordTile } from "./Tile";
-import "./Board.css";
+import "./DrawBoard.css";
 import { useEffect, useRef, useState } from "react";
 import { Fragment } from "react";
-import { calculateBoardDimensions, createLetterArray } from "../../logic/renderFunctions";
-
-export type Board = {
-  player: string;
-  height: number;
-  width: number;
-  ships: Set<Ship>;
-  tiles: Tile[][];
-};
+import {
+  Dimensions,
+  calculateBoardDimensions,
+  createLetterArray,
+} from "../../logic/renderFunctions";
+import { Board } from "../../logic/Board";
+import { ShipPlacement } from "../setup/ShipSelector";
 
 export type Coordinate = {
   y: number;
   x: number;
-};
-
-export type Guess = {
-  coordinate: Coordinate;
-  hit: boolean;
-  player: string;
 };
 
 export type HighlightType = "neutral" | "valid" | "invalid" | "none";
@@ -33,20 +24,27 @@ export type Highlight = {
 
 export type ShowShips = "all" | "hit";
 
-export type Dimensions = {
-  height: number;
-  width: number;
-};
-
 type DrawBoardProps = {
   board: Board;
-  onClick?: (selection: Highlight) => void;
-  highlightAssigner?: (hoverCoordinate: Coordinate | null) => Highlight;
   showShips: ShowShips;
+  highlight?: Highlight;
+  onClick?: (coordinate: Coordinate) => void;
+  clickCheck?: (coordinate: Coordinate) => boolean;
+  onDrop?: (startCoordinate: Coordinate, placement: ShipPlacement) => void;
+  dropCheck?: (startCoordinate: Coordinate, placement: ShipPlacement) => boolean;
+  highlighter?: (startCoordinate: Coordinate | null, placement: ShipPlacement | null) => void;
 };
 
-export function DrawBoard({ board, onClick, highlightAssigner, showShips }: DrawBoardProps) {
-  const [hoverCoordinate, setHoverCoordinate] = useState<Coordinate | null>(null);
+export function DrawBoard({
+  board,
+  showShips,
+  highlight,
+  onClick,
+  clickCheck,
+  onDrop,
+  dropCheck,
+  highlighter,
+}: DrawBoardProps) {
   const [boardDimensions, setBoardDimensions] = useState<Dimensions>({ height: 0, width: 0 });
   const container = useRef<HTMLDivElement>(null);
 
@@ -75,9 +73,6 @@ export function DrawBoard({ board, onClick, highlightAssigner, showShips }: Draw
     }
   }, [board]);
 
-  const highlight: Highlight = highlightAssigner
-    ? highlightAssigner(hoverCoordinate)
-    : { type: "none", tiles: [] };
   return (
     <div className="board-container" ref={container}>
       <div
@@ -101,10 +96,13 @@ export function DrawBoard({ board, onClick, highlightAssigner, showShips }: Draw
               <DrawTile
                 key={x}
                 tile={tile}
-                onClick={onClick ? () => onClick(highlight) : undefined}
-                setHoverCoordinate={setHoverCoordinate}
-                highlighted={highlight.tiles.includes(tile) ? highlight.type : "none"}
+                onClick={onClick}
+                clickCheck={clickCheck}
+                highlighted={highlight && highlight.tiles.includes(tile) ? highlight.type : "none"}
                 showShip={showShips}
+                onDrop={onDrop}
+                dropCheck={dropCheck}
+                highlighter={highlighter}
               />
             ))}
           </Fragment>

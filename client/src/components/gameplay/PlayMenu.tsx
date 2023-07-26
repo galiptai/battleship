@@ -1,24 +1,21 @@
 import { useRef, useState } from "react";
 import "./PlayMenu.css";
 import { GuessList } from "./GuessList";
-import { Guess } from "./Board";
+import { Guess } from "../../logic/gameLogic";
 export type PlayMenuTabs = "Actions" | "Guesses" | "Chat";
 
-type playMenuProps = {
+type PlayMenuProps = {
   children?: JSX.Element | JSX.Element[];
   player1: string;
   player2: string;
   guesses: Guess[];
 };
 
-export function PlayMenu({ guesses, player1, player2, children }: playMenuProps) {
-  const [currentTab, setCurrentTab] = useState<PlayMenuTabs>("Guesses");
+export function PlayMenu({ guesses, player1, player2, children }: PlayMenuProps) {
+  const [currentTab, setCurrentTab] = useState<PlayMenuTabs>("Actions");
   const content = useRef<HTMLDivElement>(null);
 
-  const tabs: PlayMenuTabs[] = ["Guesses"];
-  if (children) {
-    tabs.unshift("Actions");
-  }
+  const tabs: PlayMenuTabs[] = ["Actions", "Guesses"];
 
   function displayTab(): JSX.Element | undefined {
     switch (currentTab) {

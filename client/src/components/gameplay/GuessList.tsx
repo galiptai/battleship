@@ -1,16 +1,16 @@
 import { Fragment, useEffect, useRef } from "react";
-import { Guess } from "./Board";
 import { convertCoordinateToLetter } from "../../logic/renderFunctions";
 import "./GuessList.css";
+import { Guess } from "../../logic/gameLogic";
 
-type guessListProps = {
+type GuessListProps = {
   container: HTMLDivElement | null;
   player1: string;
   player2: string;
   guesses: Guess[];
 };
 
-export function GuessList({ container, guesses, player1, player2 }: guessListProps) {
+export function GuessList({ container, guesses, player1, player2 }: GuessListProps) {
   const guessBottom = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

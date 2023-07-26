@@ -1,11 +1,11 @@
 import "./SwitchScreen.css";
 
-type switchScreenProps = {
+type SwitchScreenProps = {
   player: string;
   setDisplaySwitch: (on: boolean) => void;
   setCanGuess: (boolean: boolean) => void;
 };
-export function SwitchScreen({ player, setDisplaySwitch, setCanGuess }: switchScreenProps) {
+export function SwitchScreen({ player, setDisplaySwitch, setCanGuess }: SwitchScreenProps) {
   function onClick() {
     setCanGuess(true);
     setDisplaySwitch(false);

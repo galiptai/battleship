@@ -1,6 +1,9 @@
-import { Coordinate, HighlightType, ShowShips } from "./Board";
+import { Coordinate, HighlightType, ShowShips } from "./DrawBoard";
 import { Ship } from "../../logic/Ship";
 import "./Tile.css";
+import { useDrop } from "react-dnd";
+import { ShipPlacement } from "../setup/ShipSelector";
+import { useEffect } from "react";
 
 export type Tile = {
   coordinate: Coordinate;
@@ -10,45 +13,68 @@ export type Tile = {
 
 type DrawTileProps = {
   tile: Tile;
-  onClick?: () => void;
-  setHoverCoordinate: (coordinate: Coordinate | null) => void;
   highlighted: HighlightType;
   showShip: ShowShips;
+  onClick?: (coordinate: Coordinate) => void;
+  clickCheck?: (coordinate: Coordinate) => boolean;
+  onDrop?: (startCoordinate: Coordinate, placement: ShipPlacement) => void;
+  dropCheck?: (startCoordinate: Coordinate, placement: ShipPlacement) => boolean;
+  highlighter?: (startCoordinate: Coordinate | null, placement: ShipPlacement | null) => void;
 };
 export function DrawTile({
   tile,
-  onClick,
-  setHoverCoordinate,
   highlighted,
   showShip,
+  onClick,
+  clickCheck,
+  onDrop,
+  dropCheck,
+  highlighter,
 }: DrawTileProps) {
-  let placed = "";
+  const [{ isOver, item }, drop] = useDrop(
+    () => ({
+      accept: "ship",
+      drop: (item: ShipPlacement) => onDrop?.(tile.coordinate, item),
+      canDrop: (item: ShipPlacement) => (dropCheck ? dropCheck(tile.coordinate, item) : false),
+      collect: (monitor) => ({
+        isOver: monitor.isOver(),
+        item: monitor.getItem(),
+      }),
+    }),
+    [tile]
+  );
+
+  useEffect(() => {
+    if (isOver) {
+      highlighter?.(tile.coordinate, item);
+    }
+    return () => highlighter?.(null, null);
+  }, [isOver, highlighter, tile, item]);
+
+  let hasShip = "";
 
   if (tile.placedShip !== null && (showShip === "all" || (showShip === "hit" && tile.hit))) {
-    placed = "tile-placed";
+    hasShip = "tile-ship";
   }
 
   let overlay = "tile-overlay";
   switch (highlighted) {
-    case "neutral":
-      overlay = overlay + " tile-highlight";
-      break;
     case "valid":
       overlay = overlay + " tile-valid";
       break;
     case "invalid":
       overlay = overlay + " tile-invalid";
       break;
-    case "none":
-      overlay = "";
+  }
+  if (clickCheck?.(tile.coordinate)) {
+    overlay = overlay + " tile-clickable";
   }
 
   return (
     <div
-      onClick={onClick ? () => onClick() : undefined}
-      onPointerEnter={() => setHoverCoordinate(tile.coordinate)}
-      onPointerLeave={() => setHoverCoordinate(null)}
-      className={`tile play-tile ${placed}`}
+      onClick={() => onClick?.(tile.coordinate)}
+      className={`tile play-tile ${hasShip}`}
+      ref={drop}
     >
       {tile.hit && (
         <div className="tile-hit">
@@ -60,7 +86,7 @@ export function DrawTile({
         <div>
           Y:{tile.coordinate.y} X:{tile.coordinate.x}
         </div>
-        <div>{placed ? tile.placedShip?.type : ""}</div>
+        <div>{hasShip ? tile.placedShip?.type : ""}</div>
       </div>
     </div>
   );

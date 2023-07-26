@@ -1,36 +1,26 @@
-import { ShipSelector, shipSelectorProps } from "./ShipSelector";
+import { ShipSelector, ShipSelectorProps } from "./ShipSelector";
 import "./SetupMenu.css";
-import { NameInput, nameInputProps } from "./NameInput";
+import { NameInput, NameInputProps } from "./NameInput";
 
-type setupMenuProps = {
+type SetupMenuProps = {
   verified: boolean;
   onReadyClick: () => void;
-} & shipSelectorProps &
-  nameInputProps;
+} & ShipSelectorProps &
+  NameInputProps;
 
 export function SetupMenu({
   board,
   setBoard,
   shipsToPlace,
-  selectedIndex,
-  setSelectedIndex,
-  horizontal,
-  setHorizontal,
   verified,
   setVerified,
   onReadyClick,
-}: setupMenuProps) {
+}: SetupMenuProps) {
   return (
     <div className="setup-menu">
       <div className="setup-menu-title">PLACE YOUR SHIPS</div>
       <NameInput board={board} setBoard={setBoard} setVerified={setVerified} />
-      <ShipSelector
-        shipsToPlace={shipsToPlace}
-        selectedIndex={selectedIndex}
-        setSelectedIndex={setSelectedIndex}
-        horizontal={horizontal}
-        setHorizontal={setHorizontal}
-      />
+      <ShipSelector shipsToPlace={shipsToPlace} />
       <button className="setup-ready-btn" disabled={!verified} onClick={onReadyClick}>
         READY
       </button>

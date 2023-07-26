@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Board, Guess } from "../gameplay/Board";
 import { BoardSetup } from "../setup/BoardSetup";
 import { LocalGame } from "./LocalGame";
 import { ResultsScreen } from "../gameplay/ResultsScreen";
-import { checkAllBoatsSank } from "../../logic/gameLogic";
+import { Board } from "../../logic/Board";
+import { Guess } from "../../logic/gameLogic";
 
 export function Local() {
   const [p1Board, setP1Board] = useState<Board | null>(null);
@@ -31,7 +31,7 @@ export function Local() {
     );
   } else {
     let winner: string;
-    if (checkAllBoatsSank(p1Board)) {
+    if (p1Board.checkAllBoatsSank()) {
       winner = p2Board.player;
     } else {
       winner = p1Board.player;

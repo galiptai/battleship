@@ -1,4 +1,7 @@
-import { Dimensions } from "../components/gameplay/Board";
+export type Dimensions = {
+  height: number;
+  width: number;
+};
 
 export function convertCoordinateToLetter(coordinate: number): string {
   if (coordinate < 0 || coordinate > 25) {

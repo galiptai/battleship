@@ -10,6 +10,7 @@
 
 :root {
   --main-blue: rgb(0, 8, 255);
+  --blue-hover: rgb(0, 170, 255);
   --blue-active: rgb(0, 200, 255);
   --blue-disabled: rgb(0, 0, 100);
 }
@@ -40,8 +41,14 @@ button:disabled {
   color: var(--blue-disabled);
 }
 
-button:hover:not(:disabled) {
-  color: white;
-  cursor: pointer;
+button:active:not(:disabled) {
   background-color: var(--blue-active);
+}
+
+@media (hover: hover) {
+  button:hover:not(:disabled, :active) {
+    color: white;
+    cursor: pointer;
+    background-color: var(--blue-hover);
+  }
 }

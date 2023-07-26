@@ -1,19 +1,17 @@
-import { verifyBoard } from "../../logic/gameLogic";
-import { Board } from "../gameplay/Board";
+import { Board } from "../../logic/Board";
 import "./NameInput.css";
 
-export type nameInputProps = {
+export type NameInputProps = {
   board: Board;
   setBoard: (board: Board) => void;
   setVerified: (verified: boolean) => void;
 };
 
-export function NameInput({ board, setBoard, setVerified }: nameInputProps) {
+export function NameInput({ board, setBoard, setVerified }: NameInputProps) {
   function onChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const newBoard = { ...board };
-    newBoard.player = event.target.value;
-    setBoard(newBoard);
-    setVerified(verifyBoard(newBoard));
+    board.player = event.target.value;
+    setBoard(board.makeCopy());
+    setVerified(board.isValid());
   }
 
   return (

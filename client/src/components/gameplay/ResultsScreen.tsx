@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import { Board, DrawBoard, Guess } from "./Board";
+import { DrawBoard } from "./DrawBoard";
 import "./ResultsScreen.css";
+import { Board } from "../../logic/Board";
+import { Guess } from "../../logic/gameLogic";
 
 type ResultsScreenProps = {
   winner: string;
@@ -17,8 +19,8 @@ export function ResultsScreen({ winner, p1Board, p2Board, guesses }: ResultsScre
       <div className="results-grid">
         <div className="results-stats-player">{p1Board.player}</div>
         <div className="results-stats-player">{p2Board.player}</div>
-        <DrawBoard board={p1Board} showShips="all" />
         <DrawBoard board={p2Board} showShips="all" />
+        <DrawBoard board={p1Board} showShips="all" />
         <GuessStats guesses={guesses.filter((guess) => guess.player === p1Board.player)} />
         <GuessStats guesses={guesses.filter((guess) => guess.player === p2Board.player)} />
       </div>

@@ -1,12 +1,13 @@
 import { useState } from "react";
-import { Board, Coordinate, Guess, Highlight } from "../gameplay/Board";
+import { Coordinate } from "../gameplay/DrawBoard";
 import { SwitchScreen } from "./SwitchScreen";
 import { PlayScreen } from "../gameplay/PlayScreen";
 import { PlayMenu } from "../gameplay/PlayMenu";
 import { EndOverlay } from "../gameplay/EndOverlay";
-import { checkAllBoatsSank } from "../../logic/gameLogic";
+import { Board } from "../../logic/Board";
+import { Guess } from "../../logic/gameLogic";
 
-type localGameProps = {
+type LocalGameProps = {
   p1Board: Board;
   setP1Board: (board: Board) => void;
   p2Board: Board;
@@ -24,46 +25,42 @@ export function LocalGame({
   guesses,
   setGuesses,
   setGameOver,
-}: localGameProps) {
+}: LocalGameProps) {
   const [p1Turn, setP1Turn] = useState<boolean>(true);
   const [displaySwitch, setDisplaySwitch] = useState<boolean>(true);
   const [canGuess, setCanGuess] = useState<boolean>(false);
 
-  function onOppBoardClick(selection: Highlight) {
-    if (selection.type !== "neutral" || selection.tiles.length === 0) {
+  function onOppBoardClick(coordinate: Coordinate) {
+    if (!canGuess) {
       return;
     }
     const board = p1Turn ? p2Board : p1Board;
-    const tile = selection.tiles[0];
-    const setBoard = p1Turn ? setP2Board : setP1Board;
-    tile.hit = true;
-    setBoard({ ...board });
-    const player = p1Turn ? p1Board.player : p2Board.player;
-    guesses.push({
-      coordinate: tile.coordinate,
-      hit: tile.placedShip !== null,
-      player,
-    });
-    setGuesses([...guesses]);
-    setCanGuess(false);
+    const tile = board.tiles[coordinate.y][coordinate.x];
+    if (!tile.hit) {
+      const setBoard = p1Turn ? setP2Board : setP1Board;
+      tile.hit = true;
+      setBoard(board.makeCopy());
+      const player = p1Turn ? p1Board.player : p2Board.player;
+      guesses.push({
+        coordinate: tile.coordinate,
+        hit: tile.placedShip !== null,
+        player,
+      });
+      setGuesses([...guesses]);
+      setCanGuess(false);
+    }
   }
 
-  function oppBoardHighlightAssigner(hoverCoordinate: Coordinate | null): Highlight {
-    const highlight: Highlight = {
-      type: "none",
-      tiles: [],
-    };
-    if (hoverCoordinate === null || !canGuess) {
-      return highlight;
+  function oppBoardClickCheck(coordinate: Coordinate): boolean {
+    if (!canGuess) {
+      return false;
     }
     const board = p1Turn ? p2Board : p1Board;
-    const tile = board.tiles[hoverCoordinate.y][hoverCoordinate.x];
+    const tile = board.tiles[coordinate.y][coordinate.x];
     if (!tile.hit) {
-      highlight.type = "neutral";
-      highlight.tiles.push(tile);
+      return true;
     }
-
-    return highlight;
+    return false;
   }
 
   function onPassClick() {
@@ -79,40 +76,21 @@ export function LocalGame({
         setCanGuess={setCanGuess}
       />
     );
-  } else if (p1Turn) {
-    let win = false;
-    if (!canGuess && checkAllBoatsSank(p2Board)) {
-      win = true;
-    }
-    return (
-      <>
-        <PlayScreen
-          playerBoard={p1Board}
-          opponentBoard={p2Board}
-          onOppBoardClick={onOppBoardClick}
-          oppBoardHighlightAssigner={oppBoardHighlightAssigner}
-        >
-          <PlayMenu guesses={guesses} player1={p1Board.player} player2={p2Board.player}>
-            <button onClick={onPassClick} disabled={canGuess || win}>
-              PASS
-            </button>
-          </PlayMenu>
-        </PlayScreen>
-        <EndOverlay display={win} won={true} setGameOver={setGameOver} />
-      </>
-    );
   } else {
+    const playerBoard = p1Turn ? p1Board : p2Board;
+    const opponentBoard = p1Turn ? p2Board : p1Board;
     let win = false;
-    if (!canGuess && checkAllBoatsSank(p1Board)) {
+    if (!canGuess && opponentBoard.checkAllBoatsSank()) {
       win = true;
     }
+
     return (
       <>
         <PlayScreen
-          playerBoard={p2Board}
-          opponentBoard={p1Board}
+          playerBoard={playerBoard}
+          opponentBoard={opponentBoard}
           onOppBoardClick={onOppBoardClick}
-          oppBoardHighlightAssigner={oppBoardHighlightAssigner}
+          oppBoardClickCheck={oppBoardClickCheck}
         >
           <PlayMenu guesses={guesses} player1={p1Board.player} player2={p2Board.player}>
             <button onClick={onPassClick} disabled={canGuess || win}>

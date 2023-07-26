@@ -17,14 +17,8 @@
   font-size: 1.75em;
 }
 
-.tile-highlight {
-  background-color: rgba(128, 128, 128, 0.75);
-  cursor: pointer;
-}
-
 .tile-valid {
   background-color: rgba(0, 255, 0, 0.75);
-  cursor: pointer;
 }
 
 .tile-invalid {
@@ -37,9 +31,10 @@
   width: 100%;
   top: 0;
   left: 0;
+  box-sizing: border-box;
 }
 
-.tile-placed {
+.tile-ship {
   background-color: gray;
 }
 
@@ -76,4 +71,11 @@
   font-size: 10px;
   align-items: center;
   justify-content: center;
+}
+
+@media (hover: hover) {
+  .tile-clickable:hover {
+    border: 0.5em dashed var(--blue-hover);
+    cursor: pointer;
+  }
 }

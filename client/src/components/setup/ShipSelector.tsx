@@ -1,27 +1,27 @@
+import { useState } from "react";
 import { Ship } from "../../logic/Ship";
 import "./ShipSelector.css";
+import { useDrag } from "react-dnd";
+import { usePreview } from "react-dnd-multi-backend";
 
-export type shipSelectorProps = {
-  shipsToPlace: Ship[];
-  selectedIndex: number;
-  setSelectedIndex: (index: number) => void;
-  horizontal: boolean;
-  setHorizontal: (horizontal: boolean) => void;
+export type ShipPlacement = {
+  ship: Ship;
+  vertical: boolean;
 };
 
-export function ShipSelector({
-  shipsToPlace,
-  selectedIndex,
-  setSelectedIndex,
-  horizontal,
-  setHorizontal,
-}: shipSelectorProps) {
+export type ShipSelectorProps = {
+  shipsToPlace: Ship[];
+};
+
+export function ShipSelector({ shipsToPlace }: ShipSelectorProps) {
+  const [vertical, setVertical] = useState<boolean>(true);
   return (
     <div className="ship-selector">
+      <DraggedShipPreview />
       <div className="ship-sel-title">Ships</div>
-      <div className="ship-sel-horizontal">
-        <button onClick={() => setHorizontal(!horizontal)}>
-          {horizontal ? "HORIZONTAL" : "VERTICAL"}
+      <div className="ship-sel-vertical">
+        <button onClick={() => setVertical(!vertical)}>
+          {vertical ? "VERTICAL" : "HORIZONTAL"}
         </button>
       </div>
       <div
@@ -29,45 +29,55 @@ export function ShipSelector({
         style={{ gridTemplateRows: `repeat(${shipsToPlace.length}, 1fr)` }}
       >
         {shipsToPlace.map((ship, i) => (
-          <ShipSelectOption
-            key={i}
-            ship={ship}
-            index={i}
-            selected={i === selectedIndex}
-            setSelectedIndex={setSelectedIndex}
-          />
+          <ShipSelectOption key={i} ship={ship} vertical={vertical} />
         ))}
       </div>
     </div>
   );
 }
 
-type shipSelectOptionProps = {
+type ShipSelectOptionProps = {
   ship: Ship;
-  index: number;
-  selected: boolean;
-  setSelectedIndex: (index: number) => void;
+  vertical: boolean;
 };
 
-function ShipSelectOption({ ship, index, selected, setSelectedIndex }: shipSelectOptionProps) {
+function ShipSelectOption({ ship, vertical }: ShipSelectOptionProps) {
+  const [{ isDragging }, drag] = useDrag(
+    () => ({
+      type: "ship",
+      item: { ship: ship, vertical: vertical },
+      collect: (monitor) => ({
+        isDragging: !!monitor.isDragging(),
+      }),
+    }),
+    [vertical]
+  );
+
   const placed = ship.tiles.length !== 0;
   let classes = "ship-sel-opt";
   if (placed) {
     classes = classes + " ship-sel-placed";
-  } else if (selected) {
-    classes = classes + " ship-sel-selected";
   }
-
-  function onClick() {
-    if (selected) {
-      setSelectedIndex(-1);
-    } else if (!placed) {
-      setSelectedIndex(index);
-    }
+  if (isDragging) {
+    classes = classes + " ship-sel-dragged";
   }
   return (
-    <div className={classes} onClick={onClick}>
+    <div className={classes} ref={placed ? undefined : drag}>
       {ship.type}
+    </div>
+  );
+}
+
+function DraggedShipPreview(): JSX.Element | null {
+  const preview = usePreview<ShipPlacement>();
+  if (!preview.display) {
+    return null;
+  }
+  const { style, item } = preview;
+  console.log(style);
+  return (
+    <div className="ship-sel-opt ship-sel-dragged" style={{ ...style, width: "fit-content" }}>
+      {item.ship.type}
     </div>
   );
 }

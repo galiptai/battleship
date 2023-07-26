@@ -22,11 +22,11 @@
   font-weight: 600;
 }
 
-.play-opponent-board-contatiner {
+.play-opponent-board-container {
   grid-area: opp;
 }
 
-.play-player-board-contatiner {
+.play-player-board-container {
   grid-area: pla;
 }
 
