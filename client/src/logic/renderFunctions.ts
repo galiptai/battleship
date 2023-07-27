@@ -31,6 +31,7 @@ export function calculateBoardDimensions(
   const requiredTileSizeHeight = containerSize.height / height;
   const requiredTileSizeWidth = containerSize.width / width;
   const tileSize = Math.floor(Math.min(requiredTileSizeHeight, requiredTileSizeWidth));
+  console.log(tileSize);
   return {
     height: tileSize * height,
     width: tileSize * width,

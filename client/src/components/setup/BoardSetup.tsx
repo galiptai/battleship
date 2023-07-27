@@ -74,6 +74,14 @@ export function BoardSetup({ starterName, setVerifiedBoard }: BoardSetupProps) {
 
   return (
     <div className="board-setup">
+      <div className="board-setup-menu">
+        <SetupMenu
+          board={board}
+          setBoard={setBoard}
+          shipsToPlace={shipsToPlace}
+          setVerified={setVerified}
+        />
+      </div>
       <div className="board-setup-board">
         <DrawBoard
           board={board}
@@ -86,15 +94,10 @@ export function BoardSetup({ starterName, setVerifiedBoard }: BoardSetupProps) {
           highlight={highlight}
         />
       </div>
-      <div className="board-setup-side">
-        <SetupMenu
-          board={board}
-          setBoard={setBoard}
-          shipsToPlace={shipsToPlace}
-          verified={verified}
-          setVerified={setVerified}
-          onReadyClick={onReadyClick}
-        />
+      <div className="board-setup-ready">
+        <button disabled={!verified} onClick={onReadyClick}>
+          READY
+        </button>
       </div>
     </div>
   );

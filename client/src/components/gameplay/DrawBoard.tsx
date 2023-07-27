@@ -55,7 +55,9 @@ export function DrawBoard({
           height: container.current.getBoundingClientRect().height,
           width: container.current.getBoundingClientRect().width,
         };
-        setBoardDimensions(calculateBoardDimensions(containerSize, board.height, board.width));
+        setBoardDimensions(
+          calculateBoardDimensions(containerSize, board.height + 1, board.width + 1)
+        );
       }
     }
 
@@ -69,7 +71,9 @@ export function DrawBoard({
         height: container.current.getBoundingClientRect().height,
         width: container.current.getBoundingClientRect().width,
       };
-      setBoardDimensions(calculateBoardDimensions(containerSize, board.height, board.width));
+      setBoardDimensions(
+        calculateBoardDimensions(containerSize, board.height + 1, board.width + 1)
+      );
     }
   }, [board]);
 

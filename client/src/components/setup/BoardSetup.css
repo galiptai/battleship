@@ -1,6 +1,10 @@
 .board-setup {
   display: grid;
+  grid-template-areas:
+    "boa men"
+    "boa but";
   grid-template-columns: 3fr minmax(300px, 1fr);
+  grid-template-rows: 1fr 100px;
   padding: 20px;
   height: 100%;
   width: 100%;
@@ -13,11 +17,52 @@
   min-width: 0;
 }
 .board-setup-board {
+  grid-area: boa;
   height: 100%;
   width: 100%;
 }
 
-.board-setup-side {
+.board-setup-menu {
+  grid-area: men;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+}
+
+.board-setup-ready {
+  grid-area: but;
+  display: flex;
+}
+
+.board-setup-ready > button {
+  flex: 1;
+  font-weight: 900;
+  font-size: 2em;
+}
+
+@media all and (max-width: 800px) {
+  .board-setup {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    gap: 10px;
+  }
+
+  .board-setup-board {
+    width: 100%;
+    flex: 1;
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
+
+  .board-setup-menu {
+    display: block;
+    max-height: 45%;
+    padding: 10px 10px 0 10px;
+    box-sizing: border-box;
+  }
+  .board-setup-ready {
+    display: flex;
+    height: 50px;
+  }
 }

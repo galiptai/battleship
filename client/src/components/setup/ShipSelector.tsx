@@ -18,19 +18,18 @@ export function ShipSelector({ shipsToPlace }: ShipSelectorProps) {
   return (
     <div className="ship-selector">
       <DraggedShipPreview />
-      <div className="ship-sel-title">Ships</div>
       <div className="ship-sel-vertical">
         <button onClick={() => setVertical(!vertical)}>
           {vertical ? "VERTICAL" : "HORIZONTAL"}
         </button>
       </div>
-      <div
-        className="ship-sel-opts"
-        style={{ gridTemplateRows: `repeat(${shipsToPlace.length}, 1fr)` }}
-      >
-        {shipsToPlace.map((ship, i) => (
-          <ShipSelectOption key={i} ship={ship} vertical={vertical} />
-        ))}
+      <div className="ship-sel-opts-container">
+        <div className="ship-sel-opts-instruction">↓&nbsp;Drag ships to the board&nbsp;↓</div>
+        <div className="ship-sel-opts">
+          {shipsToPlace.map((ship, i) => (
+            <ShipSelectOption key={i} ship={ship} vertical={vertical} />
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -74,9 +73,11 @@ function DraggedShipPreview(): JSX.Element | null {
     return null;
   }
   const { style, item } = preview;
-  console.log(style);
   return (
-    <div className="ship-sel-opt ship-sel-dragged" style={{ ...style, width: "fit-content" }}>
+    <div
+      className="ship-sel-opt ship-sel-dragged"
+      style={{ ...style, width: "fit-content", zIndex: "101", opacity: "0.5" }}
+    >
       {item.ship.type}
     </div>
   );

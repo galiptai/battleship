@@ -13,7 +13,7 @@ export function createEmptyBoard(height = 10, width = 10, name = "Player"): Boar
   const tiles: Tile[][] = [];
   for (let y = 0; y < height; y++) {
     const row: Tile[] = [];
-    for (let x = 0; x < 10; x++) {
+    for (let x = 0; x < width; x++) {
       row[x] = { coordinate: { y, x }, hit: false, placedShip: null };
     }
     tiles[y] = row;

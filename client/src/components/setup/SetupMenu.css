@@ -11,11 +11,19 @@
 .setup-menu-title {
   text-align: end;
   font-weight: 900;
-  font-size: 60px;
+  font-size: calc(5vh);
 }
 
-.setup-ready-btn {
-  font-weight: 900;
-  font-size: 2em;
-  padding: 2em;
+@media all and (max-width: 800px) {
+  .setup-menu {
+    width: 100%;
+    min-width: unset;
+    justify-content: unset;
+    gap: 10px;
+  }
+
+  .setup-menu-title {
+    text-align: center;
+    font-size: calc(8vw);
+  }
 }

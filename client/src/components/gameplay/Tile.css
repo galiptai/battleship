@@ -10,7 +10,7 @@
 }
 
 .play-tile {
-  border: 2px solid white;
+  border: 1px solid rgb(200, 200, 200);
 }
 
 .coord-tile {
@@ -75,7 +75,7 @@
 
 @media (hover: hover) {
   .tile-clickable:hover {
-    border: 0.5em dashed var(--blue-hover);
+    border: 0.6em dashed var(--blue-hover);
     cursor: pointer;
   }
 }

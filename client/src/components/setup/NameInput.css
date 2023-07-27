@@ -1,5 +1,5 @@
 .name-input {
-  font-size: 2rem;
+  font-size: 3.5vh;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -17,4 +17,13 @@
 
 .name-input-invalid {
   border: 2px solid red !important;
+}
+
+@media all and (max-width: 800px) {
+  .name-input {
+    font-size: 5vw;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
 }
