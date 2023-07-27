@@ -12,7 +12,7 @@ export function EndOverlay({ display, won, setGameOver }: EndOverLayProps) {
   if (display) {
     return (
       <div className="end-overlay">
-        <div></div>
+        <div className="end-overlay-placeholder"></div>
         <div className="end-overlay-text">You {won ? "Win" : "Lose"}!</div>
         <div className="end-overlay-buttons">
           <button onClick={() => setGameOver(true)}>SEE RESULTS</button>

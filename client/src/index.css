@@ -31,6 +31,7 @@ body,
 
 button {
   all: unset;
+  user-select: none;
   font-family: "TASAExplorer";
   background-color: var(--main-blue);
   color: black;

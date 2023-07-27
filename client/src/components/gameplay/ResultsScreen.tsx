@@ -16,13 +16,19 @@ export function ResultsScreen({ winner, p1Board, p2Board, guesses }: ResultsScre
   return (
     <div className="results">
       <div className="results-won">{winner} won!</div>
-      <div className="results-grid">
-        <div className="results-stats-player">{p1Board.player}</div>
-        <div className="results-stats-player">{p2Board.player}</div>
-        <DrawBoard board={p2Board} showShips="all" />
-        <DrawBoard board={p1Board} showShips="all" />
-        <GuessStats guesses={guesses.filter((guess) => guess.player === p1Board.player)} />
-        <GuessStats guesses={guesses.filter((guess) => guess.player === p2Board.player)} />
+      <div className="results-grid-container">
+        <div className="results-grid">
+          <div className="results-stats-player">
+            <div>{p1Board.player}</div>
+          </div>
+          <div className="results-stats-player">
+            <div>{p2Board.player}</div>
+          </div>
+          <DrawBoard board={p2Board} showShips="all" />
+          <DrawBoard board={p1Board} showShips="all" />
+          <GuessStats guesses={guesses.filter((guess) => guess.player === p1Board.player)} />
+          <GuessStats guesses={guesses.filter((guess) => guess.player === p2Board.player)} />
+        </div>
       </div>
       <button className="results-button" onClick={() => navigate("/")}>
         MAIN MENU

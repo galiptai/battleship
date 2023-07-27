@@ -14,6 +14,10 @@ export function NameInput({ board, setBoard, setVerified }: NameInputProps) {
     setVerified(board.isValid());
   }
 
+  function onFocus(event: React.FocusEvent<HTMLInputElement>) {
+    event.target.select();
+  }
+
   return (
     <div className="name-input">
       <label htmlFor="name">Name: </label>
@@ -24,6 +28,7 @@ export function NameInput({ board, setBoard, setVerified }: NameInputProps) {
         id="name"
         value={board.player}
         onChange={onChange}
+        onFocus={onFocus}
         maxLength={30}
       />
     </div>

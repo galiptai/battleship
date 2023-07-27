@@ -7,7 +7,6 @@
   grid-template-rows: 1fr 1fr 1fr;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
   background: radial-gradient(rgba(0, 0, 0) 25%, rgba(50, 50, 50, 0.5));
 }
 
@@ -33,4 +32,30 @@
   width: 25vh;
   text-align: center;
   font-weight: 900;
+}
+
+@media all and (max-width: 800px) {
+  .end-overlay {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    background: radial-gradient(circle, rgba(0, 0, 0) 30%, rgba(50, 50, 50, 0.5));
+  }
+
+  .end-overlay-placeholder {
+    display: none;
+  }
+
+  .end-overlay-text {
+    font-size: 20vw;
+  }
+
+  .end-overlay-buttons {
+    height: unset;
+  }
+
+  .end-overlay-buttons > button {
+    font-size: 8vw;
+    width: 50vw;
+  }
 }

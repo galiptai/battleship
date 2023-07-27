@@ -19,3 +19,8 @@
   background-color: black;
   overflow-wrap: break-word;
 }
+
+.guess-list-header > div:not(:last-child) {
+  box-sizing: border-box;
+  border-right: 2px solid var(--main-blue);
+}

@@ -15,6 +15,11 @@
   max-width: 100%;
 }
 
+.name-input > input::selection {
+  background-color: var(--blue-active);
+  color: black;
+}
+
 .name-input-invalid {
   border: 2px solid red !important;
 }
