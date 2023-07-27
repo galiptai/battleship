@@ -17,4 +17,5 @@
   position: sticky;
   top: 0;
   background-color: black;
+  overflow-wrap: break-word;
 }

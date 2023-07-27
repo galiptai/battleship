@@ -71,3 +71,24 @@
   background-color: var(--blue-disabled);
   color: black;
 }
+
+@media all and (max-width: 800px) {
+  .play-menu {
+    font-size: 5vw;
+    width: max-content;
+    flex: 1;
+    max-width: unset;
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
+  .play-menu-tabs > button {
+    height: 7vw;
+  }
+
+  .tab-content {
+    border-top: unset;
+    border-bottom: 4px solid var(--main-blue);
+    height: calc(100% - 7vw);
+  }
+}

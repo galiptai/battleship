@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Board } from "../../logic/Board";
 import { Coordinate, DrawBoard } from "./DrawBoard";
 import "./PlayScreen.css";
@@ -17,9 +18,20 @@ export function PlayScreen({
   oppBoardClickCheck,
   children,
 }: PlayScreenProps) {
+  const [showPlayerBoard, setShowPlayerBoard] = useState<boolean>(false);
+
   return (
     <div className="play-screen">
-      <div className="play-opponent-board-container">
+      <div className="play-board-switcher">
+        <button onClick={() => setShowPlayerBoard(false)} disabled={!showPlayerBoard}>
+          OPPONENT'S BOARD
+        </button>
+        <button onClick={() => setShowPlayerBoard(true)} disabled={showPlayerBoard}>
+          YOUR BOARD
+        </button>
+      </div>
+      <div className="play-board-placeholder"></div>
+      <div className={`play-opponent-board-container ${showPlayerBoard ? "play-hide" : ""}`}>
         <DrawBoard
           board={opponentBoard}
           onClick={onOppBoardClick}
@@ -27,7 +39,7 @@ export function PlayScreen({
           showShips="hit"
         />
       </div>
-      <div className="play-player-board-container">
+      <div className={`play-player-board-container ${!showPlayerBoard ? "play-hide" : ""}`}>
         <DrawBoard board={playerBoard} showShips="all" />
       </div>
       <div className="play-menu-container">{children}</div>

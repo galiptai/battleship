@@ -22,10 +22,6 @@ export class Board {
     return new Board(this.player, this.height, this.width, this.ships, this.tiles);
   }
 
-  setName(name: string) {
-    this.player = name;
-  }
-
   isValid() {
     if (this.player === "") {
       return false;

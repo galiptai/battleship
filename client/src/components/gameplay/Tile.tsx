@@ -41,7 +41,7 @@ export function DrawTile({
         item: monitor.getItem(),
       }),
     }),
-    [tile]
+    [tile, onDrop, dropCheck]
   );
 
   useEffect(() => {

@@ -49,7 +49,7 @@ function ShipSelectOption({ ship, vertical }: ShipSelectOptionProps) {
         isDragging: !!monitor.isDragging(),
       }),
     }),
-    [vertical]
+    [ship, vertical]
   );
 
   const placed = ship.tiles.length !== 0;
