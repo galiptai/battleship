@@ -1,6 +1,6 @@
 import { Tile, DrawTile, DrawCoordTile } from "./Tile";
 import "./DrawBoard.css";
-import { useEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Fragment } from "react";
 import {
   Dimensions,
@@ -47,8 +47,9 @@ export function DrawBoard({
 }: DrawBoardProps) {
   const [boardDimensions, setBoardDimensions] = useState<Dimensions>({ height: 0, width: 0 });
   const container = useRef<HTMLDivElement>(null);
+  const componentDidMount = useRef<boolean>(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     function resize() {
       if (container.current) {
         const containerSize = {
@@ -60,21 +61,12 @@ export function DrawBoard({
         );
       }
     }
-
+    if (!componentDidMount.current) {
+      resize();
+      componentDidMount.current = true;
+    }
     window.addEventListener("resize", resize);
     return () => window.removeEventListener("resize", resize);
-  }, [board]);
-
-  useEffect(() => {
-    if (container.current) {
-      const containerSize = {
-        height: container.current.getBoundingClientRect().height,
-        width: container.current.getBoundingClientRect().width,
-      };
-      setBoardDimensions(
-        calculateBoardDimensions(containerSize, board.height + 1, board.width + 1)
-      );
-    }
   }, [board]);
 
   return (
