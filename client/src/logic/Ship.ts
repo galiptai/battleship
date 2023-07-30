@@ -1,26 +1,16 @@
 import { Tile } from "../components/gameplay/Tile";
 
-export enum ShipType {
-  "CAR" = "Carrier",
-  "BAT" = "Battleship",
-  "CRU" = "Cruiser",
-  "SUB" = "Submarine",
-  "DES" = "Destroyer",
-}
-
 export class Ship {
   type: ShipType;
-  length: number;
   tiles: Tile[];
 
-  constructor(type: ShipType, length: number, tiles: Tile[]) {
+  constructor(type: ShipType, tiles: Tile[]) {
     this.type = type;
-    this.length = length;
     this.tiles = tiles;
   }
 
   setTiles(tiles: Tile[]) {
-    if (tiles.length !== this.length || tiles.some((tile) => tile.placedShip !== null)) {
+    if (tiles.length !== this.type.length || tiles.some((tile) => tile.placedShip !== null)) {
       throw new Error("Ship can't be placed here!");
     } else {
       this.tiles = tiles;
@@ -41,3 +31,30 @@ export class Ship {
     return this.tiles.every((tile) => tile.hit);
   }
 }
+
+export const SHIP_TYPES = {
+  CAR: {
+    name: "Carrier",
+    length: 5,
+  },
+  BAT: {
+    name: "Battleship",
+    length: 4,
+  },
+  CRU: {
+    name: "Cruiser",
+    length: 3,
+  },
+  SUB: {
+    name: "Submarine",
+    length: 3,
+  },
+  DES: {
+    name: "Destroyer",
+    length: 2,
+  },
+} as const;
+
+type ObjectValues<T> = T[keyof T];
+
+export type ShipType = ObjectValues<typeof SHIP_TYPES>;

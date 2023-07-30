@@ -1,105 +1,59 @@
-import { useState } from "react";
-import { Coordinate } from "../gameplay/DrawBoard";
-import { SwitchScreen } from "./SwitchScreen";
-import { PlayScreen } from "../gameplay/PlayScreen";
-import { PlayMenu } from "../gameplay/PlayMenu";
-import { EndOverlay } from "../gameplay/EndOverlay";
+import { useEffect, useState, useRef } from "react";
+import { BoardSetup } from "../setup/BoardSetup";
+import { LocalPlay } from "./LocalPlay";
+import { ResultsScreen } from "../gameplay/ResultsScreen";
 import { Board } from "../../logic/Board";
 import { Guess } from "../../logic/gameLogic";
+import { GameSave } from "../../logic/GameSave";
 
 type LocalGameProps = {
-  p1Board: Board;
-  setP1Board: (board: Board) => void;
-  p2Board: Board;
-  guesses: Guess[];
-  setGuesses: (guesses: Guess[]) => void;
-  setP2Board: (board: Board) => void;
-  setGameOver: (gameOver: boolean) => void;
+  save: GameSave;
+  updateSave: (save: GameSave) => void;
+  deleteSave: () => void;
 };
 
-export function LocalGame({
-  p1Board,
-  setP1Board,
-  p2Board,
-  setP2Board,
-  guesses,
-  setGuesses,
-  setGameOver,
-}: LocalGameProps) {
-  const [p1Turn, setP1Turn] = useState<boolean>(true);
-  const [displaySwitch, setDisplaySwitch] = useState<boolean>(true);
-  const [canGuess, setCanGuess] = useState<boolean>(false);
+export function LocalGame({ save, updateSave, deleteSave }: LocalGameProps) {
+  const [p1Board, setP1Board] = useState<Board | null>(save.getP1Board());
+  const [p2Board, setP2Board] = useState<Board | null>(save.getP2Board());
+  const [guesses, setGuesses] = useState<Guess[]>(save.guesses);
+  const [winner, setWinner] = useState<string | null>(null);
+  const [displayResults, setDisplayResults] = useState<boolean>(false);
+  const componentDidMount = useRef<boolean>(false);
 
-  function onOppBoardClick(coordinate: Coordinate) {
-    if (!canGuess) {
-      return;
+  useEffect(() => {
+    if (componentDidMount.current) {
+      if (winner == null) {
+        updateSave(GameSave.fromGameObjects(p1Board, p2Board, guesses, new Date()));
+      } else {
+        deleteSave();
+      }
+    } else {
+      componentDidMount.current = true;
     }
-    const board = p1Turn ? p2Board : p1Board;
-    const tile = board.tiles[coordinate.y][coordinate.x];
-    if (!tile.hit) {
-      const setBoard = p1Turn ? setP2Board : setP1Board;
-      tile.hit = true;
-      setBoard(board.makeCopy());
-      const player = p1Turn ? p1Board.player : p2Board.player;
-      guesses.push({
-        coordinate: tile.coordinate,
-        hit: tile.placedShip !== null,
-        player,
-      });
-      setGuesses([...guesses]);
-      setCanGuess(false);
-    }
+  }, [updateSave, p1Board, p2Board, guesses, winner, deleteSave]);
+
+  if (p1Board === null) {
+    return <BoardSetup key="P1" starterName={"Player 1"} setVerifiedBoard={setP1Board} />;
+  } else if (p2Board === null) {
+    return <BoardSetup key="P2" starterName={"Player 2"} setVerifiedBoard={setP2Board} />;
   }
 
-  function oppBoardClickCheck(coordinate: Coordinate): boolean {
-    if (!canGuess) {
-      return false;
-    }
-    const board = p1Turn ? p2Board : p1Board;
-    const tile = board.tiles[coordinate.y][coordinate.x];
-    if (!tile.hit) {
-      return true;
-    }
-    return false;
-  }
-
-  function onPassClick() {
-    setDisplaySwitch(true);
-    setP1Turn(!p1Turn);
-  }
-
-  if (displaySwitch) {
+  if (!displayResults) {
     return (
-      <SwitchScreen
-        player={p1Turn ? p1Board.player : p2Board.player}
-        setDisplaySwitch={setDisplaySwitch}
-        setCanGuess={setCanGuess}
+      <LocalPlay
+        p1Board={p1Board}
+        setP1Board={setP1Board}
+        p2Board={p2Board}
+        setP2Board={setP2Board}
+        guesses={guesses}
+        setGuesses={setGuesses}
+        setDisplayResults={setDisplayResults}
+        p1Starts={save.getP1TurnNext()}
+        winner={winner}
+        setWinner={setWinner}
       />
     );
-  } else {
-    const playerBoard = p1Turn ? p1Board : p2Board;
-    const opponentBoard = p1Turn ? p2Board : p1Board;
-    let win = false;
-    if (!canGuess && opponentBoard.checkAllBoatsSank()) {
-      win = true;
-    }
-
-    return (
-      <>
-        <PlayScreen
-          playerBoard={playerBoard}
-          opponentBoard={opponentBoard}
-          onOppBoardClick={onOppBoardClick}
-          oppBoardClickCheck={oppBoardClickCheck}
-        >
-          <PlayMenu guesses={guesses} player1={p1Board.player} player2={p2Board.player}>
-            <button onClick={onPassClick} disabled={canGuess || win}>
-              PASS
-            </button>
-          </PlayMenu>
-        </PlayScreen>
-        <EndOverlay display={win} won={true} setGameOver={setGameOver} />
-      </>
-    );
+  } else if (winner) {
+    return <ResultsScreen p1Board={p1Board} p2Board={p2Board} winner={winner} guesses={guesses} />;
   }
 }

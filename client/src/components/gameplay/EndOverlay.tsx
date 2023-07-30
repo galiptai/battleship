@@ -3,19 +3,19 @@ import "./EndOverlay.css";
 
 type EndOverLayProps = {
   display: boolean;
-  won: boolean;
-  setGameOver: (boolean: boolean) => void;
+  playerIsWinner: boolean;
+  setDisplayResults: (displayResults: boolean) => void;
 };
 
-export function EndOverlay({ display, won, setGameOver }: EndOverLayProps) {
+export function EndOverlay({ display, playerIsWinner, setDisplayResults }: EndOverLayProps) {
   const navigate = useNavigate();
   if (display) {
     return (
       <div className="end-overlay">
         <div className="end-overlay-placeholder"></div>
-        <div className="end-overlay-text">You {won ? "Win" : "Lose"}!</div>
+        <div className="end-overlay-text">You {playerIsWinner ? "Win" : "Lose"}!</div>
         <div className="end-overlay-buttons">
-          <button onClick={() => setGameOver(true)}>SEE RESULTS</button>
+          <button onClick={() => setDisplayResults(true)}>SEE RESULTS</button>
           <button onClick={() => navigate("/")}>MAIN MENU</button>
         </div>
       </div>

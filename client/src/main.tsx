@@ -9,14 +9,14 @@ import {
   RouterProvider,
   Navigate,
 } from "react-router-dom";
-import { Local } from "./components/local/Local.tsx";
 import { DndProvider } from "react-dnd-multi-backend";
 import { HTML5toTouch } from "rdndmb-html5-to-touch";
+import { LocalLoader } from "./components/local/LocalLoader.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements([
     <Route path="/" element={<App />} />,
-    <Route path="/local" element={<Local />} />,
+    <Route path="/local" element={<LocalLoader />} />,
     <Route path="*" element={<Navigate to="/" />} />,
   ])
 );

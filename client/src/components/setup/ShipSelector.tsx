@@ -62,7 +62,7 @@ function ShipSelectOption({ ship, vertical }: ShipSelectOptionProps) {
   }
   return (
     <div className={classes} ref={placed ? undefined : drag}>
-      {ship.type}
+      {ship.type.name}
     </div>
   );
 }
@@ -78,7 +78,7 @@ function DraggedShipPreview(): JSX.Element | null {
       className="ship-sel-opt ship-sel-dragged"
       style={{ ...style, width: "fit-content", zIndex: "101", opacity: "0.5" }}
     >
-      {item.ship.type}
+      {item.ship.type.name}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { Coordinate } from "../components/gameplay/DrawBoard";
 import { Tile } from "../components/gameplay/Tile";
 import { Board } from "./Board";
-import { Ship, ShipType } from "./Ship";
+import { SHIP_TYPES, Ship } from "./Ship";
 
 export type Guess = {
   coordinate: Coordinate;
@@ -24,10 +24,10 @@ export function createEmptyBoard(height = 10, width = 10, name = "Player"): Boar
 
 export function getShips(): Ship[] {
   const ships: Ship[] = [];
-  ships.push(new Ship(ShipType.CAR, 5, []));
-  ships.push(new Ship(ShipType.BAT, 4, []));
-  ships.push(new Ship(ShipType.CRU, 3, []));
-  ships.push(new Ship(ShipType.SUB, 3, []));
-  ships.push(new Ship(ShipType.DES, 2, []));
+  ships.push(new Ship(SHIP_TYPES.CAR, []));
+  ships.push(new Ship(SHIP_TYPES.BAT, []));
+  ships.push(new Ship(SHIP_TYPES.CRU, []));
+  ships.push(new Ship(SHIP_TYPES.SUB, []));
+  ships.push(new Ship(SHIP_TYPES.DES, []));
   return ships;
 }

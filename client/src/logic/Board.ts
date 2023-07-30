@@ -26,7 +26,7 @@ export class Board {
     if (this.player === "") {
       return false;
     }
-    if (this.ships.size !== 5) {
+    if (this.ships.size !== 2) {
       return false;
     }
     for (const ship of this.ships) {
@@ -49,7 +49,7 @@ export class Board {
   }
   getTiles(startCoordinate: Coordinate, placement: ShipPlacement): Tile[] {
     const tiles: Tile[] = [];
-    for (let i = 0; i < placement.ship.length; i++) {
+    for (let i = 0; i < placement.ship.type.length; i++) {
       const tile: Tile | undefined =
         this.tiles[startCoordinate.y + (placement.vertical ? i : 0)]?.[
           startCoordinate.x + (!placement.vertical ? i : 0)
@@ -64,7 +64,7 @@ export class Board {
   canAddShip(startCoordinate: Coordinate, placement: ShipPlacement): boolean {
     const tiles = this.getTiles(startCoordinate, placement);
     return (
-      tiles.length === placement.ship.length &&
+      tiles.length === placement.ship.type.length &&
       tiles.every((tile) => tile.placedShip === null) &&
       this.checkNeighborsEmpty(tiles)
     );

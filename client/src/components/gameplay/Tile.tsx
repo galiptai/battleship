@@ -86,7 +86,7 @@ export function DrawTile({
         <div>
           Y:{tile.coordinate.y} X:{tile.coordinate.x}
         </div>
-        <div>{hasShip ? tile.placedShip?.type : ""}</div>
+        <div>{hasShip ? tile.placedShip?.type.name : ""}</div>
       </div>
     </div>
   );
