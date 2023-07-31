@@ -1,6 +1,6 @@
-# Battleship
+# Battleship✖
 
-My take on the classic 1v1 game, where your aim is to guess where the other player's ships are.
+My take on the classic 1v1 game, where your aim is to guess where your opponent's ships are.
 
 ## Features
 
@@ -11,14 +11,14 @@ My take on the classic 1v1 game, where your aim is to guess where the other play
 
 ## How to start
 
-*Docker support coming soon!*
+What you need: Docker with Docker Compose
 
-In the meantime, you'll need Node.js.
-- navigate to the client folder
-- install dependencies with ```npm ci```
-- when its done, run the application with ```npm run dev```
-- you can reach the app on localhost:3000
+- in the terminal, navigate to the app's directory
+- run ```docker compose up -d```
+- wait for the image to build and the container to start
+- once it's running, you can reach the app on localhost:8080
 
 ## Stack
 
 - Frontend: React with TypeScript via Vite
+- Backend: Java Spring Boot
