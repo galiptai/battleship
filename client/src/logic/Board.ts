@@ -26,7 +26,7 @@ export class Board {
     if (this.player === "") {
       return false;
     }
-    if (this.ships.size !== 2) {
+    if (this.ships.size !== 5) {
       return false;
     }
     for (const ship of this.ships) {

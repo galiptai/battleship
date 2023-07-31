@@ -13,6 +13,7 @@ export default function App() {
         <div className="home-option not-implemented">Online random</div>
         <div className="home-option not-implemented">Online custom</div>
       </div>
+      <div className="home-footer">Made by Gabor Liptai</div>
     </div>
   );
 }

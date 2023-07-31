@@ -24,10 +24,10 @@
   border: 2px solid red !important;
 }
 
-@media all and (max-width: 800px) {
+@media all and (max-width: 600px) {
   .name-input {
-    font-size: 5vw;
-    flex-direction: row;
+    font-size: 3vh;
+    flex-flow: wrap;
     align-items: center;
     justify-content: space-between;
   }

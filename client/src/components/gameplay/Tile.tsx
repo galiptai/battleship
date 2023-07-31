@@ -82,12 +82,12 @@ export function DrawTile({
         </div>
       )}
       <div className={overlay}></div>
-      <div className="tile-data">
+      {/* <div className="tile-data">
         <div>
           Y:{tile.coordinate.y} X:{tile.coordinate.x}
         </div>
         <div>{hasShip ? tile.placedShip?.type.name : ""}</div>
-      </div>
+      </div> */}
     </div>
   );
 }

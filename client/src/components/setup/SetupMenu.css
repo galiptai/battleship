@@ -1,20 +1,18 @@
 .setup-menu {
   height: 100%;
   display: flex;
-  min-width: 300px;
   flex-direction: column;
-  box-sizing: border-box;
+  width: 100%;
   justify-content: space-between;
-  gap: 25px;
 }
 
 .setup-menu-title {
   text-align: end;
   font-weight: 900;
-  font-size: calc(5vh);
+  font-size: 5vh;
 }
 
-@media all and (max-width: 800px) {
+@media all and (max-width: 600px) {
   .setup-menu {
     width: 100%;
     min-width: unset;
@@ -24,6 +22,5 @@
 
   .setup-menu-title {
     text-align: center;
-    font-size: calc(8vw);
   }
 }

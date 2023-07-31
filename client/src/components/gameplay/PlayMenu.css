@@ -4,7 +4,6 @@
   height: 100%;
   width: max-content;
   flex: 1;
-  max-width: 600px;
   box-sizing: border-box;
 }
 
@@ -72,7 +71,7 @@
   color: black;
 }
 
-@media all and (max-width: 800px) {
+@media all and (max-width: 600px) {
   .play-menu {
     font-size: 5vw;
     width: max-content;

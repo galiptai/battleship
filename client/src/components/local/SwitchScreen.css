@@ -19,7 +19,7 @@
   font-weight: 900;
 }
 
-@media all and (max-width: 800px) {
+@media all and (max-width: 600px) {
   .switch-screen {
     font-size: 7vw;
   }

@@ -72,7 +72,7 @@
   box-sizing: border-box;
 }
 
-@media all and (max-width: 800px) {
+@media all and (max-width: 600px) {
   .results {
     padding: 0px;
     gap: 30px;

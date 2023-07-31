@@ -4,12 +4,11 @@
     "boa men"
     "boa but";
   grid-template-columns: 3fr minmax(300px, 1fr);
-  grid-template-rows: 1fr 100px;
+  grid-template-rows: 5fr minmax(1fr 100px);
   padding: 20px;
   height: 100%;
   width: 100%;
   box-sizing: border-box;
-  gap: 20px;
 }
 
 .board-setup > div {
@@ -27,25 +26,29 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  box-sizing: border-box;
+  margin-left: 1vw;
 }
 
 .board-setup-ready {
   grid-area: but;
   display: flex;
+  margin-left: 1vw;
 }
 
 .board-setup-ready > button {
   flex: 1;
   font-weight: 900;
-  font-size: 2em;
+  font-size: 5vh;
+  box-sizing: border-box;
 }
 
-@media all and (max-width: 800px) {
+@media all and (max-width: 600px) {
   .board-setup {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     padding: 0;
-    gap: 10px;
   }
 
   .board-setup-board {
@@ -60,9 +63,15 @@
     max-height: 45%;
     padding: 10px 10px 0 10px;
     box-sizing: border-box;
+    margin: 0;
   }
   .board-setup-ready {
     display: flex;
     height: 50px;
+    margin: 0;
+  }
+
+  .board-setup-ready > button {
+    font-size: 2em;
   }
 }
