@@ -1,0 +1,34 @@
+.name-input {
+  font-size: 3.5vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: flex-end;
+}
+
+.name-input > input {
+  all: unset;
+  border: 2px solid var(--main-blue);
+  padding: 3px;
+  text-align: end;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.name-input > input::selection {
+  background-color: var(--blue-active);
+  color: black;
+}
+
+.name-input-invalid {
+  border: 2px solid red !important;
+}
+
+@media all and (max-width: 600px) {
+  .name-input {
+    font-size: 3vh;
+    flex-flow: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+}

@@ -3,11 +3,54 @@
   src: url("fonts/TASAOrbiterVF.woff2") format("woff2");
 }
 
+@font-face {
+  font-family: "TASAExplorer";
+  src: url("fonts/TASAExplorerVF.woff2") format("woff2");
+}
+
 :root {
   --main-blue: rgb(0, 8, 255);
+  --blue-hover: rgb(0, 170, 255);
+  --blue-active: rgb(0, 200, 255);
+  --blue-disabled: rgb(0, 0, 100);
 }
 
 html {
   font-family: "TasaOrbiter";
   background-color: black;
+  color: var(--main-blue);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+}
+
+button {
+  all: unset;
+  user-select: none;
+  font-family: "TASAExplorer";
+  background-color: var(--main-blue);
+  color: black;
+  text-align: center;
+}
+
+button:disabled {
+  background-color: black;
+  color: var(--blue-disabled);
+}
+
+button:active:not(:disabled) {
+  background-color: var(--blue-active);
+}
+
+@media (hover: hover) {
+  button:hover:not(:disabled, :active) {
+    color: white;
+    cursor: pointer;
+    background-color: var(--blue-hover);
+  }
 }

@@ -1,0 +1,26 @@
+.setup-menu {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.setup-menu-title {
+  text-align: end;
+  font-weight: 900;
+  font-size: 5vh;
+}
+
+@media all and (max-width: 600px) {
+  .setup-menu {
+    width: 100%;
+    min-width: unset;
+    justify-content: unset;
+    gap: 10px;
+  }
+
+  .setup-menu-title {
+    text-align: center;
+  }
+}

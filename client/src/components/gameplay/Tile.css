@@ -1,0 +1,82 @@
+.tile {
+  user-select: none;
+  aspect-ratio: 1/1;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: black;
+}
+
+.play-tile {
+  border: 1px solid rgb(200, 200, 200);
+}
+
+.coord-tile {
+  font-size: 1.75em;
+}
+
+.tile-valid {
+  background-color: rgba(0, 255, 0, 0.75);
+}
+
+.tile-invalid {
+  background-color: rgba(255, 0, 0, 0.75);
+}
+
+.tile-overlay {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+}
+
+.tile-ship {
+  background-color: gray;
+}
+
+.tile-hit {
+  position: absolute;
+  pointer-events: none;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 0, 0);
+  font-weight: 900;
+  font-size: 1em;
+}
+
+.tile-hit img {
+  height: 80%;
+  width: 80%;
+}
+
+.tile-data {
+  position: absolute;
+  pointer-events: none;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  font-size: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (hover: hover) {
+  .tile-clickable:hover {
+    border: 0.6em dashed var(--blue-hover);
+    cursor: pointer;
+  }
+}

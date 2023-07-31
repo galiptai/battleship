@@ -1,0 +1,26 @@
+.guess-list {
+  display: grid;
+  grid-template-columns: 0.5fr 1fr 1fr;
+}
+
+.guess-list > div {
+  text-align: center;
+  min-height: 0;
+  min-width: 0;
+}
+
+.guess-hit {
+  color: red;
+}
+
+.guess-list-header {
+  position: sticky;
+  top: 0;
+  background-color: black;
+  overflow-wrap: break-word;
+}
+
+.guess-list-header > div:not(:last-child) {
+  box-sizing: border-box;
+  border-right: 2px solid var(--main-blue);
+}

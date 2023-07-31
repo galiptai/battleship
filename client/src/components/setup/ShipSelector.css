@@ -1,0 +1,122 @@
+.ship-selector {
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4vh;
+  align-items: flex-end;
+  justify-content: center;
+  font-size: 4vh;
+  max-height: 70%;
+  flex: 1;
+}
+
+.ship-selector > div {
+  width: 100%;
+  text-align: end;
+}
+
+.ship-sel-vertical {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: 3vh;
+  font-weight: 700;
+  width: 60% !important;
+}
+
+.ship-sel-vertical > button {
+  width: 100%;
+  padding: 1vh 0;
+}
+
+.ship-sel-opts-container {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  max-height: calc(100% - 60px);
+  gap: 10px;
+}
+
+.ship-sel-opts-instruction {
+  writing-mode: vertical-rl;
+  text-align: center;
+  font-size: 2.5vh;
+}
+
+.ship-sel-opts {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1vh;
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+.ship-sel-opt {
+  padding: 5px;
+  margin-left: auto;
+  width: fit-content;
+  background-color: var(--main-blue);
+  color: black;
+  text-align: start;
+  font-weight: 600;
+  z-index: 100;
+}
+
+.ship-sel-dragged {
+  background-color: var(--blue-active) !important;
+}
+
+.ship-sel-placed {
+  background-color: var(--blue-disabled);
+  color: black;
+}
+
+@media (hover: hover) {
+  .ship-sel-opt:hover:not(.ship-sel-placed) {
+    cursor: grab;
+    background-color: var(--blue-active);
+  }
+}
+
+@media all and (max-width: 600px) {
+  .ship-selector {
+    gap: 1vh;
+    justify-content: unset;
+    font-size: 3vh;
+  }
+
+  .ship-sel-vertical {
+    justify-content: center;
+    height: 100%;
+    width: 100% !important;
+  }
+
+  .ship-sel-vertical > button {
+    padding: 5px 0;
+    font-size: 3vh;
+    flex: 1;
+  }
+
+  .ship-sel-opts-container {
+    flex-direction: column;
+    justify-content: center;
+    max-height: 100%;
+    gap: 5px;
+    flex: 1;
+  }
+
+  .ship-sel-opts-instruction {
+    writing-mode: horizontal-tb;
+    font-size: 2.5vh;
+  }
+
+  .ship-sel-opts {
+    flex-flow: row wrap;
+    justify-content: space-evenly;
+  }
+
+  .ship-sel-opt {
+    margin: 0;
+  }
+}

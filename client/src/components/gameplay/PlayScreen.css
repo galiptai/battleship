@@ -1,0 +1,103 @@
+.play-screen {
+  display: grid;
+  grid-template-areas:
+    "opp pla"
+    "opp log";
+  grid-template-columns: 3fr 2fr;
+  grid-template-rows: 3fr 2fr;
+  padding: 20px;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  gap: 20px;
+}
+
+.play-screen > div {
+  min-height: 0;
+  min-width: 0;
+}
+
+.play-board-switcher {
+  display: none;
+}
+
+.play-board-placeholder {
+  display: none;
+}
+
+.play-opponent-board-container {
+  grid-area: opp;
+}
+
+.play-player-board-container {
+  grid-area: pla;
+}
+
+.play-menu-container {
+  grid-area: log;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+@media all and (max-width: 600px) {
+  .play-screen {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    gap: 10px;
+    padding: 0;
+  }
+
+  .play-board-switcher {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: 5%;
+    font-weight: 900;
+    font-size: 2.5vh;
+  }
+
+  .play-board-switcher > button {
+    background-color: black;
+    color: var(--main-blue);
+  }
+  .play-board-switcher > button:disabled {
+    color: black;
+    background-color: var(--blue-active);
+  }
+
+  .play-board-placeholder {
+    display: block;
+    height: 55%;
+    background-color: black;
+  }
+
+  .play-opponent-board-container {
+    height: 55%;
+    width: 100%;
+    position: absolute;
+    top: calc(5% + 10px);
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
+
+  .play-player-board-container {
+    height: 55%;
+    width: 100%;
+    position: absolute;
+    top: calc(5% + 10px);
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
+
+  .play-menu-container {
+    height: unset;
+    display: flex;
+    justify-content: center;
+    flex: 1;
+  }
+
+  .play-hide {
+    z-index: -100;
+  }
+}

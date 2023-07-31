@@ -9,16 +9,22 @@ import {
   RouterProvider,
   Navigate,
 } from "react-router-dom";
+import { DndProvider } from "react-dnd-multi-backend";
+import { HTML5toTouch } from "rdndmb-html5-to-touch";
+import { LocalLoader } from "./components/local/LocalLoader.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements([
     <Route path="/" element={<App />} />,
+    <Route path="/local" element={<LocalLoader />} />,
     <Route path="*" element={<Navigate to="/" />} />,
   ])
 );
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <DndProvider options={HTML5toTouch}>
+      <RouterProvider router={router} />
+    </DndProvider>
   </React.StrictMode>
 );
