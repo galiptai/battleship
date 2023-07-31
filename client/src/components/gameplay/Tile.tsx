@@ -78,7 +78,7 @@ export function DrawTile({
     >
       {tile.hit && (
         <div className="tile-hit">
-          <img src="/X.svg" alt="X" />
+          <img src="/images/X.svg" alt="X" />
         </div>
       )}
       <div className={overlay}></div>
