@@ -4,12 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host --port 3000",
+    "dev": "vite --host --port 3000 --mode dev",
     "build": "tsc && vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
   "dependencies": {
+    "path": "^0.12.7",
     "rdndmb-html5-to-touch": "^8.0.1",
     "react": "^18.2.0",
     "react-dnd": "^16.0.1",

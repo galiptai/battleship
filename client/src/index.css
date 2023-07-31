@@ -1,11 +1,11 @@
 @font-face {
   font-family: "TASAOrbiter";
-  src: url("fonts/TASAOrbiterVF.woff2") format("woff2");
+  src: url("$fonts/TASAOrbiterVF.woff2") format("woff2");
 }
 
 @font-face {
   font-family: "TASAExplorer";
-  src: url("fonts/TASAExplorerVF.woff2") format("woff2");
+  src: url("$fonts/TASAExplorerVF.woff2") format("woff2");
 }
 
 :root {
