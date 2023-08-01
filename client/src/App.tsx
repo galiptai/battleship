@@ -10,7 +10,7 @@ export default function App() {
         <div className="home-option" onClick={() => navigate("/local")}>
           Local game
         </div>
-        <div className="home-option not-implemented">Online random</div>
+        <div className="home-option" onClick={() => navigate("/online")}>Online random</div>
         <div className="home-option not-implemented">Online custom</div>
       </div>
       <div className="home-footer">Made by Gabor Liptai</div>

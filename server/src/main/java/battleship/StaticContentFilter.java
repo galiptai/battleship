@@ -1,6 +1,7 @@
 package battleship;
 
-import jakarta.servlet.*;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
@@ -14,7 +15,7 @@ public class StaticContentFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String path = request.getRequestURI();
 
-        if (!path.startsWith("/api") && !path.contains(".") && path.matches("/(.*)")) {
+        if (!path.startsWith("/ws") && !path.contains(".") && path.matches("/(.*)")) {
             request.getRequestDispatcher("/").forward(request, response);
             System.out.println(path);
             return;
