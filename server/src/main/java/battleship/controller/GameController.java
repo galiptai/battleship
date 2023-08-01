@@ -17,7 +17,6 @@ public class GameController {
     }
     @MessageMapping("/test")
     public String test(@Payload String message) throws InterruptedException {
-        System.out.println(message);
         String response = "test " + message;
         for (int i = 0; i < 5; i++) {
             Thread.sleep(1000);

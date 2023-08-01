@@ -1,43 +1,42 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import SockJS from "sockjs-client";
-import { Client, Frame, Message, over } from "stompjs";
+import { Client, Message, over } from "stompjs";
 
 export function OnlineGame() {
-  const [roomUrl, setRoomUrl] = useState<string>("game");
+  const [room, setRoom] = useState<string>("game");
   const [connected, setConnected] = useState<boolean>(false);
   const stompClient = useRef<Client | null>(null);
   const [messages, setMessages] = useState<string[]>([]);
 
   const onConnected = useCallback(() => {
     setConnected(true);
-    stompClient.current?.subscribe("/game", onMessageRecieved);
-  }, []);
+    stompClient.current?.subscribe(`/${room}`, onMessageRecieved);
+  }, [room]);
 
   const connect = useCallback(() => {
     if (!stompClient.current) {
       const sock = new SockJS("http://localhost:8080/ws");
       stompClient.current = over(sock);
+    }
+    if (!stompClient.current.connected) {
       stompClient.current.connect({}, onConnected, onError);
-      console.log("connected");
     }
   }, [onConnected]);
 
   useEffect(() => {
-    console.log("useEffect");
     connect();
   }, [connect]);
 
   function onError() {
-    console.error("Oops!");
+    console.error("Failed to connect.");
   }
 
   function onMessageRecieved(message: Message) {
     const payloadData = message.body;
-    console.log(payloadData);
     setMessages((messages) => {
-      console.log(messages);
-      messages.push(payloadData);
-      return [...messages];
+      const newMessages = [...messages];
+      newMessages.push(payloadData);
+      return newMessages;
     });
   }
 
