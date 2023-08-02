@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import SockJS from "sockjs-client";
 import { Client, Message, over } from "stompjs";
+import { getId } from "../../logic/identification";
 
 export function OnlineGame() {
   const [room, setRoom] = useState<string>("game");
@@ -19,7 +20,7 @@ export function OnlineGame() {
       stompClient.current = over(sock);
     }
     if (!stompClient.current.connected) {
-      stompClient.current.connect({}, onConnected, onError);
+      stompClient.current.connect({ userId: getId() }, onConnected, onError);
     }
   }, [onConnected]);
 
@@ -42,7 +43,7 @@ export function OnlineGame() {
 
   function send() {
     if (stompClient.current) {
-      stompClient.current.send("/app/test", {}, "Apple");
+      stompClient.current.send("/app/test", { id: getId() }, "Apple");
     }
   }
 

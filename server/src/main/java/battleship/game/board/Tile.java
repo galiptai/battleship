@@ -1,6 +1,6 @@
 package battleship.game.board;
 
-import battleship.game.Ship;
+import battleship.game.ship.Ship;
 
 public class Tile {
     private Coordinate coordinate;

@@ -1,23 +1,22 @@
-package battleship.controller;
+package battleship.websocket;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 @Controller
-public class GameController {
+@RequiredArgsConstructor
+public class WebsocketController {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    @Autowired
-    public GameController(SimpMessagingTemplate messagingTemplate) {
-        this.messagingTemplate = messagingTemplate;
-    }
     @MessageMapping("/test")
-    public String test(@Payload String message) throws InterruptedException {
-        String response = "test " + message;
+    public String test(@Payload String message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
+        String id = headerAccessor.getFirstNativeHeader("id");
+        String response = "test " + message + " by " + id;
         for (int i = 0; i < 5; i++) {
             Thread.sleep(1000);
             messagingTemplate.convertAndSend("/game", response);
