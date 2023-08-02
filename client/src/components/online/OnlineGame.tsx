@@ -2,17 +2,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import SockJS from "sockjs-client";
 import { Client, Message, over } from "stompjs";
 import { getId } from "../../logic/identification";
+import { Joining } from "./Joining";
 
 export function OnlineGame() {
-  const [room, setRoom] = useState<string>("game");
   const [connected, setConnected] = useState<boolean>(false);
   const stompClient = useRef<Client | null>(null);
+  const [gameId, setGameId] = useState<string | null>(null);
   const [messages, setMessages] = useState<string[]>([]);
-
-  const onConnected = useCallback(() => {
-    setConnected(true);
-    stompClient.current?.subscribe(`/${room}`, onMessageRecieved);
-  }, [room]);
 
   const connect = useCallback(() => {
     if (!stompClient.current) {
@@ -22,14 +18,19 @@ export function OnlineGame() {
     if (!stompClient.current.connected) {
       stompClient.current.connect({ userId: getId() }, onConnected, onError);
     }
-  }, [onConnected]);
+  }, []);
 
   useEffect(() => {
     connect();
   }, [connect]);
 
   function onError() {
+    setConnected(false);
     console.error("Failed to connect.");
+  }
+
+  function onConnected() {
+    setConnected(true);
   }
 
   function onMessageRecieved(message: Message) {
@@ -43,7 +44,7 @@ export function OnlineGame() {
 
   function send() {
     if (stompClient.current) {
-      stompClient.current.send("/app/test", { id: getId() }, "Apple");
+      stompClient.current.send("/app/test", { userId: getId() }, "Apple");
     }
   }
 
@@ -51,8 +52,18 @@ export function OnlineGame() {
     setMessages([]);
   }
 
+  function join() {
+    if (stompClient.current) {
+      stompClient.current.send("/app/join", { userId: getId() });
+    }
+  }
+
   if (!connected) {
     return <div>Connecting...</div>;
+  } else if (gameId === null && stompClient.current) {
+    return <Joining stompClient={stompClient.current} setGameId={setGameId} />;
+  } else {
+    return <div>GAME</div>;
   }
 
   return (
@@ -61,6 +72,7 @@ export function OnlineGame() {
       <div>
         <button onClick={send}>Test</button>
         <button onClick={clear}>Clear</button>
+        <button onClick={join}>Join</button>
         {messages.map((message, i) => (
           <div key={i}>{message}</div>
         ))}

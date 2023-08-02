@@ -1,30 +1,47 @@
 package battleship.game;
 
+import lombok.Getter;
 import lombok.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Game {
-    private Player player1;
+    @Getter
+    private final UUID id;
+    private final Player player1;
     private Player player2;
     private final List<Guess> guesses;
     private GameState state;
 
-    public Game() {
+    public Game(Player player1) {
+        this.id = UUID.randomUUID();
+        this.player1 = player1;
         this.guesses = new ArrayList<>();
+        this.state = GameState.JOINING;
+        System.out.println(id.toString());
     }
 
-    public boolean isRunning() {
-        return state != GameState.OVER;
-    }
-
-    public boolean addPlayer(@NonNull Player player,@NonNull PlayerType playerType) {
-        Player playerSlot = getPlayer(playerType);
-        if (playerSlot != null || player.isValid()) {
-            return false;
+    public boolean addSecondPlayer(@NonNull Player player) {
+        if (state == GameState.JOINING) {
+            if (player1.getId().equals(player.getId())) {
+                throw new IllegalArgumentException("Player is already in the game");
+            }
+            player2 = player;
+            state = GameState.SETUP;
+            return true;
         }
-        return setPlayer(player, playerType);
+        return false;
+    }
+    public Player getPlayerById(UUID id) {
+        if (player1.getId().equals(id)) {
+            return player1;
+        } else if(player2.getId().equals(id)) {
+            return player2;
+        } else {
+            throw new IllegalArgumentException("Player is not in this match");
+        }
     }
 
     private Player getPlayer(@NonNull PlayerType playerType) {
@@ -33,16 +50,5 @@ public class Game {
         } else {
             return player2;
         }
-    }
-
-    private boolean setPlayer(@NonNull Player player, @NonNull PlayerType playerType) {
-        if (playerType == PlayerType.PLAYER_1 && player != player2) {
-            this.player1 = player;
-            return true;
-        } else if (player != player1){
-            this.player2 = player;
-            return true;
-        }
-        return false;
     }
 }
