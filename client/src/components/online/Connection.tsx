@@ -13,7 +13,7 @@ export function Connection() {
 
   const connect = useCallback(() => {
     if (!stompClient.current) {
-      const sock = new SockJS("http://localhost:8080/ws");
+      const sock = new SockJS(`http://${import.meta.env.VITE_DOMAIN}:8080/ws`);
       stompClient.current = over(sock);
     }
     if (!stompClient.current.connected) {

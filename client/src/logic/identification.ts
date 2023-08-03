@@ -8,3 +8,12 @@ export function getId(): string {
   }
   return id;
 }
+
+export function getLastUsedName(): string {
+  const name = localStorage.getItem("name");
+  return name ? name : "Player";
+}
+
+export function setName(name: string) {
+  localStorage.setItem("name", name);
+}

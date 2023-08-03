@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Client, Message } from "stompjs";
-import { getId } from "../../logic/identification";
+import { getId, getLastUsedName } from "../../logic/identification";
+import { BoardSetup } from "../setup/BoardSetup";
+import { Board } from "../../logic/Board";
 
 type OnlineGameTypes = {
   stompClient: Client;
@@ -45,13 +47,17 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameTypes) {
     }
   }
 
+  function sendPlayerBoard(board: Board) {
+    return;
+  }
+
   function onUserSpecificUpdateReceived() {}
 
   switch (gameState) {
     case "JOINING":
-      return <div>Waiting for other player to join</div>;
+      return <div>Waiting for another player to join</div>;
     case "SETUP":
-      return <div>Setup</div>;
+      return <BoardSetup setVerifiedBoard={sendPlayerBoard} starterName={getLastUsedName()} />;
     case "P1_TURN":
     case "P2_TURN":
     case "OVER":
