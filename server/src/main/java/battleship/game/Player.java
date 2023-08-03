@@ -1,28 +1,37 @@
 package battleship.game;
 
 import battleship.game.board.Board;
-import battleship.game.ship.Ship;
 import lombok.Getter;
+import lombok.Setter;
 
-import java.util.Set;
 import java.util.UUID;
 
 public class Player {
     @Getter
-    private UUID id;
+    private final UUID id;
     private String name;
-    private Set<Ship> ships;
+    @Getter
+    @Setter
+    private boolean connected;
     private Board board;
 
     public Player(UUID id) {
         this.id = id;
     }
 
-    public boolean isValid() {
-        if (name.isEmpty() || name.length() > 30) {
-            return false;
+    public boolean isGameReady() {
+        return connected && name != null && board != null;
+    }
+
+    public boolean setData(String name, Board board) {
+        if (this.name == null && this.board == null) {
+            if ((!name.isEmpty() && name.length() < 30) && board.isValid()) {
+                this.name = name;
+                this.board = board;
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 
 }

@@ -13,14 +13,15 @@ public class Game {
     private final Player player1;
     private Player player2;
     private final List<Guess> guesses;
+    @Getter
     private GameState state;
+    private Player winner;
 
     public Game(Player player1) {
         this.id = UUID.randomUUID();
         this.player1 = player1;
         this.guesses = new ArrayList<>();
         this.state = GameState.JOINING;
-        System.out.println(id.toString());
     }
 
     public boolean addSecondPlayer(@NonNull Player player) {
@@ -34,6 +35,30 @@ public class Game {
         }
         return false;
     }
+    public void connect(Player player) {
+        player.setConnected(true);
+        if (allConnected()) {
+            if (state == GameState.JOINING) {
+                state = GameState.SETUP;
+            }
+        }
+    }
+
+    public boolean allConnected() {
+        return player2 != null && player1.isConnected() && player2.isConnected();
+    }
+
+    public boolean anyConnected() {
+        if (player2 == null) {
+            return  player1.isConnected();
+        } else {
+            return player1.isConnected() || player2.isConnected();
+        }
+    }
+
+    public boolean hasPlayerWithId(UUID id) {
+        return player1.getId().equals(id) || player2.getId().equals(id);
+    }
     public Player getPlayerById(UUID id) {
         if (player1.getId().equals(id)) {
             return player1;
@@ -42,6 +67,16 @@ public class Game {
         } else {
             throw new IllegalArgumentException("Player is not in this match");
         }
+    }
+
+    public void forfeitGame(Player forfeitingPlayer) {
+        state = GameState.OVER;
+        if (forfeitingPlayer == player1) {
+            winner = player2;
+        } else {
+            winner = player1;
+        }
+
     }
 
     private Player getPlayer(@NonNull PlayerType playerType) {

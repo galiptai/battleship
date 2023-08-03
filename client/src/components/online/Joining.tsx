@@ -46,6 +46,7 @@ export function Joining({ stompClient, setGameId }: JoiningTypes) {
 
   useEffect(() => {
     const subscription = stompClient.subscribe(`/user/${getId()}/join`, onJoinMessageReceived);
+    console.log(componentDidMount.current);
     if (!componentDidMount.current) {
       join();
       componentDidMount.current = true;
@@ -57,7 +58,9 @@ export function Joining({ stompClient, setGameId }: JoiningTypes) {
 
   useEffect(() => {
     if (receivedGameId) {
+      console.log("set");
       if (receivedGameId === localStorage.getItem(STORAGE_GAME_ID_KEY)) {
+        console.log(rejoin);
         switch (rejoin) {
           case "Undecided":
             setDisplayRejoinModal(true);
@@ -67,6 +70,7 @@ export function Joining({ stompClient, setGameId }: JoiningTypes) {
             return;
           case "No":
             localStorage.removeItem(STORAGE_GAME_ID_KEY);
+            stompClient.send("/app/forfeit", { userId: getId(), gameId: receivedGameId });
             join();
         }
       } else {
@@ -74,7 +78,7 @@ export function Joining({ stompClient, setGameId }: JoiningTypes) {
         setGameId(receivedGameId);
       }
     }
-  }, [receivedGameId, rejoin, setGameId, join]);
+  }, [receivedGameId, rejoin, setGameId, join, stompClient]);
 
   return (
     <>

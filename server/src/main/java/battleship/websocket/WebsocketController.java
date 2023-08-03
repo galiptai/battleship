@@ -1,12 +1,9 @@
 package battleship.websocket;
 
-import battleship.GameService;
-import battleship.dtos.JoinDTO;
+import battleship.GameManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import java.util.UUID;
@@ -15,50 +12,44 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class WebsocketController {
 
-    private final SimpMessagingTemplate messagingTemplate;
-    private final GameService gameService;
-
-    @MessageMapping("/test")
-    public String test(@Payload String message, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
-        String userId = headerAccessor.getFirstNativeHeader("userId");
-        if (userId == null) {
-            throw new RuntimeException("No user id");
-        }
-        String response = "test " + message + " by " + userId;
-        for (int i = 0; i < 5; i++) {
-            Thread.sleep(1000);
-            messagingTemplate.convertAndSend("/game", response);
-        }
-        return "test";
-    }
+    private final GameManager gameManager;
 
     @MessageMapping("/join/new")
     public void joinNewGame(SimpMessageHeaderAccessor headerAccessor) {
-        String userId = headerAccessor.getFirstNativeHeader("userId");
-        if (userId == null) {
-            throw new RuntimeException("No user id");
-        }
+        String userId = getUserIdFromHeader(headerAccessor);
 
-        UUID gameId = gameService.findNewGame(UUID.fromString(userId));
-        messagingTemplate.convertAndSend("/user/" + userId + "/join", new JoinDTO(true, gameId.toString()));
-
+        gameManager.findNewGame(UUID.fromString(userId));
     }
 
     @MessageMapping("/join/rejoin")
     public void rejoinGame(SimpMessageHeaderAccessor headerAccessor) {
+        String userId = getUserIdFromHeader(headerAccessor);
+        String gameId = getGameIdFromHeader(headerAccessor);
+
+        gameManager.attemptRejoin(UUID.fromString(gameId), UUID.fromString(userId));
+    }
+
+    @MessageMapping("/forfeit")
+    public void forfeitGame(SimpMessageHeaderAccessor headerAccessor) {
+        String userId = getUserIdFromHeader(headerAccessor);
+        String gameId = getGameIdFromHeader(headerAccessor);
+
+        gameManager.forfeitGame(UUID.fromString(gameId), UUID.fromString(userId));
+    }
+
+    private static String getUserIdFromHeader(SimpMessageHeaderAccessor headerAccessor) {
         String userId = headerAccessor.getFirstNativeHeader("userId");
         if (userId == null) {
-            throw new RuntimeException("No user id");
+            throw new RuntimeException("No user ID");
         }
-        String gameId = headerAccessor.getFirstNativeHeader("gameId");
-        if (gameId == null) {
-            throw new RuntimeException("No game id");
-        }
+        return userId;
+    }
 
-        if (gameService.gameRejoinable(UUID.fromString(userId), UUID.fromString(gameId))) {
-            messagingTemplate.convertAndSend("/user/" + userId + "/join", new JoinDTO(true, gameId));
-        } else {
-            messagingTemplate.convertAndSend("/user/" + userId + "/join", new JoinDTO(false, null));
+    private static String getGameIdFromHeader(SimpMessageHeaderAccessor headerAccessor) {
+        String userId = headerAccessor.getFirstNativeHeader("gameId");
+        if (userId == null) {
+            throw new RuntimeException("No game ID");
         }
+        return userId;
     }
 }

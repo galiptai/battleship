@@ -12,21 +12,20 @@ import {
 import { DndProvider } from "react-dnd-multi-backend";
 import { HTML5toTouch } from "rdndmb-html5-to-touch";
 import { LocalLoader } from "./components/local/LocalLoader.tsx";
-import { OnlineGame } from "./components/online/OnlineGame.tsx";
+import { Connection } from "./components/online/Connection.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements([
     <Route path="/" element={<App />} />,
     <Route path="/local" element={<LocalLoader />} />,
-    <Route path="/online" element={<OnlineGame />} />,
+    <Route path="/online" element={<Connection />} />,
     <Route path="*" element={<Navigate to="/" />} />,
   ])
 );
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <DndProvider options={HTML5toTouch}>
-      <RouterProvider router={router} />
-    </DndProvider>
-  </React.StrictMode>
+  //TODO: Figure out a way to work with strict mode
+  <DndProvider options={HTML5toTouch}>
+    <RouterProvider router={router} />
+  </DndProvider>
 );

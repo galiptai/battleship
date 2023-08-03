@@ -1,82 +1,59 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import SockJS from "sockjs-client";
-import { Client, Message, over } from "stompjs";
+import { useEffect, useState } from "react";
+import { Client, Message } from "stompjs";
 import { getId } from "../../logic/identification";
-import { Joining } from "./Joining";
 
-export function OnlineGame() {
-  const [connected, setConnected] = useState<boolean>(false);
-  const stompClient = useRef<Client | null>(null);
-  const [gameId, setGameId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<string[]>([]);
+type OnlineGameTypes = {
+  stompClient: Client;
+  gameId: string;
+};
 
-  const connect = useCallback(() => {
-    if (!stompClient.current) {
-      const sock = new SockJS("http://localhost:8080/ws");
-      stompClient.current = over(sock);
-    }
-    if (!stompClient.current.connected) {
-      stompClient.current.connect({ userId: getId() }, onConnected, onError);
-    }
-  }, []);
+type GameState = "JOINING" | "SETUP" | "P1_TURN" | "P2_TURN" | "OVER";
+
+type UpdateType = "STATE_CHANGE";
+
+type Update = {
+  type: UpdateType;
+};
+
+type AllUpdates = StateUpdate;
+
+type StateUpdate = {
+  gameState: GameState;
+} & Update;
+
+export function OnlineGame({ stompClient, gameId }: OnlineGameTypes) {
+  const [gameState, setGameState] = useState<GameState>("JOINING");
 
   useEffect(() => {
-    connect();
-  }, [connect]);
-
-  function onError() {
-    setConnected(false);
-    console.error("Failed to connect.");
-  }
-
-  function onConnected() {
-    setConnected(true);
-  }
-
-  function onMessageRecieved(message: Message) {
-    const payloadData = message.body;
-    setMessages((messages) => {
-      const newMessages = [...messages];
-      newMessages.push(payloadData);
-      return newMessages;
+    const gameSub = stompClient.subscribe(`/game/${gameId}/`, onGameUpdateReceived, {
+      userId: getId(),
     });
-  }
+    const userSub = stompClient.subscribe(`/user/${getId()}/game`, onUserSpecificUpdateReceived);
 
-  function send() {
-    if (stompClient.current) {
-      stompClient.current.send("/app/test", { userId: getId() }, "Apple");
+    return () => {
+      gameSub.unsubscribe();
+      userSub.unsubscribe();
+    };
+  }, [stompClient, gameId]);
+
+  function onGameUpdateReceived(message: Message) {
+    const update = JSON.parse(message.body) as AllUpdates;
+    switch (update.type) {
+      case "STATE_CHANGE":
+        setGameState(update.gameState);
+        return;
     }
   }
 
-  function clear() {
-    setMessages([]);
-  }
+  function onUserSpecificUpdateReceived() {}
 
-  function join() {
-    if (stompClient.current) {
-      stompClient.current.send("/app/join", { userId: getId() });
-    }
+  switch (gameState) {
+    case "JOINING":
+      return <div>Waiting for other player to join</div>;
+    case "SETUP":
+      return <div>Setup</div>;
+    case "P1_TURN":
+    case "P2_TURN":
+    case "OVER":
   }
-
-  if (!connected) {
-    return <div>Connecting...</div>;
-  } else if (gameId === null && stompClient.current) {
-    return <Joining stompClient={stompClient.current} setGameId={setGameId} />;
-  } else {
-    return <div>GAME</div>;
-  }
-
-  return (
-    <div>
-      <div>Connected!</div>
-      <div>
-        <button onClick={send}>Test</button>
-        <button onClick={clear}>Clear</button>
-        <button onClick={join}>Join</button>
-        {messages.map((message, i) => (
-          <div key={i}>{message}</div>
-        ))}
-      </div>
-    </div>
-  );
 }
