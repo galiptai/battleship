@@ -20,18 +20,14 @@ export function LocalLoader() {
   const [useSave, setUseSave] = useState<Choice>("Undecided");
 
   const updateSave = useCallback((save: GameSave) => {
-    console.log(save);
     if (save.isValid()) {
       localStorage.setItem("save", JSON.stringify(save));
-      console.log("saved");
     }
   }, []);
 
   const deleteSave = useCallback(() => {
     localStorage.removeItem("save");
   }, []);
-
-  console.log(save.current);
 
   if (save.current !== null && save.current.isValid() && useSave === "Undecided") {
     return <ChooseSave saveData={save.current.getSaveData()} setUseSave={setUseSave} />;

@@ -24,10 +24,10 @@ export function createEmptyBoard(height = 10, width = 10, name = "Player"): Boar
 
 export function getShips(): Ship[] {
   const ships: Ship[] = [];
-  ships.push(new Ship(SHIP_TYPES.CAR, []));
-  ships.push(new Ship(SHIP_TYPES.BAT, []));
-  ships.push(new Ship(SHIP_TYPES.CRU, []));
-  ships.push(new Ship(SHIP_TYPES.SUB, []));
-  ships.push(new Ship(SHIP_TYPES.DES, []));
+  ships.push(new Ship(SHIP_TYPES.CARRIER, []));
+  ships.push(new Ship(SHIP_TYPES.BATTLESHIP, []));
+  ships.push(new Ship(SHIP_TYPES.CRUISER, []));
+  ships.push(new Ship(SHIP_TYPES.SUBMARINE, []));
+  ships.push(new Ship(SHIP_TYPES.DESTROYER, []));
   return ships;
 }

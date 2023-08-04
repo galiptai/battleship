@@ -3,6 +3,7 @@ import { Client, Message } from "stompjs";
 import { getId, getLastUsedName } from "../../logic/identification";
 import { BoardSetup } from "../setup/BoardSetup";
 import { Board } from "../../logic/Board";
+import { BoardData } from "../../logic/GameSave";
 
 type OnlineGameTypes = {
   stompClient: Client;
@@ -48,10 +49,12 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameTypes) {
   }
 
   function sendPlayerBoard(board: Board) {
-    return;
+    stompClient.send(`/app/game/${gameId}/setBoard`, { userId: getId() });
   }
 
-  function onUserSpecificUpdateReceived() {}
+  function onUserSpecificUpdateReceived() {
+    return;
+  }
 
   switch (gameState) {
     case "JOINING":

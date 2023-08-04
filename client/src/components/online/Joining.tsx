@@ -24,7 +24,6 @@ export function Joining({ stompClient, setGameId }: JoiningTypes) {
   const onJoinMessageReceived = useCallback(
     (message: Message) => {
       const joinData = JSON.parse(message.body) as JoinData;
-      console.log(joinData);
       if (!joinData.joinable) {
         localStorage.removeItem(STORAGE_GAME_ID_KEY);
         stompClient.send("/app/join/new", { userId: getId() });
@@ -46,7 +45,6 @@ export function Joining({ stompClient, setGameId }: JoiningTypes) {
 
   useEffect(() => {
     const subscription = stompClient.subscribe(`/user/${getId()}/join`, onJoinMessageReceived);
-    console.log(componentDidMount.current);
     if (!componentDidMount.current) {
       join();
       componentDidMount.current = true;
@@ -58,9 +56,7 @@ export function Joining({ stompClient, setGameId }: JoiningTypes) {
 
   useEffect(() => {
     if (receivedGameId) {
-      console.log("set");
       if (receivedGameId === localStorage.getItem(STORAGE_GAME_ID_KEY)) {
-        console.log(rejoin);
         switch (rejoin) {
           case "Undecided":
             setDisplayRejoinModal(true);

@@ -9,7 +9,6 @@ export function Connection() {
   const [connected, setConnected] = useState<boolean>(false);
   const stompClient = useRef<Client | null>(null);
   const [gameId, setGameId] = useState<string | null>(null);
-  console.log(gameId);
 
   const connect = useCallback(() => {
     if (!stompClient.current) {

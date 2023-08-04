@@ -1,6 +1,6 @@
 package battleship.websocket;
 
-import battleship.GameManager;
+import battleship.game.GameManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;

@@ -1,14 +1,17 @@
 package battleship.websocket;
 
-import battleship.GameManager;
+import battleship.dtos.BoardDTO;
+import battleship.game.GameManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
 import java.util.UUID;
 
-@Controller
+@Controller()
 @RequiredArgsConstructor
 public class WebsocketController {
 
@@ -35,6 +38,12 @@ public class WebsocketController {
         String gameId = getGameIdFromHeader(headerAccessor);
 
         gameManager.forfeitGame(UUID.fromString(gameId), UUID.fromString(userId));
+    }
+
+    @MessageMapping("/game/{gameId}/setBoard")
+    public void setBoard(@DestinationVariable String gameId, @Payload BoardDTO board, SimpMessageHeaderAccessor headerAccessor) {
+        String userId = getUserIdFromHeader(headerAccessor);
+        gameManager.setBoard(UUID.fromString(gameId), UUID.fromString(userId), board);
     }
 
     private static String getUserIdFromHeader(SimpMessageHeaderAccessor headerAccessor) {

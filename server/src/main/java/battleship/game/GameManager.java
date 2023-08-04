@@ -1,9 +1,9 @@
-package battleship;
+package battleship.game;
 
+import battleship.dtos.BoardDTO;
 import battleship.dtos.JoinDTO;
 import battleship.dtos.gameupdates.StateUpdateDTO;
-import battleship.game.Game;
-import battleship.game.Player;
+import battleship.game.board.Board;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -40,15 +40,15 @@ public class GameManager {
             gameId = newGame.getId();
         }
 
-        messagingTemplate.convertAndSend("/user/" + playerId + "/join", new JoinDTO(true, gameId.toString()));
+        messagingTemplate.convertAndSendToUser(playerId.toString(), "/join", new JoinDTO(true, gameId.toString()));
     }
 
     public void attemptRejoin(@NonNull UUID gameId, @NonNull UUID playerID) {
         Game game = games.get(gameId);
         if (game != null && game.hasPlayerWithId(playerID)) {
-            messagingTemplate.convertAndSend("/user/" + playerID + "/join", new JoinDTO(true, gameId.toString()));
+            messagingTemplate.convertAndSendToUser(playerID.toString(), "/join", new JoinDTO(true, gameId.toString()));
         } else {
-            messagingTemplate.convertAndSend("/user/" + playerID + "/join", new JoinDTO(false, null));
+            messagingTemplate.convertAndSendToUser(playerID.toString() ,"/join", new JoinDTO(false, null));
         }
     }
 
@@ -56,7 +56,7 @@ public class GameManager {
         Game game = getGame(gameId);
         Player player = game.getPlayerById(playerID);
         game.connect(player);
-        //send existing data back to the joined player
+        //TODO send existing data back to the joined player
         messagingTemplate.convertAndSend("/game/" + gameId + "/", new StateUpdateDTO(game.getState()));
 
     }
@@ -70,12 +70,21 @@ public class GameManager {
         }
     }
 
-    public void forfeitGame(@NonNull UUID gameId, @NonNull UUID playerID) {
+    public void forfeitGame(@NonNull UUID gameId, @NonNull UUID playerId) {
         Game game = getGame(gameId);
-        Player player = game.getPlayerById(playerID);
+        Player player = game.getPlayerById(playerId);
 
         game.forfeitGame(player);
         games.remove(gameId);
+    }
+
+    public void setBoard(@NonNull UUID gameId, @NonNull UUID playerId,@NonNull BoardDTO boardData) {
+        Game game = getGame(gameId);
+        Player player = game.getPlayerById(playerId);
+        Board board = boardData.getBoard();
+        if (player.setData(boardData.player(), board)) {
+            System.out.println("yay!");
+        }
     }
 
     private Game getGame(UUID gameId) {

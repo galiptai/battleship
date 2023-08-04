@@ -33,23 +33,23 @@ export class Ship {
 }
 
 export const SHIP_TYPES = {
-  CAR: {
+  CARRIER: {
     name: "Carrier",
     length: 5,
   },
-  BAT: {
+  BATTLESHIP: {
     name: "Battleship",
     length: 4,
   },
-  CRU: {
+  CRUISER: {
     name: "Cruiser",
     length: 3,
   },
-  SUB: {
+  SUBMARINE: {
     name: "Submarine",
     length: 3,
   },
-  DES: {
+  DESTROYER: {
     name: "Destroyer",
     length: 2,
   },
