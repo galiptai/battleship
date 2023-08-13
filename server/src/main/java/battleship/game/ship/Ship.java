@@ -17,10 +17,10 @@ public class Ship {
 
     public void setOccupiedTiles(Tile[] tiles) {
         if (tiles.length != type.getLength() || Arrays.stream(tiles).anyMatch(tile -> !tile.isEmpty())) {
+            throw new BoardException("Ship can't be placed here");
+        } else {
             occupiedTiles = tiles;
             Arrays.stream(tiles).forEach(tile -> tile.setShip(this));
-        } else {
-            throw new BoardException("Ship can't be placed here");
         }
     }
     
