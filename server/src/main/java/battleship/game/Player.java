@@ -25,7 +25,7 @@ public class Player {
 
     public boolean setData(String name, Board board) {
         if (this.name == null && this.board == null) {
-            if ((!name.isEmpty() && name.length() < 30) && board.isValid()) {
+            if ((!name.isEmpty() && name.length() < 30)) {
                 this.name = name;
                 this.board = board;
                 return true;

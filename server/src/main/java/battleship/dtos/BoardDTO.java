@@ -4,12 +4,14 @@ import battleship.game.board.Board;
 import battleship.game.board.Coordinate;
 import battleship.game.board.Tile;
 import battleship.game.ship.Ship;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.HashSet;
 import java.util.List;
 
 public record BoardDTO(String player, int height, int width, List<ShipDTO> ships) {
 
+    @JsonIgnore
     public Board getBoard() {
         Tile[][] tiles = new Tile[height][width];
         for (int y = 0; y < height; y++) {

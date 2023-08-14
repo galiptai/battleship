@@ -83,7 +83,10 @@ public class GameManager {
         Player player = game.getPlayerById(playerId);
         Board board = boardData.getBoard();
         if (player.setData(boardData.player(), board)) {
-            System.out.println("yay!");
+            messagingTemplate.convertAndSendToUser(playerId.toString(), "/game", boardData);
+        }
+        if (game.isGameReady()) {
+            System.out.println("ready");
         }
     }
 

@@ -35,7 +35,6 @@ public class WebsocketEventListener {
         if (destination == null || userId == null) {
             return;
         }
-        System.out.println("sub");
         if (destination.startsWith("/game/")) {
             UUID gameId = UUID.fromString(destination.substring(6, 42));
             Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("gameId", gameId.toString());

@@ -56,6 +56,10 @@ public class Game {
         }
     }
 
+    public boolean isGameReady() {
+        return allConnected() && player1.isGameReady() && player2.isGameReady();
+    }
+
     public boolean hasPlayerWithId(UUID id) {
         return player1.getId().equals(id) || player2.getId().equals(id);
     }

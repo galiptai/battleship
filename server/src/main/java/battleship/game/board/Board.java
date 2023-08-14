@@ -21,10 +21,6 @@ public class Board {
         this.tiles = tiles;
     }
 
-    public boolean isValid() {
-        return false;
-    }
-
     public void addShip(Ship ship, Coordinate startingCoordinate, boolean vertical) {
         if (!ships.contains(ship) && canAddShip(startingCoordinate, vertical, ship.getLength())) {
             ships.add(ship);
