@@ -3,6 +3,7 @@ import { Client, Message, Subscription } from "stompjs";
 import { getId } from "../../logic/identification";
 import { Board } from "../../logic/Board";
 import { OnlineSetup } from "./OnlineSetup";
+import { ErrorMessage } from "./Connection";
 
 type OnlineGameTypes = {
   stompClient: Client;
@@ -11,45 +12,49 @@ type OnlineGameTypes = {
 
 type GameState = "JOINING" | "SETUP" | "P1_TURN" | "P2_TURN" | "OVER";
 
-type UpdateType = "STATE_CHANGE";
-
-type Update = {
-  type: UpdateType;
-};
-
-type AllUpdates = StateUpdate;
+type GameMessageType = "ERROR" | "STATE_CHANGE";
 
 type StateUpdate = {
   gameState: GameState;
-} & Update;
+};
 
 export function OnlineGame({ stompClient, gameId }: OnlineGameTypes) {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [playerBoard, setPlayerBoard] = useState<Board | null>(null);
 
   const onGameUpdateReceived = useCallback((message: Message) => {
-    const update = JSON.parse(message.body) as AllUpdates;
-    switch (update.type) {
-      case "STATE_CHANGE":
-        setGameState(update.gameState);
+    const type = (message.headers as { type?: GameMessageType })?.type;
+    if (!type) {
+      console.error("Server error: no type header.");
+    }
+    switch (type) {
+      case "ERROR": {
+        const error = JSON.parse(message.body) as ErrorMessage;
+        console.error(error.message);
         return;
+      }
+      case "STATE_CHANGE": {
+        const stateUpdate = JSON.parse(message.body) as StateUpdate;
+        setGameState(stateUpdate.gameState);
+        return;
+      }
     }
   }, []);
 
   useEffect(() => {
-    let gameSub: Subscription;
     let userSub: Subscription;
+    let gameSub: Subscription;
     const timer = setTimeout(() => {
+      userSub = stompClient.subscribe(`/user/${getId()}/game`, onGameUpdateReceived);
       gameSub = stompClient.subscribe(`/game/${gameId}/`, onGameUpdateReceived, {
         userId: getId(),
       });
-      userSub = stompClient.subscribe(`/user/${getId()}/game`, onGameUpdateReceived);
     }, 200);
 
     return () => {
       clearTimeout(timer);
-      gameSub?.unsubscribe();
       userSub?.unsubscribe();
+      gameSub?.unsubscribe();
     };
   }, [stompClient, gameId, onGameUpdateReceived]);
 

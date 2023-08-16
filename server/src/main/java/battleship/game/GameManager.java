@@ -62,26 +62,43 @@ public class GameManager {
             websocketMessenger.sendGameDataUser(playerId, game);
             websocketMessenger.sendStateUpdateGlobal(game);
         } catch (IllegalArgumentException exception) {
-            //TODO send error notification
+            websocketMessenger.sendGameErrorUser(playerId, "Game no longer available.");
+        } catch (IllegalActionException exception) {
+            websocketMessenger.sendGameErrorUser(playerId, "You are not in this game.");
+        } catch (Exception exception) {
+            log.error(exception.getMessage(), exception);
         }
     }
 
     public void leaveGame(@NonNull UUID gameId, @NonNull UUID playerId) {
-        Game game = getGame(gameId);
-        Player player = game.getPlayerById(playerId);
-        player.setConnected(false);
-        log.info("Player %s left GAME-%s".formatted(playerId, gameId));
-        if (!game.anyConnected()) {
-            closeGame(gameId);
+        try {
+            Game game = getGame(gameId);
+            Player player = game.getPlayerById(playerId);
+            player.setConnected(false);
+            log.info("Player %s left GAME-%s".formatted(playerId, gameId));
+            if (!game.anyConnected()) {
+                closeGame(gameId);
+            }
+        } catch (IllegalArgumentException | IllegalActionException ignore) {
+        } catch (Exception exception) {
+            log.error(exception.getMessage(), exception);
         }
     }
 
     public void forfeitGame(@NonNull UUID gameId, @NonNull UUID playerId) {
-        Game game = getGame(gameId);
-        Player player = game.getPlayerById(playerId);
-        game.forfeitGame(player);
-        log.info("Player %s left GAME-%s".formatted(playerId, gameId));
-        closeGame(gameId);
+        try {
+            Game game = getGame(gameId);
+            Player player = game.getPlayerById(playerId);
+            game.forfeitGame(player);
+            log.info("Player %s left GAME-%s".formatted(playerId, gameId));
+            closeGame(gameId);
+        } catch (IllegalArgumentException exception) {
+            websocketMessenger.sendGameErrorUser(playerId, "Game no longer available.");
+        } catch (IllegalActionException exception) {
+            websocketMessenger.sendGameErrorUser(playerId, "You are not in this game.");
+        } catch (Exception exception) {
+            log.error(exception.getMessage(), exception);
+        }
     }
 
     public Boolean setBoard(@NonNull UUID gameId, @NonNull UUID playerId, @NonNull BoardDTO boardData) throws IllegalActionException, BoardException {

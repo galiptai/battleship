@@ -5,6 +5,10 @@ import { getId } from "../../logic/identification";
 import { Joining } from "./Joining";
 import { OnlineGame } from "./OnlineGame";
 
+export type ErrorMessage = {
+  message: string;
+};
+
 export function Connection() {
   const [connected, setConnected] = useState<boolean>(false);
   const stompClient = useRef<Client | null>(null);

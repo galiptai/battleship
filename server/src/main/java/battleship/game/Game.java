@@ -1,5 +1,6 @@
 package battleship.game;
 
+import battleship.exceptions.IllegalActionException;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -63,13 +64,13 @@ public class Game {
     public boolean hasPlayerWithId(UUID id) {
         return player1.getId().equals(id) || player2.getId().equals(id);
     }
-    public Player getPlayerById(UUID id) {
+    public Player getPlayerById(UUID id) throws IllegalActionException {
         if (player1.getId().equals(id)) {
             return player1;
         } else if(player2.getId().equals(id)) {
             return player2;
         } else {
-            throw new IllegalArgumentException("Player is not in this match");
+            throw new IllegalActionException("Player is not in this match");
         }
     }
 

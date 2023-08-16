@@ -2,27 +2,29 @@ import { useCallback, useEffect, useState } from "react";
 import { Client, Message } from "stompjs";
 import { getId } from "../../logic/identification";
 import { Choice } from "../local/LocalLoader";
+import { ErrorMessage } from "./Connection";
 
-type JoiningTypes = {
-  stompClient: Client;
-  setGameId: (gameId: string | null) => void;
-};
+type JoinMessageType = "ERROR" | "GAME_FOUND";
 
 type JoinData = {
   joinable: boolean;
   gameId: string;
 };
 
+type JoiningProps = {
+  stompClient: Client;
+  setGameId: (gameId: string | null) => void;
+};
+
 const STORAGE_GAME_ID_KEY = "gameId";
 
-export function Joining({ stompClient, setGameId }: JoiningTypes) {
+export function Joining({ stompClient, setGameId }: JoiningProps) {
   const [displayRejoinModal, setDisplayRejoinModal] = useState<boolean>(false);
   const [rejoin, setRejoin] = useState<Choice>("Undecided");
   const [receivedGameId, setReceivedGameID] = useState<string | null>(null);
 
-  const onJoinMessageReceived = useCallback(
-    (message: Message) => {
-      const joinData = JSON.parse(message.body) as JoinData;
+  const handleReceivedJoinData = useCallback(
+    (joinData: JoinData) => {
       if (!joinData.joinable) {
         localStorage.removeItem(STORAGE_GAME_ID_KEY);
         stompClient.send("/app/join/new", { userId: getId() });
@@ -31,6 +33,28 @@ export function Joining({ stompClient, setGameId }: JoiningTypes) {
       }
     },
     [stompClient]
+  );
+  const onJoinMessageReceived = useCallback(
+    (message: Message) => {
+      const type = (message.headers as { type?: JoinMessageType })?.type;
+      if (!type) {
+        console.error("Server error: no type header.");
+      }
+      console.log(type);
+      switch (type) {
+        case "ERROR": {
+          const error = JSON.parse(message.body) as ErrorMessage;
+          console.error(error.message);
+          return;
+        }
+        case "GAME_FOUND": {
+          const joinData = JSON.parse(message.body) as JoinData;
+          handleReceivedJoinData(joinData);
+          return;
+        }
+      }
+    },
+    [handleReceivedJoinData]
   );
 
   const join = useCallback(() => {
