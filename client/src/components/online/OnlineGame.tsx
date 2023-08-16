@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
-import { Client, Message } from "stompjs";
-import { getId, getLastUsedName } from "../../logic/identification";
-import { BoardSetup } from "../setup/BoardSetup";
+import { useCallback, useEffect, useState } from "react";
+import { Client, Message, Subscription } from "stompjs";
+import { getId } from "../../logic/identification";
 import { Board } from "../../logic/Board";
-import { BoardData, GameSave } from "../../logic/GameSave";
+import { OnlineSetup } from "./OnlineSetup";
 
 type OnlineGameTypes = {
   stompClient: Client;
@@ -25,46 +24,44 @@ type StateUpdate = {
 } & Update;
 
 export function OnlineGame({ stompClient, gameId }: OnlineGameTypes) {
-  const [gameState, setGameState] = useState<GameState>("JOINING");
+  const [gameState, setGameState] = useState<GameState | null>(null);
+  const [playerBoard, setPlayerBoard] = useState<Board | null>(null);
 
-  useEffect(() => {
-    const gameSub = stompClient.subscribe(`/game/${gameId}/`, onGameUpdateReceived, {
-      userId: getId(),
-    });
-    const userSub = stompClient.subscribe(`/user/${getId()}/game`, onUserSpecificUpdateReceived);
-
-    return () => {
-      gameSub.unsubscribe();
-      userSub.unsubscribe();
-    };
-  }, [stompClient, gameId]);
-
-  function onGameUpdateReceived(message: Message) {
+  const onGameUpdateReceived = useCallback((message: Message) => {
     const update = JSON.parse(message.body) as AllUpdates;
     switch (update.type) {
       case "STATE_CHANGE":
         setGameState(update.gameState);
         return;
     }
-  }
+  }, []);
 
-  function sendPlayerBoard(board: Board) {
-    stompClient.send(
-      `/app/game/${gameId}/setBoard`,
-      { userId: getId() },
-      JSON.stringify(BoardData.getDataFromBoard(board))
-    );
-  }
+  useEffect(() => {
+    let gameSub: Subscription;
+    let userSub: Subscription;
+    const timer = setTimeout(() => {
+      gameSub = stompClient.subscribe(`/game/${gameId}/`, onGameUpdateReceived, {
+        userId: getId(),
+      });
+      userSub = stompClient.subscribe(`/user/${getId()}/game`, onGameUpdateReceived);
+    }, 200);
 
-  function onUserSpecificUpdateReceived() {
-    return;
-  }
+    return () => {
+      clearTimeout(timer);
+      gameSub?.unsubscribe();
+      userSub?.unsubscribe();
+    };
+  }, [stompClient, gameId, onGameUpdateReceived]);
 
   switch (gameState) {
+    case null:
+      return <div>Joining game...</div>;
     case "JOINING":
       return <div>Waiting for another player to join</div>;
     case "SETUP":
-      return <BoardSetup setVerifiedBoard={sendPlayerBoard} starterName={getLastUsedName()} />;
+      return (
+        <OnlineSetup gameId={gameId} playerBoard={playerBoard} setPlayerBoard={setPlayerBoard} />
+      );
     case "P1_TURN":
     case "P2_TURN":
     case "OVER":

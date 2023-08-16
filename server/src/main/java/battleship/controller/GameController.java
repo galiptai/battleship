@@ -1,0 +1,21 @@
+package battleship.controller;
+
+import battleship.dtos.BoardDTO;
+import battleship.game.GameManager;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/game")
+public class GameController {
+
+    private final GameManager gameManager;
+
+    @PostMapping("/setBoard/{gameId}")
+    public Boolean setBoard(@PathVariable UUID gameId, @RequestParam UUID playerId, @RequestBody BoardDTO boardData) {
+        return gameManager.setBoard(gameId, playerId, boardData);
+    }
+}

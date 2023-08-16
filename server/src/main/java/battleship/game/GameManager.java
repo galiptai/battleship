@@ -1,12 +1,11 @@
 package battleship.game;
 
 import battleship.dtos.BoardDTO;
-import battleship.dtos.JoinDTO;
-import battleship.dtos.gameupdates.StateUpdateDTO;
 import battleship.game.board.Board;
+import battleship.websocket.WebsocketMessenger;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -14,15 +13,16 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class GameManager {
 
     private final Map<UUID, Game> games;
-    private final SimpMessageSendingOperations messagingTemplate;
+    private final WebsocketMessenger websocketMessenger;
 
     @Autowired
-    public GameManager(SimpMessageSendingOperations messagingTemplate) {
+    public GameManager(WebsocketMessenger websocketMessenger) {
         this.games = new HashMap<>();
-        this.messagingTemplate = messagingTemplate;
+        this.websocketMessenger = websocketMessenger;
     }
 
     public void findNewGame(@NonNull UUID playerId) {
@@ -35,59 +35,59 @@ public class GameManager {
             }
         }
         if (gameId == null) {
-            Game newGame = new Game(player);
-            games.put(newGame.getId(), newGame);
-            gameId = newGame.getId();
+            gameId = startNewGame(player);
         }
 
-        messagingTemplate.convertAndSendToUser(playerId.toString(), "/join", new JoinDTO(true, gameId.toString()));
+        websocketMessenger.sendJoinDataUser(playerId, gameId);
     }
 
-    public void attemptRejoin(@NonNull UUID gameId, @NonNull UUID playerID) {
+    public void attemptRejoin(@NonNull UUID gameId, @NonNull UUID playerId) {
         Game game = games.get(gameId);
-        if (game != null && game.hasPlayerWithId(playerID)) {
-            messagingTemplate.convertAndSendToUser(playerID.toString(), "/join", new JoinDTO(true, gameId.toString()));
+        if (game != null && game.hasPlayerWithId(playerId)) {
+            websocketMessenger.sendJoinDataUser(playerId, gameId);
         } else {
-            messagingTemplate.convertAndSendToUser(playerID.toString() ,"/join", new JoinDTO(false, null));
+            websocketMessenger.sendJoinDataUser(playerId, null);
         }
     }
 
-    public void joinGame(@NonNull UUID gameId, @NonNull UUID playerID) {
+    public void joinGame(@NonNull UUID gameId, @NonNull UUID playerId) {
         Game game = getGame(gameId);
-        Player player = game.getPlayerById(playerID);
+        Player player = game.getPlayerById(playerId);
         game.connect(player);
-        //TODO send existing data back to the joined player
-        messagingTemplate.convertAndSend("/game/" + gameId + "/", new StateUpdateDTO(game.getState()));
-
+        log.info("Player %s joined GAME-%s".formatted(playerId, gameId));
+        websocketMessenger.sendGameDataUser(playerId, game);
+        websocketMessenger.sendStateUpdateGlobal(game);
     }
 
-    public void leaveGame(@NonNull UUID gameId, @NonNull UUID playerID) {
+    public void leaveGame(@NonNull UUID gameId, @NonNull UUID playerId) {
         Game game = getGame(gameId);
-        Player player = game.getPlayerById(playerID);
+        Player player = game.getPlayerById(playerId);
         player.setConnected(false);
+        log.info("Player %s left GAME-%s".formatted(playerId, gameId));
         if (!game.anyConnected()) {
-            games.remove(gameId);
+            closeGame(gameId);
         }
     }
 
     public void forfeitGame(@NonNull UUID gameId, @NonNull UUID playerId) {
         Game game = getGame(gameId);
         Player player = game.getPlayerById(playerId);
-
         game.forfeitGame(player);
-        games.remove(gameId);
+        log.info("Player %s left GAME-%s".formatted(playerId, gameId));
+        closeGame(gameId);
     }
 
-    public void setBoard(@NonNull UUID gameId, @NonNull UUID playerId,@NonNull BoardDTO boardData) {
+    public Boolean setBoard(@NonNull UUID gameId, @NonNull UUID playerId, @NonNull BoardDTO boardData) {
         Game game = getGame(gameId);
         Player player = game.getPlayerById(playerId);
         Board board = boardData.getBoard();
         if (player.setData(boardData.player(), board)) {
-            messagingTemplate.convertAndSendToUser(playerId.toString(), "/game", boardData);
+            if (game.isGameReady()) {
+                System.out.println("ready");
+            }
+            return true;
         }
-        if (game.isGameReady()) {
-            System.out.println("ready");
-        }
+        return false;
     }
 
     private Game getGame(UUID gameId) {
@@ -96,6 +96,18 @@ public class GameManager {
             throw new IllegalArgumentException("Game not found");
         }
         return game;
+    }
+
+    private UUID startNewGame(Player player) {
+        Game game = new Game(player);
+        games.put(game.getId(), game);
+        log.info("Created GAME-%s for PLAYER-%s".formatted(game.getId(), player.getId()));
+        return game.getId();
+    }
+
+    private void closeGame(UUID gameId) {
+        games.remove(gameId);
+        log.info("GAME-%s closed".formatted(gameId));
     }
 
 }

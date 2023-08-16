@@ -19,7 +19,6 @@ export function Joining({ stompClient, setGameId }: JoiningTypes) {
   const [displayRejoinModal, setDisplayRejoinModal] = useState<boolean>(false);
   const [rejoin, setRejoin] = useState<Choice>("Undecided");
   const [receivedGameId, setReceivedGameID] = useState<string | null>(null);
-  const componentDidMount = useRef<boolean>(false);
 
   const onJoinMessageReceived = useCallback(
     (message: Message) => {
@@ -45,11 +44,9 @@ export function Joining({ stompClient, setGameId }: JoiningTypes) {
 
   useEffect(() => {
     const subscription = stompClient.subscribe(`/user/${getId()}/join`, onJoinMessageReceived);
-    if (!componentDidMount.current) {
-      join();
-      componentDidMount.current = true;
-    }
+    const timer = setTimeout(() => join(), 500);
     return () => {
+      clearTimeout(timer);
       subscription.unsubscribe();
     };
   }, [stompClient, join, onJoinMessageReceived]);
@@ -86,7 +83,7 @@ export function Joining({ stompClient, setGameId }: JoiningTypes) {
         />
       )}
       <div>
-        <div>Joining...</div>
+        <div>Searching...</div>
       </div>
     </>
   );

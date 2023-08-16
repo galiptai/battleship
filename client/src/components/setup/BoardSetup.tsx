@@ -9,7 +9,7 @@ import { ShipPlacement } from "./ShipSelector";
 
 type BoardSetupProps = {
   starterName: string;
-  setVerifiedBoard: (board: Board) => void;
+  setVerifiedBoard: (board: Board) => void | Promise<void>;
 };
 
 export function BoardSetup({ starterName, setVerifiedBoard }: BoardSetupProps) {
@@ -68,7 +68,7 @@ export function BoardSetup({ starterName, setVerifiedBoard }: BoardSetupProps) {
 
   function onReadyClick() {
     if (board.isValid()) {
-      setVerifiedBoard(board);
+      void setVerifiedBoard(board);
     }
   }
 

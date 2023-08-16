@@ -24,8 +24,9 @@ const router = createBrowserRouter(
 );
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  //TODO: Figure out a way to work with strict mode
-  <DndProvider options={HTML5toTouch}>
-    <RouterProvider router={router} />
-  </DndProvider>
+  <React.StrictMode>
+    <DndProvider options={HTML5toTouch}>
+      <RouterProvider router={router} />
+    </DndProvider>
+  </React.StrictMode>
 );
