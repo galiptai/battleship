@@ -15,7 +15,7 @@ public class Ship {
         return type.getLength();
     }
 
-    public void setOccupiedTiles(Tile[] tiles) {
+    public void setOccupiedTiles(Tile[] tiles) throws BoardException {
         if (tiles.length != type.getLength() || Arrays.stream(tiles).anyMatch(tile -> !tile.isEmpty())) {
             throw new BoardException("Ship can't be placed here");
         } else {

@@ -1,5 +1,6 @@
 package battleship.game;
 
+import battleship.exceptions.BoardException;
 import battleship.game.board.Board;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,18 +21,23 @@ public class Player {
     }
 
     public boolean isGameReady() {
-        return connected && name != null && board != null;
+        return connected && isSet();
     }
+    public boolean isSet() { return  name!= null && board != null;}
 
-    public boolean setData(String name, Board board) {
+    public void setData(String name, Board board) throws BoardException {
         if (this.name == null && this.board == null) {
-            if ((!name.isEmpty() && name.length() < 30)) {
+            if (name.isEmpty()) {
+                throw new IllegalArgumentException("Name can't be empty.");
+            } else if (name.length() > 30) {
+                throw new IllegalArgumentException("Name is too long.");
+            } else {
                 this.name = name;
                 this.board = board;
-                return true;
             }
+        } else {
+            throw new BoardException("Your board has already been set.");
         }
-        return false;
     }
 
 }

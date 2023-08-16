@@ -15,6 +15,11 @@
   max-width: 100%;
 }
 
+.name-input > input:disabled {
+  border: 2px solid var(--blue-disabled);
+  color: var(--blue-disabled);
+}
+
 .name-input > input::selection {
   background-color: var(--blue-active);
   color: black;

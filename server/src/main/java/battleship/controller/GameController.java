@@ -1,6 +1,8 @@
 package battleship.controller;
 
 import battleship.dtos.BoardDTO;
+import battleship.exceptions.BoardException;
+import battleship.exceptions.IllegalActionException;
 import battleship.game.GameManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +17,8 @@ public class GameController {
     private final GameManager gameManager;
 
     @PostMapping("/setBoard/{gameId}")
-    public Boolean setBoard(@PathVariable UUID gameId, @RequestParam UUID playerId, @RequestBody BoardDTO boardData) {
+    public Boolean setBoard(@PathVariable UUID gameId, @RequestParam UUID playerId, @RequestBody BoardDTO boardData)
+            throws IllegalActionException, BoardException {
         return gameManager.setBoard(gameId, playerId, boardData);
     }
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Client, Message } from "stompjs";
 import { getId } from "../../logic/identification";
 import { Choice } from "../local/LocalLoader";

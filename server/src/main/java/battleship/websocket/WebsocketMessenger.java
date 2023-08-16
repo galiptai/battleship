@@ -32,7 +32,6 @@ public class WebsocketMessenger {
     }
 
     public void sendGameDataUser(@NonNull UUID playerId, @NonNull Game game) {
-        System.out.println("sent gamedata to user");
         messagingTemplate.convertAndSendToUser(playerId.toString(), "/game",
                 new StateUpdateDTO(game.getState()));
     }

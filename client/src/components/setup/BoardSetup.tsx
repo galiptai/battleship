@@ -10,9 +10,16 @@ import { ShipPlacement } from "./ShipSelector";
 type BoardSetupProps = {
   starterName: string;
   setVerifiedBoard: (board: Board) => void | Promise<void>;
+  disabled?: boolean;
+  readyBtnText?: string;
 };
 
-export function BoardSetup({ starterName, setVerifiedBoard }: BoardSetupProps) {
+export function BoardSetup({
+  starterName,
+  setVerifiedBoard,
+  disabled,
+  readyBtnText,
+}: BoardSetupProps) {
   const [board, setBoard] = useState<Board>(createEmptyBoard(10, 10, starterName));
   const [shipsToPlace] = useState<Ship[]>(getShips());
   const [verified, setVerified] = useState<boolean>(false);
@@ -50,6 +57,9 @@ export function BoardSetup({ starterName, setVerifiedBoard }: BoardSetupProps) {
   }
 
   function onBoardClick(coordinate: Coordinate) {
+    if (disabled) {
+      return;
+    }
     const tile = board.tiles[coordinate.y][coordinate.x];
     if (tile.placedShip === null) {
       return;
@@ -62,6 +72,9 @@ export function BoardSetup({ starterName, setVerifiedBoard }: BoardSetupProps) {
   }
 
   function clickCheck(coordinate: Coordinate): boolean {
+    if (disabled) {
+      return false;
+    }
     const tile = board.tiles[coordinate.y][coordinate.x];
     return tile.placedShip !== null;
   }
@@ -80,6 +93,7 @@ export function BoardSetup({ starterName, setVerifiedBoard }: BoardSetupProps) {
           setBoard={setBoard}
           shipsToPlace={shipsToPlace}
           setVerified={setVerified}
+          disabled={disabled}
         />
       </div>
       <div className="board-setup-board">
@@ -95,8 +109,8 @@ export function BoardSetup({ starterName, setVerifiedBoard }: BoardSetupProps) {
         />
       </div>
       <div className="board-setup-ready">
-        <button disabled={!verified} onClick={onReadyClick}>
-          READY
+        <button disabled={!verified || disabled} onClick={onReadyClick}>
+          {readyBtnText ? readyBtnText : "READY"}
         </button>
       </div>
     </div>

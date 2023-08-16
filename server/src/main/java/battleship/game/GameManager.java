@@ -1,7 +1,10 @@
 package battleship.game;
 
 import battleship.dtos.BoardDTO;
+import battleship.exceptions.BoardException;
+import battleship.exceptions.IllegalActionException;
 import battleship.game.board.Board;
+import battleship.utilities.DataConverter;
 import battleship.websocket.WebsocketMessenger;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -51,12 +54,16 @@ public class GameManager {
     }
 
     public void joinGame(@NonNull UUID gameId, @NonNull UUID playerId) {
-        Game game = getGame(gameId);
-        Player player = game.getPlayerById(playerId);
-        game.connect(player);
-        log.info("Player %s joined GAME-%s".formatted(playerId, gameId));
-        websocketMessenger.sendGameDataUser(playerId, game);
-        websocketMessenger.sendStateUpdateGlobal(game);
+        try {
+            Game game = getGame(gameId);
+            Player player = game.getPlayerById(playerId);
+            game.connect(player);
+            log.info("Player %s joined GAME-%s".formatted(playerId, gameId));
+            websocketMessenger.sendGameDataUser(playerId, game);
+            websocketMessenger.sendStateUpdateGlobal(game);
+        } catch (IllegalArgumentException exception) {
+            //TODO send error notification
+        }
     }
 
     public void leaveGame(@NonNull UUID gameId, @NonNull UUID playerId) {
@@ -77,17 +84,18 @@ public class GameManager {
         closeGame(gameId);
     }
 
-    public Boolean setBoard(@NonNull UUID gameId, @NonNull UUID playerId, @NonNull BoardDTO boardData) {
+    public Boolean setBoard(@NonNull UUID gameId, @NonNull UUID playerId, @NonNull BoardDTO boardData) throws IllegalActionException, BoardException {
         Game game = getGame(gameId);
         Player player = game.getPlayerById(playerId);
-        Board board = boardData.getBoard();
-        if (player.setData(boardData.player(), board)) {
-            if (game.isGameReady()) {
-                System.out.println("ready");
-            }
-            return true;
+        if (player.isSet()) {
+            throw new IllegalActionException("Board has already been set");
         }
-        return false;
+        Board board = DataConverter.convertAndVerifyBoard(boardData);
+        player.setData(boardData.player(), board);
+        if (game.isGameReady()) {
+            System.out.println("ready");
+        }
+        return true;
     }
 
     private Game getGame(UUID gameId) {

@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Set;
 
 public class Board {
-    private int height;
-    private int width;
-    private Set<Ship> ships;
-    private Tile[][] tiles;
+    private final int height;
+    private final int width;
+    private final Set<Ship> ships;
+    private final Tile[][] tiles;
 
     public Board(int height, int width, Set<Ship> ships, Tile[][] tiles) {
         this.height = height;
@@ -21,14 +21,14 @@ public class Board {
         this.tiles = tiles;
     }
 
-    public void addShip(Ship ship, Coordinate startingCoordinate, boolean vertical) {
+    public void addShip(Ship ship, Coordinate startingCoordinate, boolean vertical) throws BoardException {
         if (!ships.contains(ship) && canAddShip(startingCoordinate, vertical, ship.getLength())) {
             ships.add(ship);
             ship.setOccupiedTiles(getTiles(startingCoordinate, vertical, ship.getLength()));
         }
     }
 
-    private boolean canAddShip(Coordinate startingCoordinate, boolean vertical, int length) {
+    private boolean canAddShip(Coordinate startingCoordinate, boolean vertical, int length) throws BoardException {
         Tile[] tiles = getTiles(startingCoordinate, vertical, length);
         return Arrays.stream(tiles).allMatch(Tile::isEmpty) && checkTileNeighborsEmpty(tiles, 1);
     }
@@ -51,7 +51,7 @@ public class Board {
         return true;
     }
 
-    private Tile[] getTiles(Coordinate startingCoordinate, boolean vertical, int length) {
+    private Tile[] getTiles(Coordinate startingCoordinate, boolean vertical, int length) throws BoardException {
         Tile[] tiles = new Tile[length];
         if (vertical) {
             int lowerEnd = startingCoordinate.y() + length - 1;
