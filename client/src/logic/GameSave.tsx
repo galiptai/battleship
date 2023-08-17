@@ -1,7 +1,7 @@
 import { Coordinate } from "../components/gameplay/DrawBoard";
 import { Tile } from "../components/gameplay/Tile";
 import { Board } from "./Board";
-import { SHIP_TYPES, Ship, ShipType } from "./Ship";
+import { SHIP_TYPES, Ship, ShipType, ShipTypeKey } from "./Ship";
 import { Guess } from "./gameLogic";
 
 export class GameSave {
@@ -147,10 +147,9 @@ export class BoardData {
     }
     const board = new Board(this.player, this.height, this.width, new Set(), tiles);
     for (const ship of this.ships) {
-      const type = ship.type as keyof typeof SHIP_TYPES;
       board.addShip(ship.startingCoordinate, {
         vertical: ship.vertical,
-        ship: new Ship(SHIP_TYPES[type], []),
+        ship: new Ship(SHIP_TYPES[ship.type], []),
       });
     }
     return board;
@@ -158,12 +157,12 @@ export class BoardData {
 }
 
 class ShipData {
-  type: string;
+  type: ShipTypeKey;
   startingCoordinate: Coordinate;
   vertical: boolean;
 
-  constructor(type: ShipType, startingCoordinate: Coordinate, vertical: boolean) {
-    this.type = type.name.toUpperCase();
+  constructor(type: ShipTypeKey, startingCoordinate: Coordinate, vertical: boolean) {
+    this.type = type;
     this.startingCoordinate = startingCoordinate;
     this.vertical = vertical;
   }
@@ -176,7 +175,7 @@ class ShipData {
         vertical = true;
       }
     }
-    return new ShipData(ship.type, startingCoordinate, vertical);
+    return new ShipData(ship.type.name.toUpperCase() as ShipTypeKey, startingCoordinate, vertical);
   }
 }
 
@@ -201,7 +200,7 @@ export type PlainBoardData = {
 };
 
 export type PlainShipData = {
-  type: ShipType;
+  type: ShipTypeKey;
   startingCoordinate: Coordinate;
   vertical: boolean;
 };

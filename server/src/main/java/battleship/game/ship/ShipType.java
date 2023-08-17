@@ -4,17 +4,17 @@ import lombok.Getter;
 
 @Getter
 public enum ShipType {
-    CARRIER("CAR", 5),
-    BATTLESHIP("BAT", 4),
-    CRUISER("CRU", 3),
-    SUBMARINE("SUB", 3),
-    DESTROYER("DES", 2);
+    CARRIER("Carrier", 5),
+    BATTLESHIP("Battleship", 4),
+    CRUISER("Cruiser", 3),
+    SUBMARINE("Submarine", 3),
+    DESTROYER("Destroyer", 2);
 
-    private final String abbreviation;
+    private final String name;
     private final int length;
 
-    ShipType(String abbreviation, int length) {
-        this.abbreviation = abbreviation;
+    ShipType(String name, int length) {
+        this.name = name;
         this.length = length;
     }
 }

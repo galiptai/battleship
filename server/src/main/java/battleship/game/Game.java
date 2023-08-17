@@ -1,5 +1,6 @@
 package battleship.game;
 
+import battleship.dtos.BoardDTO;
 import battleship.dtos.GameDTO;
 import battleship.dtos.GuessDTO;
 import battleship.exceptions.IllegalActionException;
@@ -28,10 +29,13 @@ public class Game {
     }
 
     public GameDTO getGame(Player player) throws IllegalActionException {
+        BoardDTO playerData = player.getPlayerDataFull();
+        Player opponent = getOpponent(player);
+        BoardDTO opponentData = opponent != null ? opponent.getPlayerDataRevealed() : null;
         return new GameDTO(
                 id,
-                player.getPlayerDataFull(),
-                getOpponent(player).getPlayerDataRevealed(),
+                playerData,
+                opponentData,
                 guesses.stream().map(GuessDTO::new).toList(),
                 state
         );
@@ -48,6 +52,7 @@ public class Game {
         }
         return false;
     }
+
     public void connect(Player player) {
         player.setConnected(true);
         if (allConnected()) {
@@ -63,7 +68,7 @@ public class Game {
 
     public boolean anyConnected() {
         if (player2 == null) {
-            return  player1.isConnected();
+            return player1.isConnected();
         } else {
             return player1.isConnected() || player2.isConnected();
         }
@@ -76,10 +81,11 @@ public class Game {
     public boolean hasPlayerWithId(UUID id) {
         return player1.getId().equals(id) || player2.getId().equals(id);
     }
+
     public Player getPlayerById(UUID id) throws IllegalActionException {
         if (player1.getId().equals(id)) {
             return player1;
-        } else if(player2.getId().equals(id)) {
+        } else if (player2.getId().equals(id)) {
             return player2;
         } else {
             throw new IllegalActionException("Player is not in this match");
@@ -99,7 +105,7 @@ public class Game {
     private Player getOpponent(@NonNull Player player) throws IllegalActionException {
         if (player1.equals(player)) {
             return player2;
-        } else if (player2.equals(player)){
+        } else if (player2.equals(player)) {
             return player1;
         } else {
             throw new IllegalActionException("Player is not in this match");

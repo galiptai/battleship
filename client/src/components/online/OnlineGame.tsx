@@ -39,6 +39,11 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
   const [opponentBoard, setOpponentBoard] = useState<Board | null>(null);
   const [guesses, setGuesses] = useState<Guess[]>([]);
 
+  console.log("player");
+  console.log(playerBoard);
+  console.log("opponent");
+  console.log(playerBoard);
+
   const setGame = (data: GameData) => {
     setPlayerBoard(data.player ? BoardData.fromJSON(data.player).getBoard() : null);
     setOpponentBoard(data.opponent ? BoardData.fromJSON(data.opponent).getBoard() : null);
@@ -99,6 +104,7 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
     void fetchGameAndJoin(signal, subscriptions);
 
     return () => {
+      controller.abort();
       const { userSub, gameSub } = subscriptions;
       userSub?.unsubscribe();
       gameSub?.unsubscribe();

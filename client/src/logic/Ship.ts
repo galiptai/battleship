@@ -55,6 +55,6 @@ export const SHIP_TYPES = {
   },
 } as const;
 
-type ObjectValues<T> = T[keyof T];
+export type ShipTypeKey = keyof typeof SHIP_TYPES;
 
-export type ShipType = ObjectValues<typeof SHIP_TYPES>;
+export type ShipType = (typeof SHIP_TYPES)[ShipTypeKey];
