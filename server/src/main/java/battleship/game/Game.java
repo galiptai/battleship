@@ -1,5 +1,7 @@
 package battleship.game;
 
+import battleship.dtos.GameDTO;
+import battleship.dtos.GuessDTO;
 import battleship.exceptions.IllegalActionException;
 import lombok.Getter;
 import lombok.NonNull;
@@ -23,6 +25,16 @@ public class Game {
         this.player1 = player1;
         this.guesses = new ArrayList<>();
         this.state = GameState.JOINING;
+    }
+
+    public GameDTO getGame(Player player) throws IllegalActionException {
+        return new GameDTO(
+                id,
+                player.getPlayerDataFull(),
+                getOpponent(player).getPlayerDataRevealed(),
+                guesses.stream().map(GuessDTO::new).toList(),
+                state
+        );
     }
 
     public boolean addSecondPlayer(@NonNull Player player) {
@@ -84,11 +96,13 @@ public class Game {
 
     }
 
-    private Player getPlayer(@NonNull PlayerType playerType) {
-        if (playerType == PlayerType.PLAYER_1) {
+    private Player getOpponent(@NonNull Player player) throws IllegalActionException {
+        if (player1.equals(player)) {
+            return player2;
+        } else if (player2.equals(player)){
             return player1;
         } else {
-            return player2;
+            throw new IllegalActionException("Player is not in this match");
         }
     }
 }

@@ -193,14 +193,14 @@ export type SaveData = {
   date: Date;
 };
 
-type PlainBoardData = {
+export type PlainBoardData = {
   player: string;
   height: number;
   width: number;
   ships: PlainShipData[];
 };
 
-type PlainShipData = {
+export type PlainShipData = {
   type: ShipType;
   startingCoordinate: Coordinate;
   vertical: boolean;

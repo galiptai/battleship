@@ -1,5 +1,6 @@
 package battleship.game;
 
+import battleship.dtos.BoardDTO;
 import battleship.exceptions.BoardException;
 import battleship.game.board.Board;
 import lombok.Getter;
@@ -18,6 +19,22 @@ public class Player {
 
     public Player(UUID id) {
         this.id = id;
+    }
+
+    public BoardDTO getPlayerDataFull() {
+        if (isSet()) {
+            return board.getBoardDataFull(name);
+        } else {
+            return null;
+        }
+    }
+
+    public BoardDTO getPlayerDataRevealed() {
+        if (isSet()) {
+            return  board.getBoardDataRevealed(name);
+        } else {
+            return null;
+        }
     }
 
     public boolean isGameReady() {

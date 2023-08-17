@@ -16,7 +16,7 @@ export function OnlineSetup({ gameId, playerBoard, setPlayerBoard }: OnlineSetup
   async function sendPlayerBoard(board: Board) {
     setSubmitting(true);
     try {
-      const res = await fetch(`api/v1/game/setBoard/${gameId}?playerId=${getId()}`, {
+      const res = await fetch(`api/v1/game/${gameId}/setBoard?playerId=${getId()}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(BoardData.getDataFromBoard(board)),

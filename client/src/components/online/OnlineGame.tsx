@@ -4,23 +4,47 @@ import { getId } from "../../logic/identification";
 import { Board } from "../../logic/Board";
 import { OnlineSetup } from "./OnlineSetup";
 import { ErrorMessage } from "./Connection";
-
-type OnlineGameTypes = {
-  stompClient: Client;
-  gameId: string;
-};
+import { Guess } from "../../logic/gameLogic";
+import { BoardData, PlainBoardData } from "../../logic/GameSave";
 
 type GameState = "JOINING" | "SETUP" | "P1_TURN" | "P2_TURN" | "OVER";
 
 type GameMessageType = "ERROR" | "STATE_CHANGE";
 
+type GameData = {
+  id: string;
+  player: PlainBoardData | null;
+  opponent: PlainBoardData | null;
+  guesses: Guess[];
+  gameState: GameState;
+};
+
 type StateUpdate = {
   gameState: GameState;
 };
 
-export function OnlineGame({ stompClient, gameId }: OnlineGameTypes) {
+type OnlineGameSubscriptions = {
+  gameSub: Subscription | null;
+  userSub: Subscription | null;
+};
+
+type OnlineGameProps = {
+  stompClient: Client;
+  gameId: string;
+};
+
+export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [playerBoard, setPlayerBoard] = useState<Board | null>(null);
+  const [opponentBoard, setOpponentBoard] = useState<Board | null>(null);
+  const [guesses, setGuesses] = useState<Guess[]>([]);
+
+  const setGame = (data: GameData) => {
+    setPlayerBoard(data.player ? BoardData.fromJSON(data.player).getBoard() : null);
+    setOpponentBoard(data.opponent ? BoardData.fromJSON(data.opponent).getBoard() : null);
+    setGuesses(data.guesses);
+    setGameState(data.gameState);
+  };
 
   const onGameUpdateReceived = useCallback((message: Message) => {
     const type = (message.headers as { type?: GameMessageType })?.type;
@@ -41,22 +65,45 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameTypes) {
     }
   }, []);
 
+  const fetchGameAndJoin = useCallback(
+    async (signal: AbortSignal, subscriptions: OnlineGameSubscriptions) => {
+      try {
+        const res = await fetch(`api/v1/game/${gameId}?playerId=${getId()}`, { signal });
+        if (res.ok) {
+          const gameData = (await res.json()) as GameData;
+          setGame(gameData);
+          subscriptions.userSub = stompClient.subscribe(
+            `/user/${getId()}/game`,
+            onGameUpdateReceived
+          );
+          subscriptions.gameSub = stompClient.subscribe(`/game/${gameId}/`, onGameUpdateReceived, {
+            userId: getId(),
+          });
+        } else {
+          const data = (await res.json()) as { detail?: string };
+          if (data.detail) {
+            console.error(data.detail);
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    [gameId, stompClient, onGameUpdateReceived]
+  );
+
   useEffect(() => {
-    let userSub: Subscription;
-    let gameSub: Subscription;
-    const timer = setTimeout(() => {
-      userSub = stompClient.subscribe(`/user/${getId()}/game`, onGameUpdateReceived);
-      gameSub = stompClient.subscribe(`/game/${gameId}/`, onGameUpdateReceived, {
-        userId: getId(),
-      });
-    }, 200);
+    const controller = new AbortController();
+    const signal = controller.signal;
+    const subscriptions: OnlineGameSubscriptions = { gameSub: null, userSub: null };
+    void fetchGameAndJoin(signal, subscriptions);
 
     return () => {
-      clearTimeout(timer);
+      const { userSub, gameSub } = subscriptions;
       userSub?.unsubscribe();
       gameSub?.unsubscribe();
     };
-  }, [stompClient, gameId, onGameUpdateReceived]);
+  }, [stompClient, gameId, fetchGameAndJoin]);
 
   switch (gameState) {
     case null:

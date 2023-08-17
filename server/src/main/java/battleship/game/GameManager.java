@@ -1,6 +1,7 @@
 package battleship.game;
 
 import battleship.dtos.BoardDTO;
+import battleship.dtos.GameDTO;
 import battleship.exceptions.BoardException;
 import battleship.exceptions.IllegalActionException;
 import battleship.game.board.Board;
@@ -51,6 +52,12 @@ public class GameManager {
         } else {
             websocketMessenger.sendJoinDataUser(playerId, null);
         }
+    }
+
+    public GameDTO getGame(@NonNull UUID gameId, @NonNull UUID playerId) throws IllegalActionException {
+        Game game = getGame(gameId);
+        Player player = game.getPlayerById(playerId);
+        return game.getGame(player);
     }
 
     public void joinGame(@NonNull UUID gameId, @NonNull UUID playerId) {

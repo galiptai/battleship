@@ -1,5 +1,7 @@
 package battleship.game.board;
 
+import battleship.dtos.BoardDTO;
+import battleship.dtos.ShipDTO;
 import battleship.exceptions.BoardException;
 import battleship.game.ship.Ship;
 
@@ -28,13 +30,28 @@ public class Board {
         }
     }
 
+    public BoardDTO getBoardDataFull(String playerName) {
+        return new BoardDTO(playerName, height, width, ships.stream()
+                .map(ShipDTO::new)
+                .toList()
+        );
+    }
+
+    public BoardDTO getBoardDataRevealed(String playerName) {
+        return new BoardDTO(playerName, height, width, ships.stream()
+                .filter(Ship::isSank)
+                .map(ShipDTO::new)
+                .toList()
+        );
+    }
+
     private boolean canAddShip(Coordinate startingCoordinate, boolean vertical, int length) throws BoardException {
         Tile[] tiles = getTiles(startingCoordinate, vertical, length);
         return Arrays.stream(tiles).allMatch(Tile::isEmpty) && checkTileNeighborsEmpty(tiles, 1);
     }
 
     private boolean checkTileNeighborsEmpty(Tile[] tiles, int range) {
-        Set<Tile> tileSet= new HashSet<>(List.of(tiles));
+        Set<Tile> tileSet = new HashSet<>(List.of(tiles));
         for (Tile tile : tiles) {
             int yStart = Math.max(0, tile.getCoordinate().y() - range);
             int yLimit = Math.min(height - 1, tile.getCoordinate().y() + range);

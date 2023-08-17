@@ -20,7 +20,7 @@ public class DataConverter {
         }
         Board board = new Board(boardData.height(), boardData.width(), new HashSet<>(), tiles);
         for (ShipDTO ship : boardData.ships()) {
-            board.addShip(new Ship(ship.type(), null), ship.startingCoordinate(), ship.vertical());
+            board.addShip(new Ship(ship.type(), ship.vertical(), null), ship.startingCoordinate(), ship.vertical());
         }
         return board;
     }
