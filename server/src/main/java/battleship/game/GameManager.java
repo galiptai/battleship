@@ -66,7 +66,6 @@ public class GameManager {
             Player player = game.getPlayerById(playerId);
             game.connect(player);
             log.info("Player %s joined GAME-%s".formatted(playerId, gameId));
-            websocketMessenger.sendGameDataUser(playerId, game);
             websocketMessenger.sendStateUpdateGlobal(game);
         } catch (IllegalArgumentException exception) {
             websocketMessenger.sendGameErrorUser(playerId, "Game no longer available.");
@@ -85,6 +84,11 @@ public class GameManager {
             log.info("Player %s left GAME-%s".formatted(playerId, gameId));
             if (!game.anyConnected()) {
                 closeGame(gameId);
+            } else {
+                if (game.isRunning()) {
+                    game.suspend();
+                    websocketMessenger.sendStateUpdateGlobal(game);
+                }
             }
         } catch (IllegalArgumentException | IllegalActionException ignore) {
         } catch (Exception exception) {
@@ -116,8 +120,13 @@ public class GameManager {
         }
         Board board = DataConverter.convertAndVerifyBoard(boardData);
         player.setData(boardData.player(), board);
+        Player opponent = game.getOpponent(player);
+        if (opponent != null) {
+            websocketMessenger.sendOpponentBoardDataUser(opponent.getId(), player.getPlayerDataRevealed());
+        }
         if (game.isGameReady()) {
-            System.out.println("ready");
+            game.start();
+            websocketMessenger.sendStateUpdateGlobal(game);
         }
         return true;
     }

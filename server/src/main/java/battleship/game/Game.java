@@ -34,6 +34,7 @@ public class Game {
         BoardDTO opponentData = opponent != null ? opponent.getPlayerDataRevealed() : null;
         return new GameDTO(
                 id,
+                player.equals(player1),
                 playerData,
                 opponentData,
                 guesses.stream().map(GuessDTO::new).toList(),
@@ -62,6 +63,20 @@ public class Game {
         }
     }
 
+    public void suspend() {
+        state = GameState.SUSPENDED;
+    }
+
+    public void start() throws IllegalActionException {
+        if (state != GameState.SETUP) {
+            throw new IllegalActionException("Game is not in a startable state.");
+        }
+        if (!isGameReady()) {
+            throw new IllegalActionException("Start conditions are not met.");
+        }
+        state = GameState.P1_TURN;
+    }
+
     public boolean allConnected() {
         return player2 != null && player1.isConnected() && player2.isConnected();
     }
@@ -76,6 +91,10 @@ public class Game {
 
     public boolean isGameReady() {
         return allConnected() && player1.isGameReady() && player2.isGameReady();
+    }
+
+    public boolean isRunning() {
+        return state == GameState.P1_TURN || state == GameState.P2_TURN;
     }
 
     public boolean hasPlayerWithId(UUID id) {
@@ -102,7 +121,7 @@ public class Game {
 
     }
 
-    private Player getOpponent(@NonNull Player player) throws IllegalActionException {
+    public Player getOpponent(@NonNull Player player) throws IllegalActionException {
         if (player1.equals(player)) {
             return player2;
         } else if (player2.equals(player)) {

@@ -1,5 +1,6 @@
 package battleship.websocket;
 
+import battleship.dtos.BoardDTO;
 import battleship.dtos.messages.ErrorDTO;
 import battleship.dtos.messages.game.GameMessageType;
 import battleship.dtos.messages.game.StateUpdateDTO;
@@ -35,9 +36,9 @@ public class WebsocketMessenger {
                 new StateUpdateDTO(game.getState()), Map.of("type", GameMessageType.STATE_CHANGE));
     }
 
-    public void sendGameDataUser(@NonNull UUID playerId, @NonNull Game game) {
+    public void sendOpponentBoardDataUser(@NonNull UUID playerId, @NonNull BoardDTO boardData) {
         messagingTemplate.convertAndSendToUser(playerId.toString(), "/game",
-                new StateUpdateDTO(game.getState()), Map.of("type", GameMessageType.STATE_CHANGE));
+                boardData, Map.of("type", GameMessageType.OPPONENT_BOARD));
     }
 
     public void sendJoinErrorUser(@NonNull UUID playerId, @NonNull String message) {

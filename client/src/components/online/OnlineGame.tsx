@@ -7,12 +7,13 @@ import { ErrorMessage } from "./Connection";
 import { Guess } from "../../logic/gameLogic";
 import { BoardData, PlainBoardData } from "../../logic/GameSave";
 
-type GameState = "JOINING" | "SETUP" | "P1_TURN" | "P2_TURN" | "OVER";
+type GameState = "JOINING" | "SETUP" | "P1_TURN" | "P2_TURN" | "OVER" | "SUSPENDED";
 
-type GameMessageType = "ERROR" | "STATE_CHANGE";
+type GameMessageType = "ERROR" | "STATE_CHANGE" | "OPPONENT_BOARD";
 
 type GameData = {
   id: string;
+  isP1: boolean;
   player: PlainBoardData | null;
   opponent: PlainBoardData | null;
   guesses: Guess[];
@@ -35,16 +36,14 @@ type OnlineGameProps = {
 
 export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
   const [gameState, setGameState] = useState<GameState | null>(null);
+  const [playerIsP1, setPlayerIsP1] = useState<boolean>(false);
   const [playerBoard, setPlayerBoard] = useState<Board | null>(null);
   const [opponentBoard, setOpponentBoard] = useState<Board | null>(null);
   const [guesses, setGuesses] = useState<Guess[]>([]);
 
-  console.log("player");
-  console.log(playerBoard);
-  console.log("opponent");
-  console.log(playerBoard);
-
   const setGame = (data: GameData) => {
+    console.log(data);
+    setPlayerIsP1(data.isP1);
     setPlayerBoard(data.player ? BoardData.fromJSON(data.player).getBoard() : null);
     setOpponentBoard(data.opponent ? BoardData.fromJSON(data.opponent).getBoard() : null);
     setGuesses(data.guesses);
@@ -65,6 +64,13 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
       case "STATE_CHANGE": {
         const stateUpdate = JSON.parse(message.body) as StateUpdate;
         setGameState(stateUpdate.gameState);
+        return;
+      }
+      case "OPPONENT_BOARD": {
+        const opponentBoard = JSON.parse(message.body) as BoardData;
+        if (opponentBoard) {
+          setOpponentBoard(BoardData.fromJSON(opponentBoard).getBoard());
+        }
         return;
       }
     }
@@ -122,6 +128,15 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
       );
     case "P1_TURN":
     case "P2_TURN":
+      return (
+        <div>
+          {(gameState === "P1_TURN" && playerIsP1) || (gameState === "P2_TURN" && !playerIsP1)
+            ? "Its your turn"
+            : "Its not your turn"}
+        </div>
+      );
     case "OVER":
+    case "SUSPENDED":
+      return <div>Game is suspended.</div>;
   }
 }
