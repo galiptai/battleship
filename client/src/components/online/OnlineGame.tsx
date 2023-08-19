@@ -11,9 +11,11 @@ type GameState = "JOINING" | "SETUP" | "P1_TURN" | "P2_TURN" | "OVER" | "SUSPEND
 
 type GameMessageType = "ERROR" | "STATE_CHANGE" | "OPPONENT_BOARD";
 
+type WhichPlayer = "PLAYER1" | "PLAYER2";
+
 type GameData = {
   id: string;
-  isP1: boolean;
+  whichPlayer: WhichPlayer;
   player: PlainBoardData | null;
   opponent: PlainBoardData | null;
   guesses: Guess[];
@@ -36,14 +38,15 @@ type OnlineGameProps = {
 
 export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
   const [gameState, setGameState] = useState<GameState | null>(null);
-  const [playerIsP1, setPlayerIsP1] = useState<boolean>(false);
+  const [whichPlayer, setWhichPlayer] = useState<WhichPlayer>(null!);
   const [playerBoard, setPlayerBoard] = useState<Board | null>(null);
   const [opponentBoard, setOpponentBoard] = useState<Board | null>(null);
   const [guesses, setGuesses] = useState<Guess[]>([]);
 
+  console.log(whichPlayer);
   const setGame = (data: GameData) => {
     console.log(data);
-    setPlayerIsP1(data.isP1);
+    setWhichPlayer(data.whichPlayer);
     setPlayerBoard(data.player ? BoardData.fromJSON(data.player).getBoard() : null);
     setOpponentBoard(data.opponent ? BoardData.fromJSON(data.opponent).getBoard() : null);
     setGuesses(data.guesses);
@@ -130,12 +133,14 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
     case "P2_TURN":
       return (
         <div>
-          {(gameState === "P1_TURN" && playerIsP1) || (gameState === "P2_TURN" && !playerIsP1)
+          {(gameState === "P1_TURN" && whichPlayer === "PLAYER1") ||
+          (gameState === "P2_TURN" && whichPlayer === "PLAYER2")
             ? "Its your turn"
             : "Its not your turn"}
         </div>
       );
     case "OVER":
+      return <div>Game is over.</div>;
     case "SUSPENDED":
       return <div>Game is suspended.</div>;
   }

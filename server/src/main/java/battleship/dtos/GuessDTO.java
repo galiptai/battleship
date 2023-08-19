@@ -1,13 +1,12 @@
 package battleship.dtos;
 
 import battleship.game.Guess;
+import battleship.game.WhichPlayer;
 import battleship.game.board.Coordinate;
 
-import java.util.UUID;
-
-public record GuessDTO(UUID playerId, Coordinate coordinate, boolean hit) {
+public record GuessDTO(WhichPlayer whichPlayer, Coordinate coordinate, boolean hit) {
 
     public GuessDTO(Guess guess) {
-        this(guess.getPlayer().getId(), guess.getCoordinate(), guess.isHit());
+        this(guess.getPlayer().getWhichPlayer(), guess.getCoordinate(), guess.isHit());
     }
 }

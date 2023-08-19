@@ -16,6 +16,7 @@ public class Game {
     private final UUID id;
     private final Player player1;
     private Player player2;
+    private WhichPlayer currentTurn;
     private final List<Guess> guesses;
     @Getter
     private GameState state;
@@ -24,8 +25,11 @@ public class Game {
     public Game(Player player1) {
         this.id = UUID.randomUUID();
         this.player1 = player1;
+        this.player2 = null;
+        this.currentTurn = null;
         this.guesses = new ArrayList<>();
         this.state = GameState.JOINING;
+        this.winner = null;
     }
 
     public GameDTO getGame(Player player) throws IllegalActionException {
@@ -34,7 +38,7 @@ public class Game {
         BoardDTO opponentData = opponent != null ? opponent.getPlayerDataRevealed() : null;
         return new GameDTO(
                 id,
-                player.equals(player1),
+                player.getWhichPlayer(),
                 playerData,
                 opponentData,
                 guesses.stream().map(GuessDTO::new).toList(),
@@ -42,16 +46,16 @@ public class Game {
         );
     }
 
-    public boolean addSecondPlayer(@NonNull Player player) {
-        if (state == GameState.JOINING) {
+    public void addSecondPlayer(@NonNull Player player) throws IllegalActionException {
+        if (isJoinable()) {
             if (player1.getId().equals(player.getId())) {
                 throw new IllegalArgumentException("Player is already in the game");
             }
             player2 = player;
             state = GameState.SETUP;
-            return true;
+            return;
         }
-        return false;
+        throw new IllegalActionException("This is not joinable.");
     }
 
     public void connect(Player player) {
@@ -59,6 +63,12 @@ public class Game {
         if (allConnected()) {
             if (state == GameState.JOINING) {
                 state = GameState.SETUP;
+            } else if (state == GameState.SUSPENDED) {
+                if (currentTurn == WhichPlayer.PLAYER1) {
+                    state = GameState.P1_TURN;
+                } else if (currentTurn == WhichPlayer.PLAYER2) {
+                    state = GameState.P2_TURN;
+                }
             }
         }
     }
@@ -74,8 +84,12 @@ public class Game {
         if (!isGameReady()) {
             throw new IllegalActionException("Start conditions are not met.");
         }
+        currentTurn = WhichPlayer.PLAYER1;
         state = GameState.P1_TURN;
     }
+    public boolean isJoinable() {return player2 == null;}
+
+    public boolean isRejoinable() {return  state == GameState.SUSPENDED;}
 
     public boolean allConnected() {
         return player2 != null && player1.isConnected() && player2.isConnected();
@@ -97,6 +111,10 @@ public class Game {
         return state == GameState.P1_TURN || state == GameState.P2_TURN;
     }
 
+    public boolean hasStarted() {
+        return isRunning() || state == GameState.SUSPENDED;
+    }
+
     public boolean hasPlayerWithId(UUID id) {
         return player1.getId().equals(id) || player2.getId().equals(id);
     }
@@ -107,18 +125,19 @@ public class Game {
         } else if (player2.getId().equals(id)) {
             return player2;
         } else {
-            throw new IllegalActionException("Player is not in this match");
+            throw new IllegalActionException("Player is not in this game.");
         }
     }
 
-    public void forfeitGame(Player forfeitingPlayer) {
+    public void forfeitGame(Player forfeitingPlayer) throws IllegalActionException {
         state = GameState.OVER;
         if (forfeitingPlayer == player1) {
             winner = player2;
-        } else {
+        } else if (forfeitingPlayer == player2) {
             winner = player1;
+        } else {
+            throw new IllegalActionException("Player is not in this game.");
         }
-
     }
 
     public Player getOpponent(@NonNull Player player) throws IllegalActionException {
@@ -127,7 +146,7 @@ public class Game {
         } else if (player2.equals(player)) {
             return player1;
         } else {
-            throw new IllegalActionException("Player is not in this match");
+            throw new IllegalActionException("Player is not in this game.");
         }
     }
 }

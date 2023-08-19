@@ -1,7 +1,7 @@
 import { Coordinate } from "../components/gameplay/DrawBoard";
 import { Tile } from "../components/gameplay/Tile";
 import { Board } from "./Board";
-import { SHIP_TYPES, Ship, ShipType, ShipTypeKey } from "./Ship";
+import { SHIP_TYPES, Ship, ShipTypeKey } from "./Ship";
 import { Guess } from "./gameLogic";
 
 export class GameSave {

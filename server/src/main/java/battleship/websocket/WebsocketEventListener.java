@@ -1,6 +1,6 @@
 package battleship.websocket;
 
-import battleship.game.GameManager;
+import battleship.service.GameConnectionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
@@ -16,7 +16,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class WebsocketEventListener {
 
-    private final GameManager gameManager;
+    private final GameConnectionService gameConnectionService;
 
     @EventListener
     public void connectListener(SessionConnectEvent event) {
@@ -38,7 +38,7 @@ public class WebsocketEventListener {
         if (destination.startsWith("/game/")) {
             UUID gameId = UUID.fromString(destination.substring(6, 42));
             Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("gameId", gameId.toString());
-            gameManager.joinGame(gameId, UUID.fromString(userId));
+            gameConnectionService.joinGame(gameId, UUID.fromString(userId));
         }
     }
 
@@ -50,7 +50,7 @@ public class WebsocketEventListener {
 
         if (gameId != null && userId != null) {
             headerAccessor.getSessionAttributes().remove("gameId");
-            gameManager.leaveGame(UUID.fromString(gameId), UUID.fromString(userId));
+            gameConnectionService.leaveGame(UUID.fromString(gameId), UUID.fromString(userId));
         }
     }
 

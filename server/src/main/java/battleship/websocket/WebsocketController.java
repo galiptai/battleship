@@ -1,6 +1,6 @@
 package battleship.websocket;
 
-import battleship.game.GameManager;
+import battleship.service.GameConnectionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -12,13 +12,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class WebsocketController {
 
-    private final GameManager gameManager;
+    private final GameConnectionService gameConnectionService;
 
     @MessageMapping("/join/new")
     public void joinNewGame(SimpMessageHeaderAccessor headerAccessor) {
         String userId = getUserIdFromHeader(headerAccessor);
 
-        gameManager.findNewGame(UUID.fromString(userId));
+        gameConnectionService.findNewGame(UUID.fromString(userId));
     }
 
     @MessageMapping("/join/rejoin")
@@ -26,7 +26,7 @@ public class WebsocketController {
         String userId = getUserIdFromHeader(headerAccessor);
         String gameId = getGameIdFromHeader(headerAccessor);
 
-        gameManager.attemptRejoin(UUID.fromString(gameId), UUID.fromString(userId));
+        gameConnectionService.attemptRejoin(UUID.fromString(gameId), UUID.fromString(userId));
     }
 
     @MessageMapping("/forfeit")
@@ -34,7 +34,7 @@ public class WebsocketController {
         String userId = getUserIdFromHeader(headerAccessor);
         String gameId = getGameIdFromHeader(headerAccessor);
 
-        gameManager.forfeitGame(UUID.fromString(gameId), UUID.fromString(userId));
+        gameConnectionService.forfeitGame(UUID.fromString(gameId), UUID.fromString(userId));
     }
 
     private static String getUserIdFromHeader(SimpMessageHeaderAccessor headerAccessor) {

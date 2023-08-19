@@ -13,12 +13,18 @@ public class Player {
     private final UUID id;
     private String name;
     @Getter
+    private final WhichPlayer whichPlayer;
+    @Getter
     @Setter
     private boolean connected;
     private Board board;
 
-    public Player(UUID id) {
+    public Player(UUID id, WhichPlayer whichPlayer) {
         this.id = id;
+        this.name = null;
+        this.whichPlayer = whichPlayer;
+        this.connected = false;
+        this.board = null;
     }
 
     public BoardDTO getPlayerDataFull() {
@@ -40,6 +46,7 @@ public class Player {
     public boolean isGameReady() {
         return connected && isSet();
     }
+
     public boolean isSet() { return  name!= null && board != null;}
 
     public void setData(String name, Board board) throws BoardException {
