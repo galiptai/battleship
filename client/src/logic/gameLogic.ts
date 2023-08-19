@@ -1,12 +1,13 @@
 import { Coordinate } from "../components/gameplay/DrawBoard";
 import { Tile } from "../components/gameplay/Tile";
+import { WhichPlayer } from "../components/online/OnlineGame";
 import { Board } from "./Board";
 import { SHIP_TYPES, Ship } from "./Ship";
 
 export type Guess = {
   coordinate: Coordinate;
   hit: boolean;
-  player: string;
+  player: WhichPlayer;
 };
 
 export function createEmptyBoard(height = 10, width = 10, name = "Player"): Board {

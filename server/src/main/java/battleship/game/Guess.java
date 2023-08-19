@@ -7,7 +7,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class Guess {
-    private final Player player;
+    private final WhichPlayer whichPlayer;
     private final Coordinate coordinate;
     private final boolean hit;
+    private final boolean sunk;
 }

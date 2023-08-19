@@ -2,7 +2,10 @@ package battleship.game;
 
 import battleship.dtos.BoardDTO;
 import battleship.exceptions.BoardException;
+import battleship.exceptions.IllegalActionException;
 import battleship.game.board.Board;
+import battleship.game.board.Coordinate;
+import battleship.game.ship.Ship;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -64,4 +67,11 @@ public class Player {
         }
     }
 
+    public Ship submitGuess(Coordinate coordinate) throws IllegalActionException {
+        return board.submitGuess(coordinate);
+    }
+
+    public Ship getShip(Coordinate coordinate) {
+        return board.getShip(coordinate);
+    }
 }

@@ -6,12 +6,13 @@ import { OnlineSetup } from "./OnlineSetup";
 import { ErrorMessage } from "./Connection";
 import { Guess } from "../../logic/gameLogic";
 import { BoardData, PlainBoardData } from "../../logic/GameSave";
+import { OnlinePlay } from "./OnlinePlay";
 
 type GameState = "JOINING" | "SETUP" | "P1_TURN" | "P2_TURN" | "OVER" | "SUSPENDED";
 
 type GameMessageType = "ERROR" | "STATE_CHANGE" | "OPPONENT_BOARD";
 
-type WhichPlayer = "PLAYER1" | "PLAYER2";
+export type WhichPlayer = "PLAYER1" | "PLAYER2";
 
 type GameData = {
   id: string;
@@ -130,15 +131,24 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
         <OnlineSetup gameId={gameId} playerBoard={playerBoard} setPlayerBoard={setPlayerBoard} />
       );
     case "P1_TURN":
-    case "P2_TURN":
-      return (
-        <div>
-          {(gameState === "P1_TURN" && whichPlayer === "PLAYER1") ||
-          (gameState === "P2_TURN" && whichPlayer === "PLAYER2")
-            ? "Its your turn"
-            : "Its not your turn"}
-        </div>
-      );
+    case "P2_TURN": {
+      const isPlayersTurn: boolean =
+        (gameState === "P1_TURN" && whichPlayer === "PLAYER1") ||
+        (gameState === "P2_TURN" && whichPlayer === "PLAYER2");
+      if (playerBoard && opponentBoard) {
+        return (
+          <OnlinePlay
+            playerBoard={playerBoard}
+            opponentBoard={opponentBoard}
+            isPlayersTurn={isPlayersTurn}
+            whichPlayer={whichPlayer}
+            guesses={guesses}
+          />
+        );
+      } else {
+        return <div>Loading...</div>;
+      }
+    }
     case "OVER":
       return <div>Game is over.</div>;
     case "SUSPENDED":

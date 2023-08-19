@@ -2,8 +2,10 @@ package battleship.game;
 
 import battleship.dtos.BoardDTO;
 import battleship.dtos.GameDTO;
-import battleship.dtos.GuessDTO;
+import battleship.dtos.messages.game.GuessDTO;
 import battleship.exceptions.IllegalActionException;
+import battleship.game.board.Coordinate;
+import battleship.game.ship.Ship;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -87,9 +89,14 @@ public class Game {
         currentTurn = WhichPlayer.PLAYER1;
         state = GameState.P1_TURN;
     }
-    public boolean isJoinable() {return player2 == null;}
 
-    public boolean isRejoinable() {return  state == GameState.SUSPENDED;}
+    public boolean isJoinable() {
+        return player2 == null;
+    }
+
+    public boolean isRejoinable() {
+        return state == GameState.SUSPENDED;
+    }
 
     public boolean allConnected() {
         return player2 != null && player1.isConnected() && player2.isConnected();
@@ -140,6 +147,22 @@ public class Game {
         }
     }
 
+    public Guess makeGuess(Player player, Coordinate coordinate) throws IllegalActionException {
+        if (!isPlayersTurn(player)) {
+            throw new IllegalActionException("It's not your turn.");
+        }
+        Player opponent = getOpponent(player);
+        Ship ship = opponent.submitGuess(coordinate);
+        Guess guess;
+        if (ship != null) {
+            guess = new Guess(player.getWhichPlayer(), coordinate, true, ship.isSank());
+        } else {
+            guess = new Guess(player.getWhichPlayer(), coordinate, false, false);
+        }
+        changeTurn();
+        return guess;
+    }
+
     public Player getOpponent(@NonNull Player player) throws IllegalActionException {
         if (player1.equals(player)) {
             return player2;
@@ -148,5 +171,27 @@ public class Game {
         } else {
             throw new IllegalActionException("Player is not in this game.");
         }
+    }
+
+    private boolean isPlayersTurn(Player player) {
+        return isRunning() && currentTurn == player.getWhichPlayer();
+    }
+
+    private void changeTurn() {
+        if (currentTurn == WhichPlayer.PLAYER1) {
+            currentTurn = WhichPlayer.PLAYER2;
+            if (isRunning()) {
+                state = GameState.P2_TURN;
+            }
+        } else {
+            currentTurn = WhichPlayer.PLAYER1;
+            if (isRunning()) {
+                state = GameState.P1_TURN;
+            }
+        }
+    }
+
+    public Ship getShip(Player opponent, Coordinate coordinate) {
+        return opponent.getShip(coordinate);
     }
 }

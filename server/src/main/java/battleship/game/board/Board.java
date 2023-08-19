@@ -3,6 +3,7 @@ package battleship.game.board;
 import battleship.dtos.BoardDTO;
 import battleship.dtos.ShipDTO;
 import battleship.exceptions.BoardException;
+import battleship.exceptions.IllegalActionException;
 import battleship.game.ship.Ship;
 
 import java.util.Arrays;
@@ -90,5 +91,17 @@ public class Board {
             }
         }
         return tiles;
+    }
+
+    public Ship submitGuess(Coordinate coordinate) throws IllegalActionException {
+        return tiles[coordinate.y()][coordinate.x()].guess();
+    }
+
+    public Ship getShip(Coordinate coordinate) {
+        Tile tile = tiles[coordinate.y()][coordinate.x()];
+        if (tile.isEmpty()) {
+            throw new RuntimeException("No ship on coordinate.");
+        }
+        return tile.getShip();
     }
 }

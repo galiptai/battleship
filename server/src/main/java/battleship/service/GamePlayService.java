@@ -4,8 +4,11 @@ import battleship.dtos.BoardDTO;
 import battleship.exceptions.BoardException;
 import battleship.exceptions.IllegalActionException;
 import battleship.game.Game;
+import battleship.game.Guess;
 import battleship.game.Player;
 import battleship.game.board.Board;
+import battleship.game.board.Coordinate;
+import battleship.game.ship.Ship;
 import battleship.utilities.DataConverter;
 import battleship.websocket.WebsocketMessenger;
 import lombok.NonNull;
@@ -43,4 +46,21 @@ public class GamePlayService {
         return true;
     }
 
+    public Boolean makeGuess(UUID gameId, UUID playerId, Coordinate coordinate) throws IllegalActionException {
+        Game game = gameProvider.getGame(gameId);
+        Player player = game.getPlayerById(playerId);
+        Guess guess = game.makeGuess(player, coordinate);
+
+        if (guess.isSunk()) {
+            Player opponent = game.getOpponent(player);
+            Ship ship = game.getShip(opponent, coordinate);
+            websocketMessenger.sendGuessUser(opponent.getId(), guess);
+            websocketMessenger.sendGuessSunkUser(playerId, guess, ship);
+        } else {
+            websocketMessenger.sendGuessGlobal(game, guess);
+        }
+        websocketMessenger.sendStateUpdateGlobal(game);
+
+        return true;
+    }
 }

@@ -58,7 +58,7 @@ export function LocalPlay({
       guesses.push({
         coordinate: tile.coordinate,
         hit: tile.placedShip !== null,
-        player,
+        player: p1Turn ? "PLAYER1" : "PLAYER2",
       });
       setGuesses([...guesses]);
       setCanGuess(false);

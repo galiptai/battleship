@@ -1,5 +1,6 @@
 package battleship.dtos;
 
+import battleship.dtos.messages.game.GuessDTO;
 import battleship.game.GameState;
 import battleship.game.WhichPlayer;
 

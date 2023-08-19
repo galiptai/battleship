@@ -7,10 +7,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 @AllArgsConstructor
+@Getter
 public class Tile {
-    @Getter
     private final Coordinate coordinate;
-    @Getter
     private boolean hit;
     @Setter
     private Ship ship;
@@ -20,11 +19,11 @@ public class Tile {
         return ship == null;
     }
 
-    public boolean guess() throws IllegalActionException {
+    public Ship guess() throws IllegalActionException {
         if (hit) {
             throw new IllegalActionException("This tile has already been guessed.");
         }
         hit = true;
-        return !isEmpty();
+        return ship;
     }
 }
