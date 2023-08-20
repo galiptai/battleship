@@ -6,7 +6,7 @@ import "./PlayScreen.css";
 type PlayScreenProps = {
   playerBoard: Board;
   opponentBoard: Board;
-  onOppBoardClick: (coordinate: Coordinate) => void;
+  onOppBoardClick: (coordinate: Coordinate) => void | Promise<void>;
   oppBoardClickCheck: (coordinate: Coordinate) => boolean;
   children?: JSX.Element;
 };

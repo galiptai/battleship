@@ -74,7 +74,7 @@ export class GameSave {
       return this.p1Board;
     } else {
       const p1Board = this.p1Board.getBoard();
-      this.#registerHits(p1Board);
+      this.#registerGuesses(p1Board);
       return p1Board;
     }
   }
@@ -84,7 +84,7 @@ export class GameSave {
       return this.p2Board;
     } else {
       const p2Board = this.p2Board.getBoard();
-      this.#registerHits(p2Board);
+      this.#registerGuesses(p2Board);
       return p2Board;
     }
   }
@@ -93,10 +93,10 @@ export class GameSave {
     return this.guesses.length % 2 === 0;
   }
 
-  #registerHits(board: Board) {
+  #registerGuesses(board: Board) {
     for (const guess of this.guesses) {
       if (guess.player !== board.player) {
-        board.tiles[guess.coordinate.y][guess.coordinate.x].hit = true;
+        board.tiles[guess.coordinate.y][guess.coordinate.x].guessed = true;
       }
     }
   }
@@ -141,16 +141,13 @@ export class BoardData {
     for (let y = 0; y < this.height; y++) {
       const row: Tile[] = [];
       for (let x = 0; x < this.width; x++) {
-        row[x] = { coordinate: { y, x }, hit: false, placedShip: null };
+        row[x] = { coordinate: { y, x }, guessed: false, placedShip: null };
       }
       tiles[y] = row;
     }
     const board = new Board(this.player, this.height, this.width, new Set(), tiles);
     for (const ship of this.ships) {
-      board.addShip(ship.startingCoordinate, {
-        vertical: ship.vertical,
-        ship: new Ship(SHIP_TYPES[ship.type], []),
-      });
+      board.addShip(new Ship(SHIP_TYPES[ship.type], []), ship.startingCoordinate, ship.vertical);
     }
     return board;
   }

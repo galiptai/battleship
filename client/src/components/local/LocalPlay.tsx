@@ -50,11 +50,10 @@ export function LocalPlay({
     }
     const board = p1Turn ? p2Board : p1Board;
     const tile = board.tiles[coordinate.y][coordinate.x];
-    if (!tile.hit) {
+    if (!tile.guessed) {
       const setBoard = p1Turn ? setP2Board : setP1Board;
-      tile.hit = true;
+      tile.guessed = true;
       setBoard(board.makeCopy());
-      const player = p1Turn ? p1Board.player : p2Board.player;
       guesses.push({
         coordinate: tile.coordinate,
         hit: tile.placedShip !== null,
@@ -71,10 +70,7 @@ export function LocalPlay({
     }
     const board = p1Turn ? p2Board : p1Board;
     const tile = board.tiles[coordinate.y][coordinate.x];
-    if (!tile.hit) {
-      return true;
-    }
-    return false;
+    return !tile.guessed;
   }
 
   function onPassClick() {

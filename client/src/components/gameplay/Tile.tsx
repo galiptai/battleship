@@ -7,7 +7,7 @@ import { useEffect } from "react";
 
 export type Tile = {
   coordinate: Coordinate;
-  hit: boolean;
+  guessed: boolean;
   placedShip: Ship | null;
 };
 
@@ -15,7 +15,7 @@ type DrawTileProps = {
   tile: Tile;
   highlighted: HighlightType;
   showShip: ShowShips;
-  onClick?: (coordinate: Coordinate) => void;
+  onClick?: (coordinate: Coordinate) => void | Promise<void>;
   clickCheck?: (coordinate: Coordinate) => boolean;
   onDrop?: (startCoordinate: Coordinate, placement: ShipPlacement) => void;
   dropCheck?: (startCoordinate: Coordinate, placement: ShipPlacement) => boolean;
@@ -53,8 +53,12 @@ export function DrawTile({
 
   let hasShip = "";
 
-  if (tile.placedShip !== null && (showShip === "all" || (showShip === "hit" && tile.hit))) {
-    hasShip = "tile-ship";
+  if (tile.placedShip !== null && (showShip === "all" || (showShip === "hit" && tile.guessed))) {
+    if (tile.placedShip.isSank()) {
+      hasShip = "tile-sunk-ship";
+    } else {
+      hasShip = "tile-ship";
+    }
   }
 
   let overlay = "tile-overlay";
@@ -72,22 +76,16 @@ export function DrawTile({
 
   return (
     <div
-      onClick={() => onClick?.(tile.coordinate)}
+      onClick={() => void onClick?.(tile.coordinate)}
       className={`tile play-tile ${hasShip}`}
       ref={drop}
     >
-      {tile.hit && (
-        <div className="tile-hit">
+      {tile.guessed && (
+        <div className="tile-guessed">
           <img src="/images/X.svg" alt="X" />
         </div>
       )}
       <div className={overlay}></div>
-      {/* <div className="tile-data">
-        <div>
-          Y:{tile.coordinate.y} X:{tile.coordinate.x}
-        </div>
-        <div>{hasShip ? tile.placedShip?.type.name : ""}</div>
-      </div> */}
     </div>
   );
 }

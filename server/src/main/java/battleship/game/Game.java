@@ -159,6 +159,7 @@ public class Game {
         } else {
             guess = new Guess(player.getWhichPlayer(), coordinate, false, false);
         }
+        guesses.add(guess);
         changeTurn();
         return guess;
     }

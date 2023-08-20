@@ -10,7 +10,7 @@ import { OnlinePlay } from "./OnlinePlay";
 
 type GameState = "JOINING" | "SETUP" | "P1_TURN" | "P2_TURN" | "OVER" | "SUSPENDED";
 
-type GameMessageType = "ERROR" | "STATE_CHANGE" | "OPPONENT_BOARD";
+type GameMessageType = "ERROR" | "STATE_CHANGE" | "OPPONENT_BOARD" | "GUESS" | "GUESS_SUNK";
 
 export type WhichPlayer = "PLAYER1" | "PLAYER2";
 
@@ -44,9 +44,7 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
   const [opponentBoard, setOpponentBoard] = useState<Board | null>(null);
   const [guesses, setGuesses] = useState<Guess[]>([]);
 
-  console.log(whichPlayer);
   const setGame = (data: GameData) => {
-    console.log(data);
     setWhichPlayer(data.whichPlayer);
     setPlayerBoard(data.player ? BoardData.fromJSON(data.player).getBoard() : null);
     setOpponentBoard(data.opponent ? BoardData.fromJSON(data.opponent).getBoard() : null);
@@ -138,11 +136,16 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
       if (playerBoard && opponentBoard) {
         return (
           <OnlinePlay
+            gameId={gameId}
+            stompClient={stompClient}
             playerBoard={playerBoard}
+            setPlayerBoard={setPlayerBoard}
             opponentBoard={opponentBoard}
+            setOpponentBoard={setOpponentBoard}
             isPlayersTurn={isPlayersTurn}
             whichPlayer={whichPlayer}
             guesses={guesses}
+            setGuesses={setGuesses}
           />
         );
       } else {

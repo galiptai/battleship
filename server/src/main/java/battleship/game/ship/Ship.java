@@ -28,7 +28,7 @@ public class Ship {
     }
 
     public boolean isSank() {
-        return Arrays.stream(occupiedTiles).allMatch(Tile::isHit);
+        return Arrays.stream(occupiedTiles).allMatch(Tile::isGuessed);
     }
     
 

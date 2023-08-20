@@ -4,9 +4,9 @@ import battleship.game.Guess;
 import battleship.game.WhichPlayer;
 import battleship.game.board.Coordinate;
 
-public record GuessDTO(WhichPlayer whichPlayer, Coordinate coordinate, boolean hit) {
+public record GuessDTO(WhichPlayer player, Coordinate coordinate, boolean hit) {
 
     public GuessDTO(Guess guess) {
-        this(guess.getWhichPlayer(), guess.getCoordinate(), guess.isHit());
+        this(guess.getPlayer(), guess.getCoordinate(), guess.isHit());
     }
 }

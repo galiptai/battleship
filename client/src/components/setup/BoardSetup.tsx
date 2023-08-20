@@ -35,8 +35,9 @@ export function BoardSetup({
         setHighlight(highlight);
         return;
       }
-      highlight.tiles = board.getTiles(startCoordinate, placement);
-      if (board.canAddShip(startCoordinate, placement)) {
+      const { ship, vertical } = placement;
+      highlight.tiles = board.getTiles(ship.type.length, startCoordinate, vertical);
+      if (board.canAddShip(ship, startCoordinate, vertical)) {
         highlight.type = "valid";
       } else {
         highlight.type = "invalid";
@@ -47,13 +48,13 @@ export function BoardSetup({
   );
 
   function onDrop(startCoordinate: Coordinate, placement: ShipPlacement) {
-    board.addShip(startCoordinate, placement);
+    board.addShip(placement.ship, startCoordinate, placement.vertical);
     setBoard(board.makeCopy());
     setVerified(board.isValid());
   }
 
   function dropCheck(startCoordinate: Coordinate, placement: ShipPlacement): boolean {
-    return board.canAddShip(startCoordinate, placement);
+    return board.canAddShip(placement.ship, startCoordinate, placement.vertical);
   }
 
   function onBoardClick(coordinate: Coordinate) {

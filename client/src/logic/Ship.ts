@@ -28,7 +28,10 @@ export class Ship {
   }
 
   isSank(): boolean {
-    return this.tiles.every((tile) => tile.hit);
+    if (this.type == SHIP_TYPES.UNKNOWN) {
+      return false;
+    }
+    return this.tiles.every((tile) => tile.guessed);
   }
 }
 
@@ -52,6 +55,10 @@ export const SHIP_TYPES = {
   DESTROYER: {
     name: "Destroyer",
     length: 2,
+  },
+  UNKNOWN: {
+    name: "Unknown",
+    length: 1,
   },
 } as const;
 
