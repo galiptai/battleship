@@ -84,6 +84,8 @@ export function OnlinePlay({ stompClient, game, setGame, isPlayersTurn }: Online
         if (data.detail) {
           console.error(data.detail);
         }
+      } else {
+        console.log("yee");
       }
     } catch (error) {
       console.error(error);

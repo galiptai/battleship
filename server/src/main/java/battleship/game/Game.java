@@ -22,7 +22,7 @@ public class Game {
     private final List<Guess> guesses;
     @Getter
     private GameState state;
-    private Player winner;
+    private WhichPlayer winner;
 
     public Game(Player player1) {
         this.id = UUID.randomUUID();
@@ -44,7 +44,8 @@ public class Game {
                 playerData,
                 opponentData,
                 guesses.stream().map(GuessDTO::new).toList(),
-                state
+                state,
+                winner
         );
     }
 
@@ -139,9 +140,9 @@ public class Game {
     public void forfeitGame(Player forfeitingPlayer) throws IllegalActionException {
         state = GameState.OVER;
         if (forfeitingPlayer == player1) {
-            winner = player2;
+            winner = player2.getWhichPlayer();
         } else if (forfeitingPlayer == player2) {
-            winner = player1;
+            winner = player1.getWhichPlayer();
         } else {
             throw new IllegalActionException("Player is not in this game.");
         }
@@ -160,7 +161,9 @@ public class Game {
             guess = new Guess(player.getWhichPlayer(), coordinate, false, false);
         }
         guesses.add(guess);
-        changeTurn();
+        if (!checkWin(player, opponent)) {
+            changeTurn();
+        }
         return guess;
     }
 
@@ -176,6 +179,16 @@ public class Game {
 
     private boolean isPlayersTurn(Player player) {
         return isRunning() && currentTurn == player.getWhichPlayer();
+    }
+
+    private boolean checkWin(Player player, Player opponent) {
+        if (opponent.allShipsSank()) {
+            state = GameState.OVER;
+            winner = player.getWhichPlayer();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private void changeTurn() {
@@ -194,5 +207,17 @@ public class Game {
 
     public Ship getShip(Player opponent, Coordinate coordinate) {
         return opponent.getShip(coordinate);
+    }
+
+    public boolean isWon() {
+        return winner != null;
+    }
+
+    public WhichPlayer getWinner() {
+        if (isWon()) {
+            return winner;
+        } else {
+            throw new RuntimeException("The game is not won.");
+        }
     }
 }

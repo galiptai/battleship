@@ -9,6 +9,7 @@ export type GameData = {
   opponent: PlainBoardData | null;
   guesses: Guess[];
   gameState: GameState;
+  winner: WhichPlayer | null;
 };
 
 export type GameState = "JOINING" | "SETUP" | "P1_TURN" | "P2_TURN" | "OVER" | "SUSPENDED";
@@ -22,6 +23,7 @@ export class OnlineGame {
   opponent: Board | null;
   readonly playerIs: WhichPlayer;
   guesses: Guess[];
+  winner: WhichPlayer | null;
 
   constructor(
     id: string,
@@ -29,7 +31,8 @@ export class OnlineGame {
     player: Board | null,
     opponent: Board | null,
     playerIs: WhichPlayer,
-    guesses: Guess[]
+    guesses: Guess[],
+    winner: WhichPlayer | null
   ) {
     this.id = id;
     this.gameState = gameState;
@@ -37,6 +40,7 @@ export class OnlineGame {
     this.opponent = opponent;
     this.playerIs = playerIs;
     this.guesses = guesses;
+    this.winner = winner;
   }
 
   static fromGameData(gameData: GameData): OnlineGame {
@@ -57,7 +61,8 @@ export class OnlineGame {
       player,
       opponent,
       gameData.playerIs,
-      gameData.guesses
+      gameData.guesses,
+      gameData.winner
     );
   }
 
@@ -68,7 +73,20 @@ export class OnlineGame {
       this.player,
       this.opponent,
       this.playerIs,
-      this.guesses
+      this.guesses,
+      this.winner
     );
+  }
+
+  getWinnerName(): string {
+    if (this.winner) {
+      if (this.playerIs === this.winner) {
+        return this.player!.player;
+      } else {
+        return this.opponent!.player;
+      }
+    } else {
+      throw new Error("Game is not yet won");
+    }
   }
 }

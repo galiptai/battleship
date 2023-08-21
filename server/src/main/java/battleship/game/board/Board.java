@@ -104,4 +104,8 @@ public class Board {
         }
         return tile.getShip();
     }
+
+    public boolean allShipSank() {
+        return ships.stream().allMatch(Ship::isSank);
+    }
 }

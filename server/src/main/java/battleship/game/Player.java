@@ -74,4 +74,8 @@ public class Player {
     public Ship getShip(Coordinate coordinate) {
         return board.getShip(coordinate);
     }
+
+    public boolean allShipsSank() {
+        return board.allShipSank();
+    }
 }

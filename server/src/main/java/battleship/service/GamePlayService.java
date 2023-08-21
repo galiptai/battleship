@@ -56,6 +56,10 @@ public class GamePlayService {
             Ship ship = game.getShip(opponent, coordinate);
             websocketMessenger.sendGuessUser(opponent.getId(), guess);
             websocketMessenger.sendGuessSunkUser(playerId, guess, ship);
+            if (game.isWon()) {
+                websocketMessenger.sendWinnerGlobal(game);
+                return true;
+            }
         } else {
             websocketMessenger.sendGuessGlobal(game, guess);
         }

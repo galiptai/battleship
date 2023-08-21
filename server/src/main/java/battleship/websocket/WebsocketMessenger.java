@@ -2,6 +2,7 @@ package battleship.websocket;
 
 import battleship.dtos.BoardDTO;
 import battleship.dtos.messages.ErrorDTO;
+import battleship.dtos.messages.WinnerDTO;
 import battleship.dtos.messages.game.GameMessageType;
 import battleship.dtos.messages.game.GuessDTO;
 import battleship.dtos.messages.game.GuessSunkDTO;
@@ -66,5 +67,10 @@ public class WebsocketMessenger {
     public void sendGuessSunkUser(@NonNull UUID playerId, @NonNull Guess guess, @NonNull Ship ship) {
         messagingTemplate.convertAndSendToUser(playerId.toString(), "/game/guess_sunk",
                 new GuessSunkDTO(guess, ship));
+    }
+
+    public void sendWinnerGlobal(@NonNull Game game) {
+        messagingTemplate.convertAndSend("/game/" + game.getId() + "/winner",
+                new WinnerDTO(game.getWinner()));
     }
 }
