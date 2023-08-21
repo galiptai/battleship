@@ -1,9 +1,11 @@
+/// <reference types="vite-plugin-svgr/client" />
 import { Coordinate, HighlightType, ShowShips } from "./DrawBoard";
 import { Ship } from "../../logic/Ship";
 import "./Tile.css";
 import { useDrop } from "react-dnd";
 import { ShipPlacement } from "../setup/ShipSelector";
 import { useEffect } from "react";
+import { ReactComponent as XSvg } from "../../assets/X.svg";
 
 export type Tile = {
   coordinate: Coordinate;
@@ -51,13 +53,15 @@ export function DrawTile({
     return () => highlighter?.(null, null);
   }, [isOver, highlighter, tile, item]);
 
-  let hasShip = "";
+  const hasShip = tile.placedShip !== null;
+  const isSank = hasShip ? tile.placedShip!.isSank() : false;
+  let shipColoring = "";
 
-  if (tile.placedShip !== null && (showShip === "all" || (showShip === "hit" && tile.guessed))) {
-    if (tile.placedShip.isSank()) {
-      hasShip = "tile-sunk-ship";
+  if (hasShip && (showShip === "all" || (showShip === "hit" && tile.guessed))) {
+    if (isSank) {
+      shipColoring = "tile-sunk-ship";
     } else {
-      hasShip = "tile-ship";
+      shipColoring = "tile-ship";
     }
   }
 
@@ -77,12 +81,12 @@ export function DrawTile({
   return (
     <div
       onClick={() => void onClick?.(tile.coordinate)}
-      className={`tile play-tile ${hasShip}`}
+      className={`tile play-tile ${shipColoring}`}
       ref={drop}
     >
       {tile.guessed && (
         <div className="tile-guessed">
-          <img src="/images/X.svg" alt="X" />
+          <XSvg stroke={hasShip ? (isSank ? "black" : "red") : "blue"} />
         </div>
       )}
       <div className={overlay}></div>

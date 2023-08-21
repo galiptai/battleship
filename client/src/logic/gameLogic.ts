@@ -1,7 +1,7 @@
 import { Coordinate } from "../components/gameplay/DrawBoard";
 import { Tile } from "../components/gameplay/Tile";
-import { WhichPlayer } from "../components/online/OnlineGame";
 import { Board } from "./Board";
+import { WhichPlayer } from "./OnlineGame";
 import { SHIP_TYPES, Ship } from "./Ship";
 
 export type Guess = {

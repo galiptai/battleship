@@ -40,7 +40,7 @@
 }
 
 .tile-sunk-ship {
-  background-color: rgb(128, 80, 80);
+  background-color: red;
 }
 
 .tile-guessed {
@@ -58,9 +58,9 @@
   font-size: 1em;
 }
 
-.tile-guessed img {
-  height: 80%;
-  width: 80%;
+.tile-guessed svg {
+  height: 90%;
+  width: 90%;
 }
 
 .tile-data {
