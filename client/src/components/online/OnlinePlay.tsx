@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
-import { Board } from "../../logic/Board";
 import { PlayScreen } from "../gameplay/PlayScreen";
 import { PlayMenu } from "../gameplay/PlayMenu";
 import { Guess } from "../../logic/gameLogic";
-import { WhichPlayer } from "./OnlineGame";
 import { Coordinate } from "../gameplay/DrawBoard";
 import { getId } from "../../logic/identification";
 import { Client, Message } from "stompjs";
 import { PlainShipData } from "../../logic/GameSave";
+import { OnlineGame } from "../../logic/OnlineGame";
 
 type GuessSunk = {
   guess: Guess;
@@ -15,70 +14,47 @@ type GuessSunk = {
 };
 
 type OnlinePlayProps = {
-  gameId: string;
   stompClient: Client;
-  playerBoard: Board;
-  setPlayerBoard: React.Dispatch<React.SetStateAction<Board | null>>;
-  opponentBoard: Board;
-  setOpponentBoard: React.Dispatch<React.SetStateAction<Board | null>>;
+  game: OnlineGame;
+  setGame: React.Dispatch<React.SetStateAction<OnlineGame | null>>;
   isPlayersTurn: boolean;
-  whichPlayer: WhichPlayer;
-  guesses: Guess[];
-  setGuesses: React.Dispatch<React.SetStateAction<Guess[]>>;
 };
 
-export function OnlinePlay({
-  gameId,
-  stompClient,
-  playerBoard,
-  setPlayerBoard,
-  opponentBoard,
-  setOpponentBoard,
-  isPlayersTurn,
-  whichPlayer,
-  guesses,
-  setGuesses,
-}: OnlinePlayProps) {
+export function OnlinePlay({ stompClient, game, setGame, isPlayersTurn }: OnlinePlayProps) {
   const [submitting, setSubmitting] = useState<boolean>(false);
 
-  console.log(playerBoard.ships);
   const onGuessReceived = useCallback(
     (message: Message) => {
       const guess = JSON.parse(message.body) as Guess;
-      setGuesses((guesses) => [...guesses, guess]);
-      if (guess.player === whichPlayer) {
-        setOpponentBoard((board) => {
-          const newBoard = board!.makeCopy();
-          newBoard.processGuess(guess);
-          return newBoard;
-        });
-      } else {
-        setPlayerBoard((board) => {
-          const newBoard = board!.makeCopy();
-          newBoard.processGuess(guess);
-          return newBoard;
-        });
-      }
+      setGame((game) => {
+        const newGame = game!.makeCopy();
+        newGame.guesses = [...newGame.guesses, guess];
+        if (newGame.playerIs === guess.player) {
+          newGame.opponent!.processGuess(guess);
+        } else {
+          newGame.player!.processGuess(guess);
+        }
+        return newGame;
+      });
     },
-    [setGuesses, setPlayerBoard, setOpponentBoard, whichPlayer]
+    [setGame]
   );
 
   const onGuessSunkReceived = useCallback(
     (message: Message) => {
       const { guess, ship } = JSON.parse(message.body) as GuessSunk;
-      setGuesses((guesses) => [...guesses, guess]);
-      setOpponentBoard((board) => {
-        const newBoard = board!.makeCopy();
-        newBoard.processGuessSunk(guess, ship);
-        return newBoard;
+      setGame((game) => {
+        const newGame = game!.makeCopy();
+        newGame.guesses = [...newGame.guesses, guess];
+        newGame.opponent!.processGuessSunk(guess, ship);
+        return newGame;
       });
     },
-    [setGuesses, setOpponentBoard]
+    [setGame]
   );
 
   useEffect(() => {
-    console.log("useEffect in OnlinePlay");
-    const guessSub = stompClient.subscribe(`/game/${gameId}/guess`, onGuessReceived);
+    const guessSub = stompClient.subscribe(`/game/${game.id}/guess`, onGuessReceived);
     const guessUserSub = stompClient.subscribe(`/user/${getId()}/game/guess`, onGuessReceived);
     const guessSunkSub = stompClient.subscribe(
       `/user/${getId()}/game/guess_sunk`,
@@ -90,7 +66,7 @@ export function OnlinePlay({
       guessUserSub.unsubscribe();
       guessSunkSub.unsubscribe();
     };
-  }, [stompClient, gameId, onGuessReceived, onGuessSunkReceived]);
+  }, [stompClient, game.id, onGuessReceived, onGuessSunkReceived]);
 
   async function onOppBoardClick(coordinate: Coordinate) {
     if (!oppBoardClickCheck(coordinate)) {
@@ -98,7 +74,7 @@ export function OnlinePlay({
     }
     setSubmitting(true);
     try {
-      const res = await fetch(`api/v1/game/${gameId}/guess?playerId=${getId()}`, {
+      const res = await fetch(`api/v1/game/${game.id}/guess?playerId=${getId()}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(coordinate),
@@ -119,19 +95,19 @@ export function OnlinePlay({
     if (!isPlayersTurn || submitting) {
       return false;
     }
-    return !opponentBoard.tiles[coordinate.y][coordinate.x].guessed;
+    return !game.opponent!.tiles[coordinate.y][coordinate.x].guessed;
   }
   return (
     <PlayScreen
-      playerBoard={playerBoard}
-      opponentBoard={opponentBoard}
+      playerBoard={game.player!}
+      opponentBoard={game.opponent!}
       onOppBoardClick={onOppBoardClick}
       oppBoardClickCheck={oppBoardClickCheck}
     >
       <PlayMenu
-        guesses={guesses}
-        player1={whichPlayer == "PLAYER1" ? playerBoard.player : opponentBoard.player}
-        player2={whichPlayer == "PLAYER1" ? opponentBoard.player : playerBoard.player}
+        guesses={game.guesses}
+        player1={game.playerIs === "PLAYER1" ? game.player!.player : game.opponent!.player}
+        player2={game.playerIs === "PLAYER1" ? game.opponent!.player : game.player!.player}
       ></PlayMenu>
     </PlayScreen>
   );

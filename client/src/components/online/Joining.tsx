@@ -40,7 +40,6 @@ export function Joining({ stompClient, setGameId }: JoiningProps) {
       if (!type) {
         console.error("Server error: no type header.");
       }
-      console.log(type);
       switch (type) {
         case "ERROR": {
           const error = JSON.parse(message.body) as ErrorMessage;

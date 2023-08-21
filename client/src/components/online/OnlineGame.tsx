@@ -1,27 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { Client, Message, Subscription } from "stompjs";
 import { getId } from "../../logic/identification";
-import { Board } from "../../logic/Board";
 import { OnlineSetup } from "./OnlineSetup";
 import { ErrorMessage } from "./Connection";
-import { Guess } from "../../logic/gameLogic";
-import { BoardData, PlainBoardData } from "../../logic/GameSave";
+import { BoardData } from "../../logic/GameSave";
 import { OnlinePlay } from "./OnlinePlay";
+import { OnlineGame as Game, GameData, GameState } from "../../logic/OnlineGame";
 
-type GameState = "JOINING" | "SETUP" | "P1_TURN" | "P2_TURN" | "OVER" | "SUSPENDED";
-
-type GameMessageType = "ERROR" | "STATE_CHANGE" | "OPPONENT_BOARD" | "GUESS" | "GUESS_SUNK";
-
-export type WhichPlayer = "PLAYER1" | "PLAYER2";
-
-type GameData = {
-  id: string;
-  whichPlayer: WhichPlayer;
-  player: PlainBoardData | null;
-  opponent: PlainBoardData | null;
-  guesses: Guess[];
-  gameState: GameState;
-};
+type GameMessageType = "ERROR" | "STATE_CHANGE" | "OPPONENT_BOARD";
 
 type StateUpdate = {
   gameState: GameState;
@@ -38,19 +24,7 @@ type OnlineGameProps = {
 };
 
 export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
-  const [gameState, setGameState] = useState<GameState | null>(null);
-  const [whichPlayer, setWhichPlayer] = useState<WhichPlayer>(null!);
-  const [playerBoard, setPlayerBoard] = useState<Board | null>(null);
-  const [opponentBoard, setOpponentBoard] = useState<Board | null>(null);
-  const [guesses, setGuesses] = useState<Guess[]>([]);
-
-  const setGame = (data: GameData) => {
-    setWhichPlayer(data.whichPlayer);
-    setPlayerBoard(data.player ? BoardData.fromJSON(data.player).getBoard() : null);
-    setOpponentBoard(data.opponent ? BoardData.fromJSON(data.opponent).getBoard() : null);
-    setGuesses(data.guesses);
-    setGameState(data.gameState);
-  };
+  const [game, setGame] = useState<Game | null>(null);
 
   const onGameUpdateReceived = useCallback((message: Message) => {
     const type = (message.headers as { type?: GameMessageType })?.type;
@@ -65,14 +39,26 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
       }
       case "STATE_CHANGE": {
         const stateUpdate = JSON.parse(message.body) as StateUpdate;
-        setGameState(stateUpdate.gameState);
+        setGame((game) => {
+          if (!game) {
+            throw Error("Game is not set!");
+          }
+          const newGame = game.makeCopy();
+          newGame.gameState = stateUpdate.gameState;
+          return newGame;
+        });
         return;
       }
       case "OPPONENT_BOARD": {
         const opponentBoard = JSON.parse(message.body) as BoardData;
-        if (opponentBoard) {
-          setOpponentBoard(BoardData.fromJSON(opponentBoard).getBoard());
-        }
+        setGame((game) => {
+          if (!game) {
+            throw Error("Game is not set!");
+          }
+          const newGame = game.makeCopy();
+          newGame.opponent = BoardData.fromJSON(opponentBoard).getBoard();
+          return newGame;
+        });
         return;
       }
     }
@@ -84,7 +70,7 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
         const res = await fetch(`api/v1/game/${gameId}?playerId=${getId()}`, { signal });
         if (res.ok) {
           const gameData = (await res.json()) as GameData;
-          setGame(gameData);
+          setGame(Game.fromGameData(gameData));
           subscriptions.userSub = stompClient.subscribe(
             `/user/${getId()}/game`,
             onGameUpdateReceived
@@ -119,33 +105,27 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
     };
   }, [stompClient, gameId, fetchGameAndJoin]);
 
-  switch (gameState) {
-    case null:
-      return <div>Joining game...</div>;
+  if (!game) {
+    return <div>Joining...</div>;
+  }
+
+  switch (game.gameState) {
     case "JOINING":
       return <div>Waiting for another player to join</div>;
     case "SETUP":
-      return (
-        <OnlineSetup gameId={gameId} playerBoard={playerBoard} setPlayerBoard={setPlayerBoard} />
-      );
+      return <OnlineSetup game={game} setGame={setGame} />;
     case "P1_TURN":
     case "P2_TURN": {
       const isPlayersTurn: boolean =
-        (gameState === "P1_TURN" && whichPlayer === "PLAYER1") ||
-        (gameState === "P2_TURN" && whichPlayer === "PLAYER2");
-      if (playerBoard && opponentBoard) {
+        (game.gameState === "P1_TURN" && game.playerIs === "PLAYER1") ||
+        (game.gameState === "P2_TURN" && game.playerIs === "PLAYER2");
+      if (game.player && game.opponent) {
         return (
           <OnlinePlay
-            gameId={gameId}
             stompClient={stompClient}
-            playerBoard={playerBoard}
-            setPlayerBoard={setPlayerBoard}
-            opponentBoard={opponentBoard}
-            setOpponentBoard={setOpponentBoard}
+            game={game}
+            setGame={setGame}
             isPlayersTurn={isPlayersTurn}
-            whichPlayer={whichPlayer}
-            guesses={guesses}
-            setGuesses={setGuesses}
           />
         );
       } else {

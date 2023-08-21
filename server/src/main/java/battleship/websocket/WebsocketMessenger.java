@@ -55,16 +55,16 @@ public class WebsocketMessenger {
     }
     public void sendGuessGlobal(@NonNull Game game, @NonNull Guess guess) {
         messagingTemplate.convertAndSend("/game/" + game.getId() + "/guess",
-                new GuessDTO(guess), Map.of("type", GameMessageType.GUESS));
+                new GuessDTO(guess));
     }
 
     public void sendGuessUser(@NonNull UUID playerId, @NonNull Guess guess) {
         messagingTemplate.convertAndSendToUser(playerId.toString(), "/game/guess",
-                new GuessDTO(guess), Map.of("type", GameMessageType.GUESS));
+                new GuessDTO(guess));
     }
 
     public void sendGuessSunkUser(@NonNull UUID playerId, @NonNull Guess guess, @NonNull Ship ship) {
         messagingTemplate.convertAndSendToUser(playerId.toString(), "/game/guess_sunk",
-                new GuessSunkDTO(guess, ship), Map.of("type", GameMessageType.GUESS_SUNK));
+                new GuessSunkDTO(guess, ship));
     }
 }
