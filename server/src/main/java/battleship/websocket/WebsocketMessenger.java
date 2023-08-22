@@ -3,7 +3,6 @@ package battleship.websocket;
 import battleship.dtos.BoardDTO;
 import battleship.dtos.messages.ErrorDTO;
 import battleship.dtos.messages.WinnerDTO;
-import battleship.dtos.messages.game.GameMessageType;
 import battleship.dtos.messages.game.GuessDTO;
 import battleship.dtos.messages.game.GuessSunkDTO;
 import battleship.dtos.messages.game.StateUpdateDTO;
@@ -41,18 +40,18 @@ public class WebsocketMessenger {
     }
 
     public void sendStateUpdateGlobal(@NonNull Game game) {
-        messagingTemplate.convertAndSend("/game/" + game.getId() + "/",
-                new StateUpdateDTO(game.getState()), Map.of("type", GameMessageType.STATE_CHANGE));
+        messagingTemplate.convertAndSend("/game/" + game.getId() + "/state",
+                new StateUpdateDTO(game.getState()));
     }
 
     public void sendOpponentBoardDataUser(@NonNull UUID playerId, @NonNull BoardDTO boardData) {
-        messagingTemplate.convertAndSendToUser(playerId.toString(), "/game",
-                boardData, Map.of("type", GameMessageType.OPPONENT_BOARD));
+        messagingTemplate.convertAndSendToUser(playerId.toString(), "/game/setup",
+                boardData);
     }
 
     public void sendGameErrorUser(@NonNull UUID playerId, @NonNull String message) {
-        messagingTemplate.convertAndSendToUser(playerId.toString(), "/game",
-                new ErrorDTO(message), Map.of("type", GameMessageType.ERROR));
+        messagingTemplate.convertAndSendToUser(playerId.toString(), "/game/error",
+                new ErrorDTO(message));
     }
     public void sendGuessGlobal(@NonNull Game game, @NonNull Guess guess) {
         messagingTemplate.convertAndSend("/game/" + game.getId() + "/guess",

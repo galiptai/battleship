@@ -18,6 +18,11 @@ export function Connection() {
     if (!stompClient.current) {
       const sock = new SockJS(`http://${import.meta.env.VITE_DOMAIN}/ws`);
       stompClient.current = over(sock);
+      if (import.meta.env.PROD) {
+        stompClient.current.debug = () => {
+          return;
+        };
+      }
     }
     if (!stompClient.current.connected) {
       stompClient.current.connect({ userId: getId() }, onConnected, onError);

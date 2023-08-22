@@ -2,12 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { Client, Message, Subscription } from "stompjs";
 import { getId } from "../../logic/identification";
 import { OnlineSetup } from "./OnlineSetup";
-import { ErrorMessage } from "./Connection";
-import { BoardData } from "../../logic/GameSave";
 import { OnlinePlay } from "./OnlinePlay";
 import { OnlineGame as Game, GameData, GameState, WhichPlayer } from "../../logic/OnlineGame";
-
-type GameMessageType = "ERROR" | "STATE_CHANGE" | "OPPONENT_BOARD";
 
 type StateUpdate = {
   gameState: GameState;
@@ -18,8 +14,7 @@ type WinnerUpdate = {
 };
 
 type OnlineGameSubscriptions = {
-  gameSub: Subscription | null;
-  userSub: Subscription | null;
+  gameStateSub: Subscription | null;
   winSub: Subscription | null;
 };
 
@@ -41,42 +36,17 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
     });
   }, []);
 
-  const onGameUpdateReceived = useCallback((message: Message) => {
-    const type = (message.headers as { type?: GameMessageType })?.type;
-    if (!type) {
-      console.error("Server error: no type header.");
-    }
-    switch (type) {
-      case "ERROR": {
-        const error = JSON.parse(message.body) as ErrorMessage;
-        console.error(error.message);
-        return;
+  const onGameStateUpdateReceived = useCallback((message: Message) => {
+    const stateUpdate = JSON.parse(message.body) as StateUpdate;
+    setGame((game) => {
+      if (!game) {
+        throw Error("Game is not set!");
       }
-      case "STATE_CHANGE": {
-        const stateUpdate = JSON.parse(message.body) as StateUpdate;
-        setGame((game) => {
-          if (!game) {
-            throw Error("Game is not set!");
-          }
-          const newGame = game.makeCopy();
-          newGame.gameState = stateUpdate.gameState;
-          return newGame;
-        });
-        return;
-      }
-      case "OPPONENT_BOARD": {
-        const opponentBoard = JSON.parse(message.body) as BoardData;
-        setGame((game) => {
-          if (!game) {
-            throw Error("Game is not set!");
-          }
-          const newGame = game.makeCopy();
-          newGame.opponent = BoardData.fromJSON(opponentBoard).getBoard();
-          return newGame;
-        });
-        return;
-      }
-    }
+      const newGame = game.makeCopy();
+      newGame.gameState = stateUpdate.gameState;
+      return newGame;
+    });
+    return;
   }, []);
 
   const fetchGameAndJoin = useCallback(
@@ -86,14 +56,14 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
         if (res.ok) {
           const gameData = (await res.json()) as GameData;
           setGame(Game.fromGameData(gameData));
-          subscriptions.userSub = stompClient.subscribe(
-            `/user/${getId()}/game`,
-            onGameUpdateReceived
+          subscriptions.gameStateSub = stompClient.subscribe(
+            `/game/${gameId}/state`,
+            onGameStateUpdateReceived,
+            {
+              userId: getId(),
+            }
           );
-          subscriptions.gameSub = stompClient.subscribe(`/game/${gameId}/`, onGameUpdateReceived, {
-            userId: getId(),
-          });
-          subscriptions.gameSub = stompClient.subscribe(
+          subscriptions.winSub = stompClient.subscribe(
             `/game/${gameId}/winner`,
             onWinUpdateReceived
           );
@@ -107,20 +77,19 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
         console.error(error);
       }
     },
-    [gameId, stompClient, onGameUpdateReceived, onWinUpdateReceived]
+    [gameId, stompClient, onGameStateUpdateReceived, onWinUpdateReceived]
   );
 
   useEffect(() => {
     const controller = new AbortController();
     const signal = controller.signal;
-    const subscriptions: OnlineGameSubscriptions = { gameSub: null, userSub: null, winSub: null };
+    const subscriptions: OnlineGameSubscriptions = { gameStateSub: null, winSub: null };
     void fetchGameAndJoin(signal, subscriptions);
 
     return () => {
       controller.abort();
-      const { userSub, gameSub, winSub } = subscriptions;
-      userSub?.unsubscribe();
-      gameSub?.unsubscribe();
+      const { gameStateSub, winSub } = subscriptions;
+      gameStateSub?.unsubscribe();
       winSub?.unsubscribe();
     };
   }, [stompClient, gameId, fetchGameAndJoin]);
@@ -133,7 +102,7 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
     case "JOINING":
       return <div>Waiting for another player to join</div>;
     case "SETUP":
-      return <OnlineSetup game={game} setGame={setGame} />;
+      return <OnlineSetup stompClient={stompClient} game={game} setGame={setGame} />;
     case "P1_TURN":
     case "P2_TURN": {
       const isPlayersTurn: boolean =

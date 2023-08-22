@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => ({
   plugins: [react(), svgr()],
   resolve: {
     alias: {
-      $fonts: mode === "dev" ? "../fonts" : "./public/fonts",
+      $fonts: mode === "development" ? "../fonts" : "./public/fonts",
     },
   },
   server: {

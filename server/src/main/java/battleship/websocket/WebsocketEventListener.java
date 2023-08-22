@@ -35,7 +35,7 @@ public class WebsocketEventListener {
         if (destination == null || userId == null) {
             return;
         }
-        if (destination.startsWith("/game/")) {
+        if (destination.startsWith("/game/") && destination.endsWith("/state")) {
             UUID gameId = UUID.fromString(destination.substring(6, 42));
             Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("gameId", gameId.toString());
             gameConnectionService.joinGame(gameId, UUID.fromString(userId));
