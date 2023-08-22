@@ -3,9 +3,10 @@ import { Coordinate } from "../gameplay/DrawBoard";
 import { SwitchScreen } from "./SwitchScreen";
 import { PlayScreen } from "../gameplay/PlayScreen";
 import { PlayMenu } from "../gameplay/PlayMenu";
-import { EndOverlay } from "../gameplay/EndOverlay";
+import { MessageOverlay } from "../general/MessageOverlay";
 import { Board } from "../../logic/Board";
 import { Guess } from "../../logic/gameLogic";
+import { useNavigate } from "react-router-dom";
 
 type LocalPlayProps = {
   p1Board: Board;
@@ -32,6 +33,7 @@ export function LocalPlay({
   winner,
   setWinner,
 }: LocalPlayProps) {
+  const navigate = useNavigate();
   const [p1Turn, setP1Turn] = useState<boolean>(p1Starts);
   const [displaySwitch, setDisplaySwitch] = useState<boolean>(true);
   const [canGuess, setCanGuess] = useState<boolean>(false);
@@ -105,7 +107,15 @@ export function LocalPlay({
             </button>
           </PlayMenu>
         </PlayScreen>
-        <EndOverlay display={over} playerIsWinner={true} setDisplayResults={setDisplayResults} />
+        <MessageOverlay
+          display={over}
+          message="You win!"
+          description={`Congratulations, ${playerBoard.player}!`}
+          buttons={[
+            <button onClick={() => setDisplayResults(true)}>SEE RESULTS</button>,
+            <button onClick={() => navigate("/")}>MAIN MENU</button>,
+          ]}
+        />
       </>
     );
   }

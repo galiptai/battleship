@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { DrawBoard } from "./DrawBoard";
+import { DrawBoard } from "../gameplay/DrawBoard";
 import "./ResultsScreen.css";
 import { Board } from "../../logic/Board";
 import { Guess } from "../../logic/gameLogic";
@@ -26,8 +26,8 @@ export function ResultsScreen({ winner, p1Board, p2Board, guesses }: ResultsScre
           </div>
           <DrawBoard board={p2Board} showShips="all" />
           <DrawBoard board={p1Board} showShips="all" />
-          <GuessStats guesses={guesses.filter((guess) => guess.player === p1Board.player)} />
-          <GuessStats guesses={guesses.filter((guess) => guess.player === p2Board.player)} />
+          <GuessStats guesses={guesses.filter((guess) => guess.player === "PLAYER1")} />
+          <GuessStats guesses={guesses.filter((guess) => guess.player === "PLAYER2")} />
         </div>
       </div>
       <button className="results-button" onClick={() => navigate("/")}>

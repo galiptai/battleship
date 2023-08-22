@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { BoardSetup } from "../setup/BoardSetup";
 import { LocalPlay } from "./LocalPlay";
-import { ResultsScreen } from "../gameplay/ResultsScreen";
+import { ResultsScreen } from "../general/ResultsScreen";
 import { Board } from "../../logic/Board";
 import { Guess } from "../../logic/gameLogic";
 import { GameSave } from "../../logic/GameSave";

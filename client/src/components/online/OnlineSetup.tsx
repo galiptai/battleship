@@ -5,6 +5,7 @@ import { OnlineGame } from "../../logic/OnlineGame";
 import { getId, getLastUsedName } from "../../logic/identification";
 import { BoardSetup } from "../setup/BoardSetup";
 import { useCallback, useEffect, useState } from "react";
+import { MessageOverlay } from "../general/MessageOverlay";
 
 type OnlineSetupProps = {
   stompClient: Client;
@@ -65,16 +66,20 @@ export function OnlineSetup({ stompClient, game, setGame }: OnlineSetupProps) {
     setSubmitting(false);
   }
 
-  if (game.player) {
-    return <div>Your board has been set.</div>;
-  } else {
-    return (
+  const boardSet = game.player != null;
+  return (
+    <>
       <BoardSetup
         setVerifiedBoard={sendPlayerBoard}
         starterName={getLastUsedName()}
-        disabled={submitting}
+        disabled={submitting || boardSet}
         readyBtnText={submitting ? "Verifying..." : undefined}
       />
-    );
-  }
+      <MessageOverlay
+        display={boardSet}
+        message="Your board is set."
+        description="Waiting for other player."
+      />
+    </>
+  );
 }

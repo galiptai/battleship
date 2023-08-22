@@ -1,4 +1,4 @@
-.end-overlay {
+.overlay {
   width: 100vw;
   height: 100vh;
   position: absolute;
@@ -8,17 +8,28 @@
   align-items: center;
   justify-content: center;
   background: radial-gradient(rgba(0, 0, 0) 25%, rgba(50, 50, 50, 0.5));
+  z-index: 200;
 }
 
-.end-overlay-text {
-  font-size: 10vw;
+.overlay-text {
   text-align: center;
+  text-shadow: black 0 0 1vw;
+  overflow-wrap: break-word;
+}
+
+.overlay-message {
+  font-size: 10vw;
   font-weight: 600;
 }
 
-.end-overlay-buttons {
+.overlay-description {
+  font-size: 3vw;
+}
+
+.overlay-buttons {
+  margin: auto;
   height: 100%;
-  width: 100%;
+  width: fit-content;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -26,36 +37,42 @@
   justify-content: flex-start;
 }
 
-.end-overlay-buttons > button {
+.overlay-buttons > button {
   font-size: 2vw;
-  padding: 1% 0;
-  width: 25vh;
+  padding: 0.5vw;
+  width: 100%;
   text-align: center;
   font-weight: 900;
+  box-sizing: border-box;
 }
 
 @media all and (max-width: 600px) {
-  .end-overlay {
+  .overlay {
     display: flex;
     flex-direction: column;
     gap: 30px;
     background: radial-gradient(circle, rgba(0, 0, 0) 30%, rgba(50, 50, 50, 0.5));
   }
 
-  .end-overlay-placeholder {
+  .overlay-placeholder {
     display: none;
   }
 
-  .end-overlay-text {
-    font-size: 20vw;
+  .overlay-message {
+    font-size: 12vw;
   }
 
-  .end-overlay-buttons {
+  .overlay-description {
+    font-size: 6vw;
+  }
+
+  .overlay-buttons {
+    margin: unset;
     height: unset;
   }
 
-  .end-overlay-buttons > button {
+  .overlay-buttons > button {
     font-size: 8vw;
-    width: 50vw;
+    padding: 1vw;
   }
 }
