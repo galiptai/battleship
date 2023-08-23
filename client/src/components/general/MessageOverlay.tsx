@@ -9,9 +9,7 @@ type MessageOverlayProps = {
 };
 
 export function MessageOverlay({ display, message, description, buttons }: MessageOverlayProps) {
-  if (!buttons) {
-    buttons = [];
-  }
+  buttons = buttons ?? [];
   if (display) {
     return (
       <div className="overlay">

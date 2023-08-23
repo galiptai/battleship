@@ -21,7 +21,8 @@ export function GuessList({ container, guesses, player1, player2 }: GuessListPro
     if (
       container &&
       guessBottom.current &&
-      container.getBoundingClientRect().bottom >= guessBottom.current.getBoundingClientRect().top
+      container.getBoundingClientRect().bottom + 0.5 >=
+        guessBottom.current.getBoundingClientRect().top
     ) {
       guessBottom.current?.scrollIntoView({ behavior: "smooth" });
     }

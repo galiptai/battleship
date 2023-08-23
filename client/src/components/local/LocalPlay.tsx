@@ -100,13 +100,20 @@ export function LocalPlay({
           opponentBoard={opponentBoard}
           onOppBoardClick={onOppBoardClick}
           oppBoardClickCheck={oppBoardClickCheck}
-        >
-          <PlayMenu guesses={guesses} player1={p1Board.player} player2={p2Board.player}>
-            <button onClick={onPassClick} disabled={canGuess || over}>
-              PASS
-            </button>
-          </PlayMenu>
-        </PlayScreen>
+          playMenu={
+            <PlayMenu
+              guesses={guesses}
+              player1={p1Board.player}
+              player2={p2Board.player}
+              isPlayersTurn={true}
+              actions={[
+                <button onClick={onPassClick} disabled={canGuess || over}>
+                  PASS
+                </button>,
+              ]}
+            />
+          }
+        />
         <MessageOverlay
           display={over}
           message="You win!"
