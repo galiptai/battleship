@@ -1,26 +1,33 @@
-import { useRef, useState } from "react";
+import { useRef, useState, ReactNode } from "react";
 import "./PlayMenu.css";
 import { GuessList } from "./GuessList";
 import { Guess } from "../../logic/gameLogic";
 export type PlayMenuTabs = "Actions" | "Guesses" | "Chat";
 
 type PlayMenuProps = {
-  children?: JSX.Element | JSX.Element[];
   player1: string;
   player2: string;
+  isPlayersTurn: boolean;
   guesses: Guess[];
+  actions?: ReactNode[];
 };
 
-export function PlayMenu({ guesses, player1, player2, children }: PlayMenuProps) {
-  const [currentTab, setCurrentTab] = useState<PlayMenuTabs>("Actions");
+export function PlayMenu({ guesses, player1, player2, isPlayersTurn, actions }: PlayMenuProps) {
+  const [currentTab, setCurrentTab] = useState<PlayMenuTabs>(() =>
+    actions ? "Actions" : "Guesses"
+  );
   const content = useRef<HTMLDivElement>(null);
+  actions = actions ?? [];
 
-  const tabs: PlayMenuTabs[] = ["Actions", "Guesses"];
+  const tabs: PlayMenuTabs[] = ["Guesses"];
+  if (actions.length > 0) {
+    tabs.unshift("Actions");
+  }
 
   function displayTab(): JSX.Element | undefined {
     switch (currentTab) {
       case "Actions":
-        return <div className="play-menu-actions">{children}</div>;
+        return <div className="play-menu-actions">{...actions!}</div>;
       case "Guesses":
         return (
           <GuessList
@@ -36,18 +43,23 @@ export function PlayMenu({ guesses, player1, player2, children }: PlayMenuProps)
   }
   return (
     <div className="play-menu">
-      <div
-        className="play-menu-tabs"
-        style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}
-      >
-        {tabs.map((tab) => (
-          <button key={tab} onClick={() => setCurrentTab(tab)} disabled={currentTab === tab}>
-            {tab.toUpperCase()}
-          </button>
-        ))}
+      <div className="play-menu-info">
+        {isPlayersTurn ? "It's your turn!" : "It's your opponent's turn!"}
       </div>
-      <div className="tab-content" ref={content}>
-        {displayTab()}
+      <div className="play-menu-box">
+        <div
+          className="play-menu-tabs"
+          style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}
+        >
+          {tabs.map((tab) => (
+            <button key={tab} onClick={() => setCurrentTab(tab)} disabled={currentTab === tab}>
+              {tab.toUpperCase()}
+            </button>
+          ))}
+        </div>
+        <div className="tab-content" ref={content}>
+          {displayTab()}
+        </div>
       </div>
     </div>
   );

@@ -97,18 +97,21 @@ export function OnlinePlay({ stompClient, game, setGame, isPlayersTurn }: Online
     }
     return !game.opponent!.tiles[coordinate.y][coordinate.x].guessed;
   }
+
   return (
     <PlayScreen
       playerBoard={game.player!}
       opponentBoard={game.opponent!}
       onOppBoardClick={onOppBoardClick}
       oppBoardClickCheck={oppBoardClickCheck}
-    >
-      <PlayMenu
-        guesses={game.guesses}
-        player1={game.playerIs === "PLAYER1" ? game.player!.player : game.opponent!.player}
-        player2={game.playerIs === "PLAYER1" ? game.opponent!.player : game.player!.player}
-      ></PlayMenu>
-    </PlayScreen>
+      playMenu={
+        <PlayMenu
+          guesses={game.guesses}
+          player1={game.playerIs === "PLAYER1" ? game.player!.player : game.opponent!.player}
+          player2={game.playerIs === "PLAYER1" ? game.opponent!.player : game.player!.player}
+          isPlayersTurn={isPlayersTurn}
+        />
+      }
+    />
   );
 }
