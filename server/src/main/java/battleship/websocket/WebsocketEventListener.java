@@ -1,5 +1,6 @@
 package battleship.websocket;
 
+import battleship.config.CustomScheduledExecutorService;
 import battleship.service.GameConnectionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
@@ -11,12 +12,14 @@ import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
 public class WebsocketEventListener {
 
     private final GameConnectionService gameConnectionService;
+    private final CustomScheduledExecutorService executorService;
 
     @EventListener
     public void connectListener(SessionConnectEvent event) {
@@ -27,18 +30,22 @@ public class WebsocketEventListener {
         }
         Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("userId", userId);
     }
+
     @EventListener
     public void subscribeListener(SessionSubscribeEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String destination = headerAccessor.getDestination();
-        String userId = headerAccessor.getFirstNativeHeader("userId");
-        if (destination == null || userId == null) {
+        String userId = (String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("userId");
+        if (destination == null) {
             return;
         }
         if (destination.startsWith("/game/") && destination.endsWith("/state")) {
-            UUID gameId = UUID.fromString(destination.substring(6, 42));
-            Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("gameId", gameId.toString());
-            gameConnectionService.joinGame(gameId, UUID.fromString(userId));
+            Runnable joinGame = () -> {
+                UUID gameId = UUID.fromString(destination.substring(6, 42));
+                Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("gameId", gameId.toString());
+                gameConnectionService.joinGame(gameId, UUID.fromString(userId));
+            };
+            executorService.schedule(joinGame, 100L, TimeUnit.MILLISECONDS);
         }
     }
 
