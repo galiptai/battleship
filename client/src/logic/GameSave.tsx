@@ -1,6 +1,7 @@
 import { Coordinate } from "../components/gameplay/DrawBoard";
 import { Tile } from "../components/gameplay/Tile";
 import { Board } from "./Board";
+import { WhichPlayer } from "./OnlineGame";
 import { SHIP_TYPES, Ship, ShipTypeKey } from "./Ship";
 import { Guess } from "./gameLogic";
 
@@ -74,7 +75,7 @@ export class GameSave {
       return this.p1Board;
     } else {
       const p1Board = this.p1Board.getBoard();
-      this.#registerGuesses(p1Board);
+      this.#registerGuesses(p1Board, "PLAYER1");
       return p1Board;
     }
   }
@@ -84,7 +85,7 @@ export class GameSave {
       return this.p2Board;
     } else {
       const p2Board = this.p2Board.getBoard();
-      this.#registerGuesses(p2Board);
+      this.#registerGuesses(p2Board, "PLAYER2");
       return p2Board;
     }
   }
@@ -93,9 +94,9 @@ export class GameSave {
     return this.guesses.length % 2 === 0;
   }
 
-  #registerGuesses(board: Board) {
+  #registerGuesses(board: Board, whichPlayer: WhichPlayer) {
     for (const guess of this.guesses) {
-      if (guess.player !== board.player) {
+      if (guess.player !== whichPlayer) {
         board.tiles[guess.coordinate.y][guess.coordinate.x].guessed = true;
       }
     }
