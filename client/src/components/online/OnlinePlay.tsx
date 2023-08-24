@@ -7,6 +7,8 @@ import { getId } from "../../logic/identification";
 import { Client, Message } from "stompjs";
 import { PlainShipData } from "../../logic/GameSave";
 import { OnlineGame } from "../../logic/OnlineGame";
+import { MessageOverlay } from "../general/MessageOverlay";
+import { useNavigate } from "react-router-dom";
 
 type GuessSunk = {
   guess: Guess;
@@ -17,11 +19,16 @@ type OnlinePlayProps = {
   stompClient: Client;
   game: OnlineGame;
   setGame: React.Dispatch<React.SetStateAction<OnlineGame | null>>;
-  isPlayersTurn: boolean;
+  updateMessage: string | null;
 };
 
-export function OnlinePlay({ stompClient, game, setGame, isPlayersTurn }: OnlinePlayProps) {
+export function OnlinePlay({ stompClient, game, setGame, updateMessage }: OnlinePlayProps) {
   const [submitting, setSubmitting] = useState<boolean>(false);
+  const navigate = useNavigate();
+
+  const isPlayersTurn: boolean =
+    (game.gameState === "P1_TURN" && game.playerIs === "PLAYER1") ||
+    (game.gameState === "P2_TURN" && game.playerIs === "PLAYER2");
 
   const onGuessReceived = useCallback(
     (message: Message) => {
@@ -99,19 +106,29 @@ export function OnlinePlay({ stompClient, game, setGame, isPlayersTurn }: Online
   }
 
   return (
-    <PlayScreen
-      playerBoard={game.player!}
-      opponentBoard={game.opponent!}
-      onOppBoardClick={onOppBoardClick}
-      oppBoardClickCheck={oppBoardClickCheck}
-      playMenu={
-        <PlayMenu
-          guesses={game.guesses}
-          player1={game.playerIs === "PLAYER1" ? game.player!.player : game.opponent!.player}
-          player2={game.playerIs === "PLAYER1" ? game.opponent!.player : game.player!.player}
-          isPlayersTurn={isPlayersTurn}
-        />
-      }
-    />
+    <>
+      <PlayScreen
+        playerBoard={game.player!}
+        opponentBoard={game.opponent!}
+        onOppBoardClick={onOppBoardClick}
+        oppBoardClickCheck={oppBoardClickCheck}
+        playMenu={
+          <PlayMenu
+            guesses={game.guesses}
+            player1={game.playerIs === "PLAYER1" ? game.player!.player : game.opponent!.player}
+            player2={game.playerIs === "PLAYER1" ? game.opponent!.player : game.player!.player}
+            isPlayersTurn={isPlayersTurn}
+          />
+        }
+      />
+      <MessageOverlay
+        display={game.gameState === "SUSPENDED"}
+        message={updateMessage ? "Game suspended." : "Loading..."}
+        description={updateMessage ? updateMessage : undefined}
+        buttons={
+          updateMessage ? [<button onClick={() => navigate("/")}>MAIN MENU</button>] : undefined
+        }
+      />
+    </>
   );
 }

@@ -67,7 +67,7 @@ public class GameConnectionService {
             Player player = game.getPlayerById(playerId);
             game.connect(player);
             log.info("Player %s joined GAME-%s".formatted(playerId, gameId));
-            websocketMessenger.sendStateUpdateGlobal(game);
+            websocketMessenger.sendStateUpdateGlobal(game, null);
         } catch (IllegalArgumentException exception) {
             websocketMessenger.sendGameErrorUser(playerId, "Game no longer available.");
         } catch (IllegalActionException exception) {
@@ -86,14 +86,14 @@ public class GameConnectionService {
                 log.info("Player %s left GAME-%s".formatted(playerId, gameId));
                 if (game.anyConnected()) {
                     game.suspend();
-                    websocketMessenger.sendStateUpdateGlobal(game);
+                    websocketMessenger.sendStateUpdateGlobal(game, "Other player left. Wait for them to rejoin.");
                 } else {
                     gameProvider.closeGame(gameId);
                 }
             } else {
                 forfeitGame(gameId, playerId);
                 if (game.anyConnected()) {
-                    websocketMessenger.sendStateUpdateGlobal(game);
+                    websocketMessenger.sendStateUpdateGlobal(game, "The other player left.");
                 } else {
                     gameProvider.closeGame(gameId);
                 }

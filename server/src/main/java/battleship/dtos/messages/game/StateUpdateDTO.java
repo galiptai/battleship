@@ -1,6 +1,7 @@
 package battleship.dtos.messages.game;
 
 import battleship.game.GameState;
+import lombok.NonNull;
 
-public record StateUpdateDTO(GameState gameState) {
+public record StateUpdateDTO(@NonNull GameState gameState, String message) {
 }

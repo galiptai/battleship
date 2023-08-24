@@ -4,13 +4,16 @@ import { getId } from "../../logic/identification";
 import { OnlineSetup } from "./OnlineSetup";
 import { OnlinePlay } from "./OnlinePlay";
 import { OnlineGame as Game, GameData, GameState, WhichPlayer } from "../../logic/OnlineGame";
+import { MessageOverlay } from "../general/MessageOverlay";
 
 type StateUpdate = {
   gameState: GameState;
+  message: string | null;
 };
 
 type WinnerUpdate = {
   winner: WhichPlayer;
+  message: string | null;
 };
 
 type OnlineGameSubscriptions = {
@@ -25,6 +28,7 @@ type OnlineGameProps = {
 
 export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
   const [game, setGame] = useState<Game | null>(null);
+  const [updateMessage, setUpdateMessage] = useState<string | null>(null);
 
   const onWinUpdateReceived = useCallback((message: Message) => {
     const winnerUpdate = JSON.parse(message.body) as WinnerUpdate;
@@ -34,6 +38,7 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
       newGame.gameState = "OVER";
       return newGame;
     });
+    setUpdateMessage(winnerUpdate.message);
   }, []);
 
   const onGameStateUpdateReceived = useCallback((message: Message) => {
@@ -46,7 +51,7 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
       newGame.gameState = stateUpdate.gameState;
       return newGame;
     });
-    return;
+    setUpdateMessage(stateUpdate.message);
   }, []);
 
   const fetchGameAndJoin = useCallback(
@@ -58,10 +63,7 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
           setGame(Game.fromGameData(gameData));
           subscriptions.gameStateSub = stompClient.subscribe(
             `/game/${gameId}/state`,
-            onGameStateUpdateReceived,
-            {
-              userId: getId(),
-            }
+            onGameStateUpdateReceived
           );
           subscriptions.winSub = stompClient.subscribe(
             `/game/${gameId}/winner`,
@@ -104,17 +106,15 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
     case "SETUP":
       return <OnlineSetup stompClient={stompClient} game={game} setGame={setGame} />;
     case "P1_TURN":
-    case "P2_TURN": {
-      const isPlayersTurn: boolean =
-        (game.gameState === "P1_TURN" && game.playerIs === "PLAYER1") ||
-        (game.gameState === "P2_TURN" && game.playerIs === "PLAYER2");
+    case "P2_TURN":
+    case "SUSPENDED": {
       if (game.player && game.opponent) {
         return (
           <OnlinePlay
             stompClient={stompClient}
             game={game}
             setGame={setGame}
-            isPlayersTurn={isPlayersTurn}
+            updateMessage={updateMessage}
           />
         );
       } else {
@@ -123,10 +123,18 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
     }
     case "OVER":
       if (game.winner) {
-        return <div>{game.getWinnerName()} won!</div>;
+        return (
+          <>
+            <OnlinePlay
+              stompClient={stompClient}
+              game={game}
+              setGame={setGame}
+              updateMessage={updateMessage}
+            />
+            <MessageOverlay display message={`${game.getWinnerName()} won!`} />
+          </>
+        );
       }
       return <div>Game is over.</div>;
-    case "SUSPENDED":
-      return <div>Game is suspended.</div>;
   }
 }

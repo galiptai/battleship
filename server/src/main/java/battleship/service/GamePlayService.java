@@ -41,7 +41,7 @@ public class GamePlayService {
         }
         if (game.isGameReady()) {
             game.start();
-            websocketMessenger.sendStateUpdateGlobal(game);
+            websocketMessenger.sendStateUpdateGlobal(game, null);
         }
         return true;
     }
@@ -57,13 +57,13 @@ public class GamePlayService {
             websocketMessenger.sendGuessUser(opponent.getId(), guess);
             websocketMessenger.sendGuessSunkUser(playerId, guess, ship);
             if (game.isWon()) {
-                websocketMessenger.sendWinnerGlobal(game);
+                websocketMessenger.sendWinnerGlobal(game, null);
                 return true;
             }
         } else {
             websocketMessenger.sendGuessGlobal(game, guess);
         }
-        websocketMessenger.sendStateUpdateGlobal(game);
+        websocketMessenger.sendStateUpdateGlobal(game, null);
 
         return true;
     }

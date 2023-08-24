@@ -2,10 +2,10 @@ package battleship.websocket;
 
 import battleship.dtos.BoardDTO;
 import battleship.dtos.messages.ErrorDTO;
-import battleship.dtos.messages.WinnerDTO;
 import battleship.dtos.messages.game.GuessDTO;
 import battleship.dtos.messages.game.GuessSunkDTO;
 import battleship.dtos.messages.game.StateUpdateDTO;
+import battleship.dtos.messages.game.WinnerDTO;
 import battleship.dtos.messages.join.JoinDTO;
 import battleship.dtos.messages.join.JoinMessageType;
 import battleship.game.Game;
@@ -39,9 +39,9 @@ public class WebsocketMessenger {
                 new ErrorDTO(message), Map.of("type", JoinMessageType.ERROR));
     }
 
-    public void sendStateUpdateGlobal(@NonNull Game game) {
+    public void sendStateUpdateGlobal(@NonNull Game game, String message) {
         messagingTemplate.convertAndSend("/game/" + game.getId() + "/state",
-                new StateUpdateDTO(game.getState()));
+                new StateUpdateDTO(game.getState(), message));
     }
 
     public void sendOpponentBoardDataUser(@NonNull UUID playerId, @NonNull BoardDTO boardData) {
@@ -68,8 +68,8 @@ public class WebsocketMessenger {
                 new GuessSunkDTO(guess, ship));
     }
 
-    public void sendWinnerGlobal(@NonNull Game game) {
+    public void sendWinnerGlobal(@NonNull Game game, String message) {
         messagingTemplate.convertAndSend("/game/" + game.getId() + "/winner",
-                new WinnerDTO(game.getWinner()));
+                new WinnerDTO(game.getWinner(), message));
     }
 }
