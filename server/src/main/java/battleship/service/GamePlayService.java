@@ -57,6 +57,7 @@ public class GamePlayService {
             websocketMessenger.sendGuessUser(opponent.getId(), guess);
             websocketMessenger.sendGuessSunkUser(playerId, guess, ship);
             if (game.isWon()) {
+                websocketMessenger.sendOpponentBoardDataUser(opponent.getId(), player.getPlayerDataFull());
                 websocketMessenger.sendWinnerGlobal(game, null);
                 return true;
             }

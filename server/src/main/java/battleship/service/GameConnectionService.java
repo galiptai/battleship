@@ -81,24 +81,17 @@ public class GameConnectionService {
         try {
             Game game = gameProvider.getGame(gameId);
             Player player = game.getPlayerById(playerId);
-            player.setConnected(false);
-            if (game.isRunning()) {
-                log.info("Player %s left GAME-%s".formatted(playerId, gameId));
-                if (game.anyConnected()) {
-                    game.suspend();
-                    websocketMessenger.sendStateUpdateGlobal(game, "Other player left. Wait for them to rejoin.");
-                } else {
+            game.disconnect(player);
+            log.info("Player %s left GAME-%s".formatted(playerId, gameId));
+            if (game.isOver()) {
+                if (!game.anyConnected()) {
                     gameProvider.closeGame(gameId);
+                } else {
+                    websocketMessenger.sendStateUpdateGlobal(game, "The other player left.");
                 }
             } else {
-                forfeitGame(gameId, playerId);
-                if (game.anyConnected()) {
-                    websocketMessenger.sendStateUpdateGlobal(game, "The other player left.");
-                } else {
-                    gameProvider.closeGame(gameId);
-                }
+                websocketMessenger.sendStateUpdateGlobal(game, "Other player left. Wait for them to rejoin.");
             }
-        } catch (IllegalArgumentException | IllegalActionException ignore) {
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception);
         }
@@ -110,10 +103,8 @@ public class GameConnectionService {
             Player player = game.getPlayerById(playerId);
             game.forfeitGame(player);
             log.info("Player %s forfeited GAME-%s".formatted(playerId, gameId));
-        } catch (IllegalArgumentException exception) {
-            websocketMessenger.sendGameErrorUser(playerId, "Game no longer available.");
-        } catch (IllegalActionException exception) {
-            websocketMessenger.sendGameErrorUser(playerId, "You are not in this game.");
+            websocketMessenger.sendOpponentBoardDataUser(game.getOpponent(player).getId(), player.getPlayerDataFull());
+            websocketMessenger.sendWinnerGlobal(game, "%s forfeited.".formatted(player.getName()));
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception);
         }

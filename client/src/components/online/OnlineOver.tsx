@@ -58,7 +58,7 @@ export function OnlineOver({ stompClient, game, setGame, updateMessage }: Online
       <MessageOverlay
         display
         message="Game cancelled."
-        description="Other player left."
+        description={updateMessage ? updateMessage : undefined}
         buttons={[<button onClick={() => navigate("/")}>MAIN MENU</button>]}
       />
     );

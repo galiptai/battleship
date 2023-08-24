@@ -46,13 +46,11 @@ export class OnlineGame {
   static fromGameData(gameData: GameData): OnlineGame {
     const player = gameData.player ? BoardData.fromJSON(gameData.player).getBoard() : null;
     const opponent = gameData.opponent ? BoardData.fromJSON(gameData.opponent).getBoard() : null;
-    if (gameData.guesses.length > 0) {
-      for (const guess of gameData.guesses) {
-        if (gameData.playerIs === guess.player) {
-          opponent!.processGuess(guess);
-        } else {
-          player!.processGuess(guess);
-        }
+    for (const guess of gameData.guesses) {
+      if (gameData.playerIs === guess.player) {
+        opponent!.processGuess(guess);
+      } else {
+        player!.processGuess(guess);
       }
     }
     return new OnlineGame(
@@ -91,6 +89,15 @@ export class OnlineGame {
       return this.player!.player;
     } else {
       return this.opponent!.player;
+    }
+  }
+
+  setOpponent(opponentBoard: Board) {
+    this.opponent = opponentBoard;
+    for (const guess of this.guesses) {
+      if (this.playerIs === guess.player) {
+        this.opponent.processGuess(guess);
+      }
     }
   }
 }

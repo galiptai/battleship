@@ -14,6 +14,7 @@ import java.util.UUID;
 public class Player {
     @Getter
     private final UUID id;
+    @Getter
     private String name;
     @Getter
     private final WhichPlayer whichPlayer;

@@ -46,7 +46,7 @@ function GuessStats({ guesses }: GuessStatsProps) {
   const total = guesses.length;
   const hits = guesses.filter((guess) => guess.hit).length;
   const misses = total - hits;
-  const percent = ((hits / total) * 100).toFixed(2);
+  const percent = total === 0 || hits === 0 ? 0 : ((hits / total) * 100).toFixed(2);
   return (
     <div className="results-stats">
       <div>Guesses: {total}</div>

@@ -49,6 +49,38 @@ public class Game {
         );
     }
 
+    public Player getPlayerById(UUID id) throws IllegalActionException {
+        if (player1.getId().equals(id)) {
+            return player1;
+        } else if (player2.getId().equals(id)) {
+            return player2;
+        } else {
+            throw new IllegalActionException("Player is not in this game.");
+        }
+    }
+
+    public Player getOpponent(@NonNull Player player) throws IllegalActionException {
+        if (player1.equals(player)) {
+            return player2;
+        } else if (player2.equals(player)) {
+            return player1;
+        } else {
+            throw new IllegalActionException("Player is not in this game.");
+        }
+    }
+
+    public Ship getShip(Player opponent, Coordinate coordinate) {
+        return opponent.getShip(coordinate);
+    }
+
+    public WhichPlayer getWinner() {
+        if (isWon()) {
+            return winner;
+        } else {
+            throw new RuntimeException("The game is not won.");
+        }
+    }
+
     public void addSecondPlayer(@NonNull Player player) throws IllegalActionException {
         if (isJoinable()) {
             if (player1.getId().equals(player.getId())) {
@@ -76,8 +108,13 @@ public class Game {
         }
     }
 
-    public void suspend() {
-        state = GameState.SUSPENDED;
+    public void disconnect(Player player) {
+        player.setConnected(false);
+        if (isRunning()) {
+            state = GameState.SUSPENDED;
+        } else {
+            state = GameState.OVER;
+        }
     }
 
     public void start() throws IllegalActionException {
@@ -89,52 +126,6 @@ public class Game {
         }
         currentTurn = WhichPlayer.PLAYER1;
         state = GameState.P1_TURN;
-    }
-
-    public boolean isJoinable() {
-        return player2 == null;
-    }
-
-    public boolean isRejoinable() {
-        return state == GameState.SUSPENDED;
-    }
-
-    public boolean allConnected() {
-        return player2 != null && player1.isConnected() && player2.isConnected();
-    }
-
-    public boolean anyConnected() {
-        if (player2 == null) {
-            return player1.isConnected();
-        } else {
-            return player1.isConnected() || player2.isConnected();
-        }
-    }
-
-    public boolean isGameReady() {
-        return allConnected() && player1.isGameReady() && player2.isGameReady();
-    }
-
-    public boolean isRunning() {
-        return state == GameState.P1_TURN || state == GameState.P2_TURN;
-    }
-
-    public boolean hasStarted() {
-        return isRunning() || state == GameState.SUSPENDED;
-    }
-
-    public boolean hasPlayerWithId(UUID id) {
-        return player1.getId().equals(id) || player2.getId().equals(id);
-    }
-
-    public Player getPlayerById(UUID id) throws IllegalActionException {
-        if (player1.getId().equals(id)) {
-            return player1;
-        } else if (player2.getId().equals(id)) {
-            return player2;
-        } else {
-            throw new IllegalActionException("Player is not in this game.");
-        }
     }
 
     public void forfeitGame(Player forfeitingPlayer) throws IllegalActionException {
@@ -161,30 +152,60 @@ public class Game {
             guess = new Guess(player.getWhichPlayer(), coordinate, false, false);
         }
         guesses.add(guess);
-        if (!checkWin(player, opponent)) {
+        if (!checkWin()) {
             changeTurn();
         }
         return guess;
     }
 
-    public Player getOpponent(@NonNull Player player) throws IllegalActionException {
-        if (player1.equals(player)) {
-            return player2;
-        } else if (player2.equals(player)) {
-            return player1;
-        } else {
-            throw new IllegalActionException("Player is not in this game.");
-        }
+    public boolean isJoinable() {
+        return player2 == null;
+    }
+
+    public boolean isRejoinable() {
+        return state == GameState.SUSPENDED;
+    }
+
+    public boolean allConnected() {
+        return player2 != null && player1.isConnected() && player2.isConnected();
+    }
+
+    public boolean anyConnected() {
+            return player1.isConnected() || (player2 != null && player2.isConnected());
+    }
+
+    public boolean isGameReady() {
+        return allConnected() && player1.isGameReady() && player2.isGameReady();
+    }
+
+    public boolean isRunning() {
+        return state == GameState.P1_TURN || state == GameState.P2_TURN;
+    }
+
+    public boolean isOver() {
+        return state == GameState.OVER;
+    }
+
+    public boolean isWon() {
+        return winner != null;
+    }
+
+    public boolean hasPlayerWithId(UUID id) {
+        return player1.getId().equals(id) || player2.getId().equals(id);
     }
 
     private boolean isPlayersTurn(Player player) {
         return isRunning() && currentTurn == player.getWhichPlayer();
     }
 
-    private boolean checkWin(Player player, Player opponent) {
-        if (opponent.allShipsSank()) {
+    private boolean checkWin() {
+        if (player1.allShipsSank()) {
             state = GameState.OVER;
-            winner = player.getWhichPlayer();
+            winner = WhichPlayer.PLAYER1;
+            return true;
+        } else if (player2.allShipsSank()){
+            state = GameState.OVER;
+            winner = WhichPlayer.PLAYER2;
             return true;
         } else {
             return false;
@@ -205,19 +226,4 @@ public class Game {
         }
     }
 
-    public Ship getShip(Player opponent, Coordinate coordinate) {
-        return opponent.getShip(coordinate);
-    }
-
-    public boolean isWon() {
-        return winner != null;
-    }
-
-    public WhichPlayer getWinner() {
-        if (isWon()) {
-            return winner;
-        } else {
-            throw new RuntimeException("The game is not won.");
-        }
-    }
 }

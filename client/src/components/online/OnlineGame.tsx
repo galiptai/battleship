@@ -5,6 +5,7 @@ import { OnlineSetup } from "./OnlineSetup";
 import { OnlinePlay } from "./OnlinePlay";
 import { OnlineGame as Game, GameData, GameState, WhichPlayer } from "../../logic/OnlineGame";
 import { OnlineOver } from "./OnlineOver";
+import { BoardData } from "../../logic/GameSave";
 
 type StateUpdate = {
   gameState: GameState;
@@ -18,6 +19,7 @@ type WinnerUpdate = {
 
 type OnlineGameSubscriptions = {
   gameStateSub: Subscription | null;
+  oppDataSub: Subscription | null;
   winSub: Subscription | null;
 };
 
@@ -29,17 +31,6 @@ type OnlineGameProps = {
 export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
   const [game, setGame] = useState<Game | null>(null);
   const [updateMessage, setUpdateMessage] = useState<string | null>(null);
-
-  const onWinUpdateReceived = useCallback((message: Message) => {
-    const winnerUpdate = JSON.parse(message.body) as WinnerUpdate;
-    setGame((game) => {
-      const newGame = game!.makeCopy();
-      newGame.winner = winnerUpdate.winner;
-      newGame.gameState = "OVER";
-      return newGame;
-    });
-    setUpdateMessage(winnerUpdate.message);
-  }, []);
 
   const onGameStateUpdateReceived = useCallback((message: Message) => {
     const stateUpdate = JSON.parse(message.body) as StateUpdate;
@@ -54,6 +45,45 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
     setUpdateMessage(stateUpdate.message);
   }, []);
 
+  const onOppDataReceived = useCallback((message: Message) => {
+    const opponentBoard = JSON.parse(message.body) as BoardData;
+    setGame((game) => {
+      if (!game) {
+        throw Error("Game is not set!");
+      }
+      const newGame = game.makeCopy();
+      newGame.setOpponent(BoardData.fromJSON(opponentBoard).getBoard());
+      return newGame;
+    });
+    return;
+  }, []);
+
+  const onWinUpdateReceived = useCallback((message: Message) => {
+    const winnerUpdate = JSON.parse(message.body) as WinnerUpdate;
+    setGame((game) => {
+      const newGame = game!.makeCopy();
+      newGame.winner = winnerUpdate.winner;
+      newGame.gameState = "OVER";
+      return newGame;
+    });
+    setUpdateMessage(winnerUpdate.message);
+  }, []);
+
+  const startSubscriptions = useCallback(
+    (subscriptions: OnlineGameSubscriptions) => {
+      subscriptions.gameStateSub = stompClient.subscribe(
+        `/game/${gameId}/state`,
+        onGameStateUpdateReceived
+      );
+      subscriptions.oppDataSub = stompClient.subscribe(
+        `/user/${getId()}/game/setup`,
+        onOppDataReceived
+      );
+      subscriptions.winSub = stompClient.subscribe(`/game/${gameId}/winner`, onWinUpdateReceived);
+    },
+    [gameId, stompClient, onGameStateUpdateReceived, onOppDataReceived, onWinUpdateReceived]
+  );
+
   const fetchGameAndJoin = useCallback(
     async (signal: AbortSignal, subscriptions: OnlineGameSubscriptions) => {
       try {
@@ -61,14 +91,7 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
         if (res.ok) {
           const gameData = (await res.json()) as GameData;
           setGame(Game.fromGameData(gameData));
-          subscriptions.gameStateSub = stompClient.subscribe(
-            `/game/${gameId}/state`,
-            onGameStateUpdateReceived
-          );
-          subscriptions.winSub = stompClient.subscribe(
-            `/game/${gameId}/winner`,
-            onWinUpdateReceived
-          );
+          startSubscriptions(subscriptions);
         } else {
           const data = (await res.json()) as { detail?: string };
           if (data.detail) {
@@ -79,19 +102,24 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
         console.error(error);
       }
     },
-    [gameId, stompClient, onGameStateUpdateReceived, onWinUpdateReceived]
+    [gameId, startSubscriptions]
   );
 
   useEffect(() => {
     const controller = new AbortController();
     const signal = controller.signal;
-    const subscriptions: OnlineGameSubscriptions = { gameStateSub: null, winSub: null };
+    const subscriptions: OnlineGameSubscriptions = {
+      gameStateSub: null,
+      oppDataSub: null,
+      winSub: null,
+    };
     void fetchGameAndJoin(signal, subscriptions);
 
     return () => {
       controller.abort();
-      const { gameStateSub, winSub } = subscriptions;
+      const { gameStateSub, oppDataSub, winSub } = subscriptions;
       gameStateSub?.unsubscribe();
+      oppDataSub?.unsubscribe();
       winSub?.unsubscribe();
     };
   }, [stompClient, gameId, fetchGameAndJoin]);
