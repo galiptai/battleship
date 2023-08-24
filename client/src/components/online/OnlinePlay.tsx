@@ -15,7 +15,7 @@ type GuessSunk = {
   ship: PlainShipData;
 };
 
-type OnlinePlayProps = {
+export type OnlinePlayProps = {
   stompClient: Client;
   game: OnlineGame;
   setGame: React.Dispatch<React.SetStateAction<OnlineGame | null>>;
@@ -123,6 +123,7 @@ export function OnlinePlay({ stompClient, game, setGame, updateMessage }: Online
       />
       <MessageOverlay
         display={game.gameState === "SUSPENDED"}
+        background
         message={updateMessage ? "Game suspended." : "Loading..."}
         description={updateMessage ? updateMessage : undefined}
         buttons={

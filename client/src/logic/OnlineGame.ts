@@ -78,15 +78,19 @@ export class OnlineGame {
     );
   }
 
-  getWinnerName(): string {
+  playerIsWinner(): boolean {
     if (this.winner) {
-      if (this.playerIs === this.winner) {
-        return this.player!.player;
-      } else {
-        return this.opponent!.player;
-      }
+      return this.playerIs === this.winner;
     } else {
       throw new Error("Game is not yet won");
+    }
+  }
+
+  getWinnerName(): string {
+    if (this.playerIsWinner()) {
+      return this.player!.player;
+    } else {
+      return this.opponent!.player;
     }
   }
 }

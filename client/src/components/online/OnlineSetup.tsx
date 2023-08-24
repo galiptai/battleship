@@ -77,6 +77,7 @@ export function OnlineSetup({ stompClient, game, setGame }: OnlineSetupProps) {
       />
       <MessageOverlay
         display={boardSet}
+        background
         message="Your board is set."
         description="Waiting for other player."
       />

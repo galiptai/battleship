@@ -116,6 +116,7 @@ export function LocalPlay({
         />
         <MessageOverlay
           display={over}
+          background
           message="You win!"
           description={`Congratulations, ${playerBoard.player}!`}
           buttons={[

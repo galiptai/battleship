@@ -3,15 +3,17 @@ import { DrawBoard } from "../gameplay/DrawBoard";
 import "./ResultsScreen.css";
 import { Board } from "../../logic/Board";
 import { Guess } from "../../logic/gameLogic";
+import { WhichPlayer } from "../../logic/OnlineGame";
 
 type ResultsScreenProps = {
   winner: string;
   p1Board: Board;
   p2Board: Board;
   guesses: Guess[];
+  playerIs: WhichPlayer;
 };
 
-export function ResultsScreen({ winner, p1Board, p2Board, guesses }: ResultsScreenProps) {
+export function ResultsScreen({ winner, p1Board, p2Board, guesses, playerIs }: ResultsScreenProps) {
   const navigate = useNavigate();
   return (
     <div className="results">
@@ -26,8 +28,8 @@ export function ResultsScreen({ winner, p1Board, p2Board, guesses }: ResultsScre
           </div>
           <DrawBoard board={p2Board} showShips="all" />
           <DrawBoard board={p1Board} showShips="all" />
-          <GuessStats guesses={guesses.filter((guess) => guess.player === "PLAYER1")} />
-          <GuessStats guesses={guesses.filter((guess) => guess.player === "PLAYER2")} />
+          <GuessStats guesses={guesses.filter((guess) => guess.player === playerIs)} />
+          <GuessStats guesses={guesses.filter((guess) => guess.player !== playerIs)} />
         </div>
       </div>
       <button className="results-button" onClick={() => navigate("/")}>

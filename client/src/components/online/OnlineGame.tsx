@@ -4,7 +4,7 @@ import { getId } from "../../logic/identification";
 import { OnlineSetup } from "./OnlineSetup";
 import { OnlinePlay } from "./OnlinePlay";
 import { OnlineGame as Game, GameData, GameState, WhichPlayer } from "../../logic/OnlineGame";
-import { MessageOverlay } from "../general/MessageOverlay";
+import { OnlineOver } from "./OnlineOver";
 
 type StateUpdate = {
   gameState: GameState;
@@ -122,19 +122,13 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
       }
     }
     case "OVER":
-      if (game.winner) {
-        return (
-          <>
-            <OnlinePlay
-              stompClient={stompClient}
-              game={game}
-              setGame={setGame}
-              updateMessage={updateMessage}
-            />
-            <MessageOverlay display message={`${game.getWinnerName()} won!`} />
-          </>
-        );
-      }
-      return <div>Game is over.</div>;
+      return (
+        <OnlineOver
+          stompClient={stompClient}
+          game={game}
+          setGame={setGame}
+          updateMessage={updateMessage}
+        />
+      );
   }
 }
