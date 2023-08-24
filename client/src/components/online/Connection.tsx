@@ -4,6 +4,8 @@ import { Client, over } from "stompjs";
 import { getId } from "../../logic/identification";
 import { Joining } from "./Joining";
 import { OnlineGame } from "./OnlineGame";
+import { MessageOverlay } from "../general/MessageOverlay";
+import { Loading } from "../general/Loading";
 
 export type ErrorMessage = {
   message: string;
@@ -49,7 +51,7 @@ export function Connection() {
   }
 
   if (!connected) {
-    return <div>Connecting...</div>;
+    return <MessageOverlay display message="Connecting" description={<Loading />} />;
   } else if (gameId === null && stompClient.current) {
     return <Joining stompClient={stompClient.current} setGameId={setGameId} />;
   } else if (gameId !== null && stompClient.current) {

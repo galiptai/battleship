@@ -5,7 +5,7 @@ type MessageOverlayProps = {
   display: boolean;
   background?: boolean;
   message: string;
-  description?: string;
+  description?: string | ReactNode;
   buttons?: ReactNode[];
 };
 

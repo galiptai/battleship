@@ -3,6 +3,8 @@ import { Client, Message } from "stompjs";
 import { getId } from "../../logic/identification";
 import { Choice } from "../local/LocalLoader";
 import { ErrorMessage } from "./Connection";
+import { MessageOverlay } from "../general/MessageOverlay";
+import { Loading } from "../general/Loading";
 
 type JoinMessageType = "ERROR" | "GAME_FOUND";
 
@@ -105,9 +107,7 @@ export function Joining({ stompClient, setGameId }: JoiningProps) {
           onCancel={() => setRejoin("No")}
         />
       )}
-      <div>
-        <div>Searching...</div>
-      </div>
+      <MessageOverlay display message="Connecting" description={<Loading />} />
     </>
   );
 }

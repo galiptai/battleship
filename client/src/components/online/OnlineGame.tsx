@@ -6,6 +6,8 @@ import { OnlinePlay } from "./OnlinePlay";
 import { OnlineGame as Game, GameData, GameState, WhichPlayer } from "../../logic/OnlineGame";
 import { OnlineOver } from "./OnlineOver";
 import { BoardData } from "../../logic/GameSave";
+import { MessageOverlay } from "../general/MessageOverlay";
+import { Loading } from "../general/Loading";
 
 type StateUpdate = {
   gameState: GameState;
@@ -125,12 +127,12 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
   }, [stompClient, gameId, fetchGameAndJoin]);
 
   if (!game) {
-    return <div>Joining...</div>;
+    return <MessageOverlay display message="Joining" description={<Loading />} />;
   }
 
   switch (game.gameState) {
     case "JOINING":
-      return <div>Waiting for another player to join</div>;
+      return <MessageOverlay display message="Waiting for another player to join" />;
     case "SETUP":
       return <OnlineSetup stompClient={stompClient} game={game} setGame={setGame} />;
     case "P1_TURN":
@@ -146,7 +148,7 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
           />
         );
       } else {
-        return <div>Loading...</div>;
+        return <MessageOverlay display message="Loading" description={<Loading />} />;
       }
     }
     case "OVER":
