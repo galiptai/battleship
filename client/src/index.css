@@ -16,7 +16,7 @@
 }
 
 html {
-  font-family: "TasaOrbiter";
+  font-family: "TasaOrbiter", sans-serif;
   background-color: black;
   color: var(--main-blue);
 }
@@ -27,12 +27,12 @@ body,
   height: 100%;
   width: 100%;
   margin: 0;
+  user-select: none;
 }
 
 button {
   all: unset;
-  user-select: none;
-  font-family: "TASAExplorer";
+  font-family: "TASAExplorer", sans-serif;
   background-color: var(--main-blue);
   color: black;
   text-align: center;

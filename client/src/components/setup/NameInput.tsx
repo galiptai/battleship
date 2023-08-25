@@ -32,6 +32,12 @@ export function NameInput({ board, setBoard, setVerified, disabled }: NameInputP
         onFocus={onFocus}
         maxLength={30}
         disabled={disabled}
+        onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
+          if (event.key === "Enter") {
+            const target = event.target as HTMLInputElement;
+            target.blur();
+          }
+        }}
       />
     </div>
   );
