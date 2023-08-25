@@ -201,11 +201,11 @@ public class Game {
     private boolean checkWin() {
         if (player1.allShipsSank()) {
             state = GameState.OVER;
-            winner = WhichPlayer.PLAYER1;
+            winner = WhichPlayer.PLAYER2;
             return true;
         } else if (player2.allShipsSank()){
             state = GameState.OVER;
-            winner = WhichPlayer.PLAYER2;
+            winner = WhichPlayer.PLAYER1;
             return true;
         } else {
             return false;

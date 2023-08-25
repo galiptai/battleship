@@ -81,12 +81,13 @@ public class GameConnectionService {
         try {
             Game game = gameProvider.getGame(gameId);
             Player player = game.getPlayerById(playerId);
+            boolean alreadyOver = game.isOver();
             game.disconnect(player);
             log.info("Player %s left GAME-%s".formatted(playerId, gameId));
             if (game.isOver()) {
                 if (!game.anyConnected()) {
                     gameProvider.closeGame(gameId);
-                } else {
+                } else if (!alreadyOver){
                     websocketMessenger.sendStateUpdateGlobal(game, "The other player left.");
                 }
             } else {
