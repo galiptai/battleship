@@ -54,6 +54,8 @@
     display: flex;
     flex-direction: column;
     gap: 30px;
+    box-sizing: border-box;
+    padding: 0 5px;
   }
 
   .overlay-background {

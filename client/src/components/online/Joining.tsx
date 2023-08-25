@@ -5,6 +5,7 @@ import { Choice } from "../local/LocalLoader";
 import { ErrorMessage } from "./Connection";
 import { MessageOverlay } from "../general/MessageOverlay";
 import { Loading } from "../general/Loading";
+import { ChoiceModal } from "../general/ChoiceModal";
 
 type JoinMessageType = "ERROR" | "GAME_FOUND";
 
@@ -100,30 +101,14 @@ export function Joining({ stompClient, setGameId }: JoiningProps) {
 
   return (
     <>
-      {displayRejoinModal && (
-        <ChoiceModal
-          question="Running unfinished game found. Rejoin?"
-          onConfirm={() => setRejoin("Yes")}
-          onCancel={() => setRejoin("No")}
-        />
-      )}
-      <MessageOverlay display message="Connecting" description={<Loading />} />
+      <MessageOverlay display message="Searching" description={<Loading />} />
+      <ChoiceModal
+        display={displayRejoinModal}
+        question="Running unfinished game found. Rejoin?"
+        description='Picking "NO" will forfeit the running game.'
+        onConfirm={() => setRejoin("Yes")}
+        onCancel={() => setRejoin("No")}
+      />
     </>
-  );
-}
-
-type ChoiceModalProps = {
-  question: string;
-  onConfirm: () => void;
-  onCancel: () => void;
-};
-
-function ChoiceModal({ question, onConfirm, onCancel }: ChoiceModalProps) {
-  return (
-    <div>
-      <div>{question}</div>
-      <button onClick={onConfirm}>Yes</button>
-      <button onClick={onCancel}>No</button>
-    </div>
   );
 }
