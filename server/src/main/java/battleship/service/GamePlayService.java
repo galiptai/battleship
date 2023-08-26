@@ -1,8 +1,7 @@
 package battleship.service;
 
 import battleship.dtos.BoardDTO;
-import battleship.exceptions.BoardException;
-import battleship.exceptions.IllegalActionException;
+import battleship.exceptions.*;
 import battleship.game.Game;
 import battleship.game.Guess;
 import battleship.game.Player;
@@ -27,11 +26,13 @@ public class GamePlayService {
 
     private final WebsocketMessenger websocketMessenger;
 
-    public Boolean setBoard(@NonNull UUID gameId, @NonNull UUID playerId, @NonNull BoardDTO boardData) throws IllegalActionException, BoardException {
+    public Boolean setBoard(@NonNull UUID gameId, @NonNull UUID playerId, @NonNull BoardDTO boardData)
+            throws IllegalRequestException, InvalidActionException, BoardException, GameNotFoundException,
+            GameStateException, InvalidRequestException {
         Game game = gameProvider.getGame(gameId);
         Player player = game.getPlayerById(playerId);
         if (player.isSet()) {
-            throw new IllegalActionException("Board has already been set");
+            throw new InvalidActionException("Board has already been set.");
         }
         Board board = DataConverter.convertAndVerifyBoard(boardData);
         player.setData(boardData.player(), board);
@@ -46,7 +47,8 @@ public class GamePlayService {
         return true;
     }
 
-    public Boolean makeGuess(UUID gameId, UUID playerId, Coordinate coordinate) throws IllegalActionException {
+    public Boolean makeGuess(UUID gameId, UUID playerId, Coordinate coordinate) throws IllegalRequestException,
+            InvalidActionException, GameNotFoundException, GameStateException {
         Game game = gameProvider.getGame(gameId);
         Player player = game.getPlayerById(playerId);
         Guess guess = game.makeGuess(player, coordinate);
@@ -58,7 +60,7 @@ public class GamePlayService {
             websocketMessenger.sendGuessSunkUser(playerId, guess, ship);
             if (game.isWon()) {
                 websocketMessenger.sendOpponentBoardDataUser(opponent.getId(), player.getPlayerDataFull());
-                websocketMessenger.sendWinnerGlobal(game, null);
+                websocketMessenger.sendWinnerGlobal(game.getId(), game.getWinner(), null);
                 return true;
             }
         } else {

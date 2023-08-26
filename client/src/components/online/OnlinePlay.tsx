@@ -9,6 +9,7 @@ import { PlainShipData } from "../../logic/GameSave";
 import { OnlineGame } from "../../logic/OnlineGame";
 import { MessageOverlay } from "../general/MessageOverlay";
 import { useNavigate } from "react-router-dom";
+import { CustomError, isErrorMessage } from "../../logic/CustomError";
 
 type GuessSunk = {
   guess: Guess;
@@ -20,9 +21,16 @@ export type OnlinePlayProps = {
   game: OnlineGame;
   setGame: React.Dispatch<React.SetStateAction<OnlineGame | null>>;
   updateMessage: string | null;
+  displayError: (error: unknown) => void;
 };
 
-export function OnlinePlay({ stompClient, game, setGame, updateMessage }: OnlinePlayProps) {
+export function OnlinePlay({
+  stompClient,
+  game,
+  setGame,
+  updateMessage,
+  displayError,
+}: OnlinePlayProps) {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const navigate = useNavigate();
 
@@ -87,13 +95,19 @@ export function OnlinePlay({ stompClient, game, setGame, updateMessage }: Online
         body: JSON.stringify(coordinate),
       });
       if (!res.ok) {
-        const data = (await res.json()) as { detail?: string };
-        if (data.detail) {
-          console.error(data.detail);
+        const error = (await res.json()) as unknown;
+        if (isErrorMessage(error)) {
+          const { type, statusCode, userMessage, errorMessage } = error;
+          throw new CustomError(type, statusCode, userMessage, errorMessage);
+        } else {
+          throw error;
         }
       }
-    } catch (error) {
-      console.error(error);
+    } catch (error: unknown) {
+      if ((error as Error)?.name === "AbortError") {
+        return;
+      }
+      displayError(error);
     }
     setSubmitting(false);
   }
@@ -117,7 +131,13 @@ export function OnlinePlay({ stompClient, game, setGame, updateMessage }: Online
             guesses={game.guesses}
             player1={game.playerIs === "PLAYER1" ? game.player!.player : game.opponent!.player}
             player2={game.playerIs === "PLAYER1" ? game.opponent!.player : game.player!.player}
-            isPlayersTurn={isPlayersTurn}
+            info={
+              isPlayersTurn
+                ? submitting
+                  ? "Processing..."
+                  : "It's your turn!"
+                : "It's your opponents turn!"
+            }
           />
         }
       />

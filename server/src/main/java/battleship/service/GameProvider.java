@@ -1,5 +1,6 @@
 package battleship.service;
 
+import battleship.exceptions.GameNotFoundException;
 import battleship.game.Game;
 import battleship.game.Player;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +22,10 @@ public class GameProvider {
         this.games = new HashMap<>();
     }
 
-    public Game getGame(UUID gameId) {
+    public Game getGame(UUID gameId) throws GameNotFoundException {
         Game game = games.get(gameId);
         if (game == null) {
-            throw new IllegalArgumentException("Game not found");
+            throw new GameNotFoundException("Game not found.");
         }
         return game;
     }

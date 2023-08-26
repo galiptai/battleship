@@ -7,12 +7,12 @@ export type PlayMenuTabs = "Actions" | "Guesses" | "Chat";
 type PlayMenuProps = {
   player1: string;
   player2: string;
-  isPlayersTurn: boolean;
+  info: string;
   guesses: Guess[];
   actions?: ReactNode[];
 };
 
-export function PlayMenu({ guesses, player1, player2, isPlayersTurn, actions }: PlayMenuProps) {
+export function PlayMenu({ guesses, player1, player2, info, actions }: PlayMenuProps) {
   const [currentTab, setCurrentTab] = useState<PlayMenuTabs>(() =>
     actions ? "Actions" : "Guesses"
   );
@@ -43,9 +43,7 @@ export function PlayMenu({ guesses, player1, player2, isPlayersTurn, actions }: 
   }
   return (
     <div className="play-menu">
-      <div className="play-menu-info">
-        {isPlayersTurn ? "It's your turn!" : "It's your opponent's turn!"}
-      </div>
+      <div className="play-menu-info">{info}</div>
       <div className="play-menu-box">
         <div
           className="play-menu-tabs"

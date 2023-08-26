@@ -8,6 +8,7 @@ import { OnlineOver } from "./OnlineOver";
 import { BoardData } from "../../logic/GameSave";
 import { MessageOverlay } from "../general/MessageOverlay";
 import { Loading } from "../general/Loading";
+import { CustomError, ErrorMessage, isErrorMessage } from "../../logic/CustomError";
 
 type StateUpdate = {
   gameState: GameState;
@@ -28,9 +29,10 @@ type OnlineGameSubscriptions = {
 type OnlineGameProps = {
   stompClient: Client;
   gameId: string;
+  displayError: (error: unknown) => void;
 };
 
-export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
+export function OnlineGame({ stompClient, gameId, displayError }: OnlineGameProps) {
   const [game, setGame] = useState<Game | null>(null);
   const [updateMessage, setUpdateMessage] = useState<string | null>(null);
 
@@ -95,16 +97,22 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
           setGame(Game.fromGameData(gameData));
           startSubscriptions(subscriptions);
         } else {
-          const data = (await res.json()) as { detail?: string };
-          if (data.detail) {
-            console.error(data.detail);
+          const error = (await res.json()) as unknown;
+          if (isErrorMessage(error)) {
+            const { type, statusCode, userMessage, errorMessage } = error;
+            throw new CustomError(type, statusCode, userMessage, errorMessage);
+          } else {
+            throw error;
           }
         }
-      } catch (error) {
-        console.error(error);
+      } catch (error: unknown) {
+        if ((error as Error)?.name === "AbortError") {
+          return;
+        }
+        displayError(error);
       }
     },
-    [gameId, startSubscriptions]
+    [gameId, startSubscriptions, displayError]
   );
 
   useEffect(() => {
@@ -134,7 +142,14 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
     case "JOINING":
       return <MessageOverlay display message="Waiting for another player to join" />;
     case "SETUP":
-      return <OnlineSetup stompClient={stompClient} game={game} setGame={setGame} />;
+      return (
+        <OnlineSetup
+          stompClient={stompClient}
+          game={game}
+          setGame={setGame}
+          displayError={displayError}
+        />
+      );
     case "P1_TURN":
     case "P2_TURN":
     case "SUSPENDED": {
@@ -145,6 +160,7 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
             game={game}
             setGame={setGame}
             updateMessage={updateMessage}
+            displayError={displayError}
           />
         );
       } else {
@@ -158,6 +174,7 @@ export function OnlineGame({ stompClient, gameId }: OnlineGameProps) {
           game={game}
           setGame={setGame}
           updateMessage={updateMessage}
+          displayError={displayError}
         />
       );
   }

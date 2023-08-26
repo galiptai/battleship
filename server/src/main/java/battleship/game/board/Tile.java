@@ -1,6 +1,6 @@
 package battleship.game.board;
 
-import battleship.exceptions.IllegalActionException;
+import battleship.exceptions.InvalidActionException;
 import battleship.game.ship.Ship;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,9 +19,9 @@ public class Tile {
         return ship == null;
     }
 
-    public Ship guess() throws IllegalActionException {
+    public Ship guess() throws InvalidActionException {
         if (guessed) {
-            throw new IllegalActionException("This tile has already been guessed.");
+            throw new InvalidActionException("This tile has already been guessed.");
         }
         guessed = true;
         return ship;

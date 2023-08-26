@@ -1,7 +1,11 @@
 package battleship.service;
 
 import battleship.dtos.GameDTO;
-import battleship.exceptions.IllegalActionException;
+import battleship.dtos.messages.ErrorDTO;
+import battleship.dtos.messages.ErrorType;
+import battleship.exceptions.GameNotFoundException;
+import battleship.exceptions.IllegalRequestException;
+import battleship.exceptions.InvalidRequestException;
 import battleship.game.Game;
 import battleship.game.Player;
 import battleship.game.WhichPlayer;
@@ -23,23 +27,28 @@ public class GameConnectionService {
     private final GameProvider gameProvider;
 
     public void findNewGame(@NonNull UUID playerId) {
-        UUID gameId;
-        Game game = gameProvider.getJoinableGame().orElse(null);
-        if (game != null) {
-            Player player = new Player(playerId, WhichPlayer.PLAYER2);
-            try {
+        try {
+            UUID gameId;
+            Game game = gameProvider.getJoinableGame().orElse(null);
+            if (game != null) {
+                Player player = new Player(playerId, WhichPlayer.PLAYER2);
                 game.addSecondPlayer(player);
                 gameId = game.getId();
-            } catch (IllegalActionException exception) {
-                log.error(exception.getMessage(), exception);
-                return;
+            } else {
+                Player player = new Player(playerId, WhichPlayer.PLAYER1);
+                gameId = gameProvider.startNewGame(player);
             }
-        } else {
-            Player player = new Player(playerId, WhichPlayer.PLAYER1);
-            gameId = gameProvider.startNewGame(player);
-        }
 
-        websocketMessenger.sendJoinDataUser(playerId, gameId);
+            websocketMessenger.sendJoinDataUser(playerId, gameId);
+        } catch (InvalidRequestException exception) {
+            log.error(exception.getMessage(), exception);
+            websocketMessenger.sendErrorUser(playerId, new ErrorDTO(ErrorType.ERROR, 400,
+                    "You are already in this game.", exception.getMessage()));
+        } catch (Exception exception) {
+            log.error(exception.getMessage(), exception);
+            websocketMessenger.sendErrorUser(playerId, new ErrorDTO(ErrorType.ERROR, 500,
+                    "Something went wrong.", exception.getMessage()));
+        }
     }
 
     public void attemptRejoin(@NonNull UUID gameId, @NonNull UUID playerId) {
@@ -55,7 +64,7 @@ public class GameConnectionService {
         }
     }
 
-    public GameDTO getGame(@NonNull UUID gameId, @NonNull UUID playerId) throws IllegalActionException {
+    public GameDTO getGame(@NonNull UUID gameId, @NonNull UUID playerId) throws IllegalRequestException, GameNotFoundException {
         Game game = gameProvider.getGame(gameId);
         Player player = game.getPlayerById(playerId);
         return game.getGame(player);
@@ -68,10 +77,12 @@ public class GameConnectionService {
             game.connect(player);
             log.info("Player %s joined GAME-%s".formatted(playerId, gameId));
             websocketMessenger.sendStateUpdateGlobal(game, null);
-        } catch (IllegalArgumentException exception) {
-            websocketMessenger.sendGameErrorUser(playerId, "Game no longer available.");
-        } catch (IllegalActionException exception) {
-            websocketMessenger.sendGameErrorUser(playerId, "You are not in this game.");
+        } catch (GameNotFoundException exception) {
+            websocketMessenger.sendErrorUser(playerId, new ErrorDTO(ErrorType.ERROR, 400,
+                    "Game is no longer available.", exception.getMessage()));
+        } catch (IllegalRequestException exception) {
+            websocketMessenger.sendErrorUser(playerId, new ErrorDTO(ErrorType.ERROR, 403,
+                    "You can't do that.", exception.getMessage()));
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception);
         }
@@ -87,7 +98,7 @@ public class GameConnectionService {
             if (game.isOver()) {
                 if (!game.anyConnected()) {
                     gameProvider.closeGame(gameId);
-                } else if (!alreadyOver){
+                } else if (!alreadyOver) {
                     websocketMessenger.sendStateUpdateGlobal(game, "The other player left.");
                 }
             } else {
@@ -105,7 +116,7 @@ public class GameConnectionService {
             game.forfeitGame(player);
             log.info("Player %s forfeited GAME-%s".formatted(playerId, gameId));
             websocketMessenger.sendOpponentBoardDataUser(game.getOpponent(player).getId(), player.getPlayerDataFull());
-            websocketMessenger.sendWinnerGlobal(game, "%s forfeited.".formatted(player.getName()));
+            websocketMessenger.sendWinnerGlobal(game.getId(), game.getWinner(), "%s forfeited.".formatted(player.getName()));
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception);
         }

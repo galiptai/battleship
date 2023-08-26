@@ -6,14 +6,16 @@ import { getId, getLastUsedName } from "../../logic/identification";
 import { BoardSetup } from "../setup/BoardSetup";
 import { useCallback, useEffect, useState } from "react";
 import { MessageOverlay } from "../general/MessageOverlay";
+import { CustomError, isErrorMessage } from "../../logic/CustomError";
 
 type OnlineSetupProps = {
   stompClient: Client;
   game: OnlineGame;
   setGame: React.Dispatch<React.SetStateAction<OnlineGame | null>>;
+  displayError: (error: unknown) => void;
 };
 
-export function OnlineSetup({ stompClient, game, setGame }: OnlineSetupProps) {
+export function OnlineSetup({ stompClient, game, setGame, displayError }: OnlineSetupProps) {
   const [submitting, setSubmitting] = useState<boolean>(false);
 
   const onSetupReceived = useCallback(
@@ -55,13 +57,19 @@ export function OnlineSetup({ stompClient, game, setGame }: OnlineSetupProps) {
           return newGame;
         });
       } else {
-        const data = (await res.json()) as { detail?: string };
-        if (data.detail) {
-          console.error(data.detail);
+        const error = (await res.json()) as unknown;
+        if (isErrorMessage(error)) {
+          const { type, statusCode, userMessage, errorMessage } = error;
+          throw new CustomError(type, statusCode, userMessage, errorMessage);
+        } else {
+          throw error;
         }
       }
-    } catch (error) {
-      console.error(error);
+    } catch (error: unknown) {
+      if ((error as Error)?.name === "AbortError") {
+        return;
+      }
+      displayError(error);
     }
     setSubmitting(false);
   }

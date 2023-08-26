@@ -105,7 +105,7 @@ export function LocalPlay({
               guesses={guesses}
               player1={p1Board.player}
               player2={p2Board.player}
-              isPlayersTurn={true}
+              info="It's your turn!"
               actions={[
                 <button onClick={onPassClick} disabled={canGuess || over}>
                   PASS

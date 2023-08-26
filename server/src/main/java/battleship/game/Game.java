@@ -2,8 +2,11 @@ package battleship.game;
 
 import battleship.dtos.BoardDTO;
 import battleship.dtos.GameDTO;
-import battleship.dtos.messages.game.GuessDTO;
-import battleship.exceptions.IllegalActionException;
+import battleship.dtos.messages.GuessDTO;
+import battleship.exceptions.GameStateException;
+import battleship.exceptions.IllegalRequestException;
+import battleship.exceptions.InvalidActionException;
+import battleship.exceptions.InvalidRequestException;
 import battleship.game.board.Coordinate;
 import battleship.game.ship.Ship;
 import lombok.Getter;
@@ -34,7 +37,7 @@ public class Game {
         this.winner = null;
     }
 
-    public GameDTO getGame(Player player) throws IllegalActionException {
+    public GameDTO getGame(Player player) {
         BoardDTO playerData = player.getPlayerDataFull();
         Player opponent = getOpponent(player);
         BoardDTO opponentData = opponent != null ? opponent.getPlayerDataRevealed() : null;
@@ -49,23 +52,23 @@ public class Game {
         );
     }
 
-    public Player getPlayerById(UUID id) throws IllegalActionException {
+    public Player getPlayerById(UUID id) throws IllegalRequestException {
         if (player1.getId().equals(id)) {
             return player1;
         } else if (player2.getId().equals(id)) {
             return player2;
         } else {
-            throw new IllegalActionException("Player is not in this game.");
+            throw new IllegalRequestException("Player is not in this game.");
         }
     }
 
-    public Player getOpponent(@NonNull Player player) throws IllegalActionException {
+    public Player getOpponent(@NonNull Player player) {
         if (player1.equals(player)) {
             return player2;
         } else if (player2.equals(player)) {
             return player1;
         } else {
-            throw new IllegalActionException("Player is not in this game.");
+            throw new IllegalArgumentException("Player is not in this game.");
         }
     }
 
@@ -73,24 +76,24 @@ public class Game {
         return opponent.getShip(coordinate);
     }
 
-    public WhichPlayer getWinner() {
+    public WhichPlayer getWinner() throws GameStateException {
         if (isWon()) {
             return winner;
         } else {
-            throw new RuntimeException("The game is not won.");
+            throw new GameStateException("The game is not won.");
         }
     }
 
-    public void addSecondPlayer(@NonNull Player player) throws IllegalActionException {
+    public void addSecondPlayer(@NonNull Player player) throws InvalidRequestException, GameStateException {
         if (isJoinable()) {
             if (player1.getId().equals(player.getId())) {
-                throw new IllegalArgumentException("Player is already in the game");
+                throw new InvalidRequestException("Player is trying to join game they are already in.");
             }
             player2 = player;
             state = GameState.SETUP;
             return;
         }
-        throw new IllegalActionException("This is not joinable.");
+        throw new GameStateException("This game is not joinable.");
     }
 
     public void connect(Player player) {
@@ -117,31 +120,31 @@ public class Game {
         }
     }
 
-    public void start() throws IllegalActionException {
+    public void start() throws GameStateException {
         if (state != GameState.SETUP) {
-            throw new IllegalActionException("Game is not in a startable state.");
+            throw new GameStateException("Game is not in a startable state.");
         }
         if (!isGameReady()) {
-            throw new IllegalActionException("Start conditions are not met.");
+            throw new GameStateException("Start conditions are not met.");
         }
         currentTurn = WhichPlayer.PLAYER1;
         state = GameState.P1_TURN;
     }
 
-    public void forfeitGame(Player forfeitingPlayer) throws IllegalActionException {
+    public void forfeitGame(Player forfeitingPlayer) throws IllegalRequestException {
         state = GameState.OVER;
         if (forfeitingPlayer == player1) {
             winner = player2.getWhichPlayer();
         } else if (forfeitingPlayer == player2) {
             winner = player1.getWhichPlayer();
         } else {
-            throw new IllegalActionException("Player is not in this game.");
+            throw new IllegalRequestException("Player is not in this game.");
         }
     }
 
-    public Guess makeGuess(Player player, Coordinate coordinate) throws IllegalActionException {
+    public Guess makeGuess(Player player, Coordinate coordinate) throws InvalidActionException {
         if (!isPlayersTurn(player)) {
-            throw new IllegalActionException("It's not your turn.");
+            throw new InvalidActionException("It's not your turn.");
         }
         Player opponent = getOpponent(player);
         Ship ship = opponent.submitGuess(coordinate);

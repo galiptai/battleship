@@ -1,22 +1,16 @@
 package battleship.websocket;
 
 import battleship.dtos.BoardDTO;
-import battleship.dtos.messages.ErrorDTO;
-import battleship.dtos.messages.game.GuessDTO;
-import battleship.dtos.messages.game.GuessSunkDTO;
-import battleship.dtos.messages.game.StateUpdateDTO;
-import battleship.dtos.messages.game.WinnerDTO;
-import battleship.dtos.messages.join.JoinDTO;
-import battleship.dtos.messages.join.JoinMessageType;
+import battleship.dtos.messages.*;
 import battleship.game.Game;
 import battleship.game.Guess;
+import battleship.game.WhichPlayer;
 import battleship.game.ship.Ship;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -28,15 +22,11 @@ public class WebsocketMessenger {
     public void sendJoinDataUser(@NonNull UUID playerId, UUID gameId) {
         if (gameId != null) {
             messagingTemplate.convertAndSendToUser(playerId.toString(), "/join",
-                    new JoinDTO(true, gameId.toString()), Map.of("type", JoinMessageType.GAME_FOUND));
+                    new JoinDTO(true, gameId.toString()));
         } else {
             messagingTemplate.convertAndSendToUser(playerId.toString(), "/join",
-                    new JoinDTO(false, null), Map.of("type", JoinMessageType.GAME_FOUND));
+                    new JoinDTO(false, null));
         }
-    }
-    public void sendJoinErrorUser(@NonNull UUID playerId, @NonNull String message) {
-        messagingTemplate.convertAndSendToUser(playerId.toString(), "/join",
-                new ErrorDTO(message), Map.of("type", JoinMessageType.ERROR));
     }
 
     public void sendStateUpdateGlobal(@NonNull Game game, String message) {
@@ -49,9 +39,9 @@ public class WebsocketMessenger {
                 boardData);
     }
 
-    public void sendGameErrorUser(@NonNull UUID playerId, @NonNull String message) {
-        messagingTemplate.convertAndSendToUser(playerId.toString(), "/game/error",
-                new ErrorDTO(message));
+    public void sendErrorUser(@NonNull UUID playerId, @NonNull ErrorDTO error ) {
+        messagingTemplate.convertAndSendToUser(playerId.toString(), "/error",
+                error);
     }
     public void sendGuessGlobal(@NonNull Game game, @NonNull Guess guess) {
         messagingTemplate.convertAndSend("/game/" + game.getId() + "/guess",
@@ -68,8 +58,8 @@ public class WebsocketMessenger {
                 new GuessSunkDTO(guess, ship));
     }
 
-    public void sendWinnerGlobal(@NonNull Game game, String message) {
-        messagingTemplate.convertAndSend("/game/" + game.getId() + "/winner",
-                new WinnerDTO(game.getWinner(), message));
+    public void sendWinnerGlobal(@NonNull UUID gameId, @NonNull WhichPlayer winner, String message) {
+        messagingTemplate.convertAndSend("/game/" + gameId + "/winner",
+                new WinnerDTO(winner, message));
     }
 }

@@ -1,8 +1,8 @@
 package battleship.game;
 
 import battleship.dtos.BoardDTO;
-import battleship.exceptions.BoardException;
-import battleship.exceptions.IllegalActionException;
+import battleship.exceptions.InvalidActionException;
+import battleship.exceptions.InvalidRequestException;
 import battleship.game.board.Board;
 import battleship.game.board.Coordinate;
 import battleship.game.ship.Ship;
@@ -53,22 +53,22 @@ public class Player {
 
     public boolean isSet() { return  name!= null && board != null;}
 
-    public void setData(String name, Board board) throws BoardException {
+    public void setData(String name, Board board) throws InvalidActionException, InvalidRequestException {
         if (this.name == null && this.board == null) {
             if (name.isEmpty()) {
-                throw new IllegalArgumentException("Name can't be empty.");
+                throw new InvalidRequestException("Name can't be empty.");
             } else if (name.length() > 30) {
-                throw new IllegalArgumentException("Name is too long.");
+                throw new InvalidRequestException("Name is too long.");
             } else {
                 this.name = name;
                 this.board = board;
             }
         } else {
-            throw new BoardException("Your board has already been set.");
+            throw new InvalidActionException("Your board has already been set.");
         }
     }
 
-    public Ship submitGuess(Coordinate coordinate) throws IllegalActionException {
+    public Ship submitGuess(Coordinate coordinate) throws InvalidActionException {
         return board.submitGuess(coordinate);
     }
 

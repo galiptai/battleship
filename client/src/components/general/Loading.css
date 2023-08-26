@@ -1,14 +1,14 @@
 .loading::after {
   content: "";
   font-size: 1.5em;
-  animation: 2s ease-in-out 0s infinite normal loading;
+  animation: 1.5s ease-in-out 0s infinite normal loading;
 }
 
 @keyframes loading {
   0% {
     content: "○○○";
   }
-  10% {
+  5% {
     content: "○○○";
   }
   33% {
@@ -17,7 +17,7 @@
   66% {
     content: "●●○";
   }
-  90% {
+  95% {
     content: "●●●";
   }
   100% {

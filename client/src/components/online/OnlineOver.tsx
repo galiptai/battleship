@@ -6,7 +6,13 @@ import { ResultsScreen } from "../general/ResultsScreen";
 
 type OnlineOverProps = OnlinePlayProps;
 
-export function OnlineOver({ stompClient, game, setGame, updateMessage }: OnlineOverProps) {
+export function OnlineOver({
+  stompClient,
+  game,
+  setGame,
+  updateMessage,
+  displayError,
+}: OnlineOverProps) {
   const [displayResults, setDisplayResults] = useState<boolean>(false);
   const navigate = useNavigate();
 
@@ -39,6 +45,7 @@ export function OnlineOver({ stompClient, game, setGame, updateMessage }: Online
             game={game}
             setGame={setGame}
             updateMessage={updateMessage}
+            displayError={displayError}
           />
           <MessageOverlay
             display

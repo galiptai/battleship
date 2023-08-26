@@ -1,4 +1,4 @@
-package battleship.dtos.messages.join;
+package battleship.dtos.messages;
 
 public record JoinDTO(boolean joinable, String gameId) {
 }

@@ -3,7 +3,7 @@ package battleship.game.board;
 import battleship.dtos.BoardDTO;
 import battleship.dtos.ShipDTO;
 import battleship.exceptions.BoardException;
-import battleship.exceptions.IllegalActionException;
+import battleship.exceptions.InvalidActionException;
 import battleship.game.ship.Ship;
 
 import java.util.Arrays;
@@ -93,7 +93,7 @@ public class Board {
         return tiles;
     }
 
-    public Ship submitGuess(Coordinate coordinate) throws IllegalActionException {
+    public Ship submitGuess(Coordinate coordinate) throws InvalidActionException {
         return tiles[coordinate.y()][coordinate.x()].guess();
     }
 

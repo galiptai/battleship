@@ -2,8 +2,7 @@ package battleship.controller;
 
 import battleship.dtos.BoardDTO;
 import battleship.dtos.GameDTO;
-import battleship.exceptions.BoardException;
-import battleship.exceptions.IllegalActionException;
+import battleship.exceptions.*;
 import battleship.game.board.Coordinate;
 import battleship.service.GameConnectionService;
 import battleship.service.GamePlayService;
@@ -21,18 +20,21 @@ public class GameController {
     private final GamePlayService gamePlayService;
 
     @GetMapping("/{gameId}")
-    public GameDTO gameGame(@PathVariable UUID gameId, @RequestParam UUID playerId) throws IllegalActionException {
+    public GameDTO gameGame(@PathVariable UUID gameId, @RequestParam UUID playerId)
+            throws IllegalRequestException, GameNotFoundException {
         return gameConnectionService.getGame(gameId, playerId);
     }
 
     @PostMapping("/{gameId}/setBoard")
     public Boolean setBoard(@PathVariable UUID gameId, @RequestParam UUID playerId, @RequestBody BoardDTO boardData)
-            throws IllegalActionException, BoardException {
+            throws InvalidActionException, BoardException, IllegalRequestException, GameNotFoundException,
+            GameStateException, InvalidRequestException {
         return gamePlayService.setBoard(gameId, playerId, boardData);
     }
 
     @PostMapping("/{gameId}/guess")
-    public Boolean makeGuess(@PathVariable UUID gameId, @RequestParam UUID playerId, @RequestBody Coordinate coordinate) throws IllegalActionException {
+    public Boolean makeGuess(@PathVariable UUID gameId, @RequestParam UUID playerId, @RequestBody Coordinate coordinate)
+            throws InvalidActionException, IllegalRequestException, GameNotFoundException, GameStateException {
         return gamePlayService.makeGuess(gameId, playerId, coordinate);
     }
 }

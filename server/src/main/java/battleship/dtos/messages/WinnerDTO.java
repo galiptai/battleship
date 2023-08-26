@@ -1,4 +1,4 @@
-package battleship.dtos.messages.game;
+package battleship.dtos.messages;
 
 import battleship.game.WhichPlayer;
 import lombok.NonNull;

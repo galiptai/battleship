@@ -2,12 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 import { Client, Message } from "stompjs";
 import { getId } from "../../logic/identification";
 import { Choice } from "../local/LocalLoader";
-import { ErrorMessage } from "./Connection";
 import { MessageOverlay } from "../general/MessageOverlay";
 import { Loading } from "../general/Loading";
 import { ChoiceModal } from "../general/ChoiceModal";
-
-type JoinMessageType = "ERROR" | "GAME_FOUND";
 
 type JoinData = {
   joinable: boolean;
@@ -26,45 +23,25 @@ export function Joining({ stompClient, setGameId }: JoiningProps) {
   const [rejoin, setRejoin] = useState<Choice>("Undecided");
   const [receivedGameId, setReceivedGameID] = useState<string | null>(null);
 
-  const handleReceivedJoinData = useCallback(
-    (joinData: JoinData) => {
+  const onJoinMessageReceived = useCallback(
+    (message: Message) => {
+      const joinData = JSON.parse(message.body) as JoinData;
       if (!joinData.joinable) {
         localStorage.removeItem(STORAGE_GAME_ID_KEY);
-        stompClient.send("/app/join/new", { userId: getId() });
+        stompClient.send("/app/join/new");
       } else {
         setReceivedGameID(joinData.gameId);
       }
     },
     [stompClient]
   );
-  const onJoinMessageReceived = useCallback(
-    (message: Message) => {
-      const type = (message.headers as { type?: JoinMessageType })?.type;
-      if (!type) {
-        console.error("Server error: no type header.");
-      }
-      switch (type) {
-        case "ERROR": {
-          const error = JSON.parse(message.body) as ErrorMessage;
-          console.error(error.message);
-          return;
-        }
-        case "GAME_FOUND": {
-          const joinData = JSON.parse(message.body) as JoinData;
-          handleReceivedJoinData(joinData);
-          return;
-        }
-      }
-    },
-    [handleReceivedJoinData]
-  );
 
   const join = useCallback(() => {
     const gameId = localStorage.getItem(STORAGE_GAME_ID_KEY);
     if (gameId) {
-      stompClient.send("/app/join/rejoin", { userId: getId(), gameId });
+      stompClient.send("/app/join/rejoin", { gameId });
     } else {
-      stompClient.send("/app/join/new", { userId: getId() });
+      stompClient.send("/app/join/new");
     }
   }, [stompClient]);
 
