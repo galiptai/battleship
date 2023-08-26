@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { Client, Message } from "stompjs";
-import { getId } from "../../logic/identification";
-import { Choice } from "../local/LocalLoader";
+import { getGameId, getId, deleteGameId, saveGameId } from "../../logic/storageFunctions";
 import { MessageOverlay } from "../general/MessageOverlay";
 import { Loading } from "../general/Loading";
-import { ChoiceModal } from "../general/ChoiceModal";
+import { Choice, ChoiceModal } from "../general/ChoiceModal";
 
 type JoinData = {
   joinable: boolean;
@@ -16,8 +15,6 @@ type JoiningProps = {
   setGameId: (gameId: string | null) => void;
 };
 
-const STORAGE_GAME_ID_KEY = "gameId";
-
 export function Joining({ stompClient, setGameId }: JoiningProps) {
   const [displayRejoinModal, setDisplayRejoinModal] = useState<boolean>(false);
   const [rejoin, setRejoin] = useState<Choice>("Undecided");
@@ -27,7 +24,7 @@ export function Joining({ stompClient, setGameId }: JoiningProps) {
     (message: Message) => {
       const joinData = JSON.parse(message.body) as JoinData;
       if (!joinData.joinable) {
-        localStorage.removeItem(STORAGE_GAME_ID_KEY);
+        deleteGameId();
         stompClient.send("/app/join/new");
       } else {
         setReceivedGameID(joinData.gameId);
@@ -37,7 +34,7 @@ export function Joining({ stompClient, setGameId }: JoiningProps) {
   );
 
   const join = useCallback(() => {
-    const gameId = localStorage.getItem(STORAGE_GAME_ID_KEY);
+    const gameId = getGameId();
     if (gameId) {
       stompClient.send("/app/join/rejoin", { gameId });
     } else {
@@ -56,7 +53,7 @@ export function Joining({ stompClient, setGameId }: JoiningProps) {
 
   useEffect(() => {
     if (receivedGameId) {
-      if (receivedGameId === localStorage.getItem(STORAGE_GAME_ID_KEY)) {
+      if (receivedGameId === getGameId()) {
         switch (rejoin) {
           case "Undecided":
             setDisplayRejoinModal(true);
@@ -65,12 +62,12 @@ export function Joining({ stompClient, setGameId }: JoiningProps) {
             setGameId(receivedGameId);
             return;
           case "No":
-            localStorage.removeItem(STORAGE_GAME_ID_KEY);
+            deleteGameId();
             stompClient.send("/app/forfeit", { userId: getId(), gameId: receivedGameId });
             join();
         }
       } else {
-        localStorage.setItem(STORAGE_GAME_ID_KEY, receivedGameId);
+        saveGameId(receivedGameId);
         setGameId(receivedGameId);
       }
     }

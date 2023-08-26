@@ -3,7 +3,7 @@ import { PlayScreen } from "../gameplay/PlayScreen";
 import { PlayMenu } from "../gameplay/PlayMenu";
 import { Guess } from "../../logic/gameLogic";
 import { Coordinate } from "../gameplay/DrawBoard";
-import { getId } from "../../logic/identification";
+import { getId } from "../../logic/storageFunctions";
 import { Client, Message } from "stompjs";
 import { PlainShipData } from "../../logic/GameSave";
 import { OnlineGame } from "../../logic/OnlineGame";

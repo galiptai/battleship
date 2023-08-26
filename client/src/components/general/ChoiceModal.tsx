@@ -1,10 +1,13 @@
 import "./ChoiceModal.css";
+import { ReactNode } from "react";
+
+export type Choice = "Yes" | "No" | "Undecided";
 
 type ChoiceModalProps = {
   display: boolean;
   background?: boolean;
   question: string;
-  description?: string;
+  description?: string | ReactNode;
   confirmText?: string;
   onConfirm: () => void;
   cancelText?: string;

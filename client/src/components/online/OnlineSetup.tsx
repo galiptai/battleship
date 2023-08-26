@@ -2,7 +2,7 @@ import { Client, Message } from "stompjs";
 import { Board } from "../../logic/Board";
 import { BoardData } from "../../logic/GameSave";
 import { OnlineGame } from "../../logic/OnlineGame";
-import { getId, getLastUsedName } from "../../logic/identification";
+import { getId, getLastUsedName, saveName } from "../../logic/storageFunctions";
 import { BoardSetup } from "../setup/BoardSetup";
 import { useCallback, useEffect, useState } from "react";
 import { MessageOverlay } from "../general/MessageOverlay";
@@ -56,6 +56,7 @@ export function OnlineSetup({ stompClient, game, setGame, displayError }: Online
           newGame.player = board;
           return newGame;
         });
+        saveName(board.player);
       } else {
         const error = (await res.json()) as unknown;
         if (isErrorMessage(error)) {

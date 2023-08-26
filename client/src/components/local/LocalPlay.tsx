@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Coordinate } from "../gameplay/DrawBoard";
-import { SwitchScreen } from "./SwitchScreen";
 import { PlayScreen } from "../gameplay/PlayScreen";
 import { PlayMenu } from "../gameplay/PlayMenu";
 import { MessageOverlay } from "../general/MessageOverlay";
@@ -82,10 +81,20 @@ export function LocalPlay({
 
   if (displaySwitch) {
     return (
-      <SwitchScreen
-        player={p1Turn ? p1Board.player : p2Board.player}
-        setDisplaySwitch={setDisplaySwitch}
-        setCanGuess={setCanGuess}
+      <MessageOverlay
+        display
+        message={p1Turn ? p1Board.player : p2Board.player}
+        description="It's your turn!"
+        buttons={[
+          <button
+            onClick={() => {
+              setCanGuess(true);
+              setDisplaySwitch(false);
+            }}
+          >
+            READY
+          </button>,
+        ]}
       />
     );
   } else {

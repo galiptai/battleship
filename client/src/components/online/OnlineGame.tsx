@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Client, Message, Subscription } from "stompjs";
-import { getId } from "../../logic/identification";
+import { getId } from "../../logic/storageFunctions";
 import { OnlineSetup } from "./OnlineSetup";
 import { OnlinePlay } from "./OnlinePlay";
 import { OnlineGame as Game, GameData, GameState, WhichPlayer } from "../../logic/OnlineGame";
@@ -8,7 +8,7 @@ import { OnlineOver } from "./OnlineOver";
 import { BoardData } from "../../logic/GameSave";
 import { MessageOverlay } from "../general/MessageOverlay";
 import { Loading } from "../general/Loading";
-import { CustomError, ErrorMessage, isErrorMessage } from "../../logic/CustomError";
+import { CustomError, isErrorMessage } from "../../logic/CustomError";
 
 type StateUpdate = {
   gameState: GameState;
