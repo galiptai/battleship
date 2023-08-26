@@ -44,7 +44,7 @@ export function Connection() {
 
   const connect = useCallback(() => {
     if (!stompClient.current) {
-      const sock = new SockJS(`http://${import.meta.env.VITE_DOMAIN}/ws`);
+      const sock = new SockJS(`/ws`);
       stompClient.current = over(sock);
       if (import.meta.env.PROD) {
         stompClient.current.debug = () => {

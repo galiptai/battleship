@@ -17,6 +17,9 @@ export default defineConfig(({ mode }) => ({
       "/api": {
         target: `http://${env.VITE_DOMAIN}`,
       },
+      "/ws": {
+        target: `http://${env.VITE_DOMAIN}`,
+      },
     },
   },
 }));
