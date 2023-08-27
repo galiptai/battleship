@@ -13,12 +13,24 @@ export default defineConfig(({ mode }) => ({
     },
   },
   server: {
+    port: 3000,
     proxy: {
       "/api": {
-        target: `http://${env.VITE_DOMAIN}`,
+        target: `http://${env.VITE_ADDRESS}`,
       },
       "/ws": {
-        target: `http://${env.VITE_DOMAIN}`,
+        target: `http://${env.VITE_ADDRESS}`,
+      },
+    },
+  },
+  preview: {
+    port: 4000,
+    proxy: {
+      "/api": {
+        target: `http://${env.VITE_ADDRESS}`,
+      },
+      "/ws": {
+        target: `http://${env.VITE_ADDRESS}`,
       },
     },
   },
