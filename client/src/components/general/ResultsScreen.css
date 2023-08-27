@@ -74,7 +74,7 @@
 
 @media all and (max-width: 600px) {
   .results {
-    padding: 0px;
+    padding: 0;
     gap: 30px;
   }
 
@@ -88,7 +88,7 @@
     flex: 1;
     max-height: 70%;
     box-sizing: border-box;
-    overflow-x: auto;
+    overflow-x: scroll;
   }
 
   .results-grid {

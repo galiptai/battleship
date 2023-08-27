@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { Coordinate } from "../gameplay/DrawBoard";
-import { SwitchScreen } from "./SwitchScreen";
 import { PlayScreen } from "../gameplay/PlayScreen";
 import { PlayMenu } from "../gameplay/PlayMenu";
-import { EndOverlay } from "../gameplay/EndOverlay";
+import { MessageOverlay } from "../general/MessageOverlay";
 import { Board } from "../../logic/Board";
 import { Guess } from "../../logic/gameLogic";
+import { useNavigate } from "react-router-dom";
 
 type LocalPlayProps = {
   p1Board: Board;
@@ -32,6 +32,7 @@ export function LocalPlay({
   winner,
   setWinner,
 }: LocalPlayProps) {
+  const navigate = useNavigate();
   const [p1Turn, setP1Turn] = useState<boolean>(p1Starts);
   const [displaySwitch, setDisplaySwitch] = useState<boolean>(true);
   const [canGuess, setCanGuess] = useState<boolean>(false);
@@ -50,15 +51,14 @@ export function LocalPlay({
     }
     const board = p1Turn ? p2Board : p1Board;
     const tile = board.tiles[coordinate.y][coordinate.x];
-    if (!tile.hit) {
+    if (!tile.guessed) {
       const setBoard = p1Turn ? setP2Board : setP1Board;
-      tile.hit = true;
+      tile.guessed = true;
       setBoard(board.makeCopy());
-      const player = p1Turn ? p1Board.player : p2Board.player;
       guesses.push({
         coordinate: tile.coordinate,
         hit: tile.placedShip !== null,
-        player,
+        player: p1Turn ? "PLAYER1" : "PLAYER2",
       });
       setGuesses([...guesses]);
       setCanGuess(false);
@@ -71,10 +71,7 @@ export function LocalPlay({
     }
     const board = p1Turn ? p2Board : p1Board;
     const tile = board.tiles[coordinate.y][coordinate.x];
-    if (!tile.hit) {
-      return true;
-    }
-    return false;
+    return !tile.guessed;
   }
 
   function onPassClick() {
@@ -84,10 +81,20 @@ export function LocalPlay({
 
   if (displaySwitch) {
     return (
-      <SwitchScreen
-        player={p1Turn ? p1Board.player : p2Board.player}
-        setDisplaySwitch={setDisplaySwitch}
-        setCanGuess={setCanGuess}
+      <MessageOverlay
+        display
+        message={p1Turn ? p1Board.player : p2Board.player}
+        description="It's your turn!"
+        buttons={[
+          <button
+            onClick={() => {
+              setCanGuess(true);
+              setDisplaySwitch(false);
+            }}
+          >
+            READY
+          </button>,
+        ]}
       />
     );
   } else {
@@ -102,14 +109,30 @@ export function LocalPlay({
           opponentBoard={opponentBoard}
           onOppBoardClick={onOppBoardClick}
           oppBoardClickCheck={oppBoardClickCheck}
-        >
-          <PlayMenu guesses={guesses} player1={p1Board.player} player2={p2Board.player}>
-            <button onClick={onPassClick} disabled={canGuess || over}>
-              PASS
-            </button>
-          </PlayMenu>
-        </PlayScreen>
-        <EndOverlay display={over} playerIsWinner={true} setDisplayResults={setDisplayResults} />
+          playMenu={
+            <PlayMenu
+              guesses={guesses}
+              player1={p1Board.player}
+              player2={p2Board.player}
+              info="It's your turn!"
+              actions={[
+                <button onClick={onPassClick} disabled={canGuess || over}>
+                  PASS
+                </button>,
+              ]}
+            />
+          }
+        />
+        <MessageOverlay
+          display={over}
+          background
+          message="You win!"
+          description={`Congratulations, ${playerBoard.player}!`}
+          buttons={[
+            <button onClick={() => setDisplayResults(true)}>SEE RESULTS</button>,
+            <button onClick={() => navigate("/")}>MAIN MENU</button>,
+          ]}
+        />
       </>
     );
   }

@@ -10,14 +10,12 @@
 }
 
 .home-title {
-  user-select: none;
-  font-family: "TASAExplorer";
+  font-family: "TASAExplorer", sans-serif;
   font-weight: 900;
   font-size: 16vw;
 }
 
 .home-menu {
-  user-select: none;
   display: flex;
   flex-direction: column;
   gap: 20px;

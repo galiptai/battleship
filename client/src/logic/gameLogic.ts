@@ -1,12 +1,13 @@
 import { Coordinate } from "../components/gameplay/DrawBoard";
 import { Tile } from "../components/gameplay/Tile";
 import { Board } from "./Board";
+import { WhichPlayer } from "./OnlineGame";
 import { SHIP_TYPES, Ship } from "./Ship";
 
 export type Guess = {
   coordinate: Coordinate;
   hit: boolean;
-  player: string;
+  player: WhichPlayer;
 };
 
 export function createEmptyBoard(height = 10, width = 10, name = "Player"): Board {
@@ -14,7 +15,7 @@ export function createEmptyBoard(height = 10, width = 10, name = "Player"): Boar
   for (let y = 0; y < height; y++) {
     const row: Tile[] = [];
     for (let x = 0; x < width; x++) {
-      row[x] = { coordinate: { y, x }, hit: false, placedShip: null };
+      row[x] = { coordinate: { y, x }, guessed: false, placedShip: null };
     }
     tiles[y] = row;
   }
@@ -24,10 +25,10 @@ export function createEmptyBoard(height = 10, width = 10, name = "Player"): Boar
 
 export function getShips(): Ship[] {
   const ships: Ship[] = [];
-  ships.push(new Ship(SHIP_TYPES.CAR, []));
-  ships.push(new Ship(SHIP_TYPES.BAT, []));
-  ships.push(new Ship(SHIP_TYPES.CRU, []));
-  ships.push(new Ship(SHIP_TYPES.SUB, []));
-  ships.push(new Ship(SHIP_TYPES.DES, []));
+  ships.push(new Ship(SHIP_TYPES.CARRIER, []));
+  ships.push(new Ship(SHIP_TYPES.BATTLESHIP, []));
+  ships.push(new Ship(SHIP_TYPES.CRUISER, []));
+  ships.push(new Ship(SHIP_TYPES.SUBMARINE, []));
+  ships.push(new Ship(SHIP_TYPES.DESTROYER, []));
   return ships;
 }

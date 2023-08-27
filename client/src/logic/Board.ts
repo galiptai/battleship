@@ -1,7 +1,8 @@
 import { Coordinate } from "../components/gameplay/DrawBoard";
 import { Tile } from "../components/gameplay/Tile";
-import { ShipPlacement } from "../components/setup/ShipSelector";
-import { Ship } from "./Ship";
+import { PlainShipData } from "./GameSave";
+import { SHIP_TYPES, Ship } from "./Ship";
+import { Guess } from "./gameLogic";
 
 export class Board {
   player: string;
@@ -41,18 +42,18 @@ export class Board {
     return [...this.ships].every((ship) => ship.isSank());
   }
 
-  addShip(startCoordinate: Coordinate, placement: ShipPlacement) {
-    if (!this.ships.has(placement.ship) && this.canAddShip(startCoordinate, placement)) {
-      placement.ship.setTiles(this.getTiles(startCoordinate, placement));
-      this.ships.add(placement.ship);
+  addShip(ship: Ship, startCoordinate: Coordinate, vertical: boolean) {
+    if (!this.ships.has(ship) && this.canAddShip(ship, startCoordinate, vertical)) {
+      ship.setTiles(this.getTiles(ship.type.length, startCoordinate, vertical));
+      this.ships.add(ship);
     }
   }
-  getTiles(startCoordinate: Coordinate, placement: ShipPlacement): Tile[] {
+  getTiles(length: number, startCoordinate: Coordinate, vertical: boolean): Tile[] {
     const tiles: Tile[] = [];
-    for (let i = 0; i < placement.ship.type.length; i++) {
+    for (let i = 0; i < length; i++) {
       const tile: Tile | undefined =
-        this.tiles[startCoordinate.y + (placement.vertical ? i : 0)]?.[
-          startCoordinate.x + (!placement.vertical ? i : 0)
+        this.tiles[startCoordinate.y + (vertical ? i : 0)]?.[
+          startCoordinate.x + (vertical ? 0 : i)
         ];
       if (tile) {
         tiles.push(tile);
@@ -61,10 +62,10 @@ export class Board {
     return tiles;
   }
 
-  canAddShip(startCoordinate: Coordinate, placement: ShipPlacement): boolean {
-    const tiles = this.getTiles(startCoordinate, placement);
+  canAddShip(ship: Ship, startCoordinate: Coordinate, vertical: boolean): boolean {
+    const tiles = this.getTiles(ship.type.length, startCoordinate, vertical);
     return (
-      tiles.length === placement.ship.type.length &&
+      tiles.length === ship.type.length &&
       tiles.every((tile) => tile.placedShip === null) &&
       this.checkNeighborsEmpty(tiles)
     );
@@ -87,5 +88,39 @@ export class Board {
       neighbors.delete(tile);
     }
     return [...neighbors].every((tile) => tile.placedShip === null);
+  }
+
+  submitGuess(coordinate: Coordinate): boolean {
+    const tile = this.tiles[coordinate.y][coordinate.x];
+    tile.guessed = true;
+    return tile.placedShip !== null;
+  }
+
+  processGuess(guess: Guess) {
+    const tile = this.tiles[guess.coordinate.y][guess.coordinate.x];
+    tile.guessed = true;
+    if (guess.hit && tile.placedShip === null) {
+      tile.placedShip = new Ship(SHIP_TYPES.UNKNOWN, [tile]);
+    }
+  }
+
+  processGuessSunk(guess: Guess, shipData: PlainShipData) {
+    const tile = this.tiles[guess.coordinate.y][guess.coordinate.x];
+    tile.guessed = true;
+    const { type, startingCoordinate, vertical } = shipData;
+    this.#clearUnknownShip(SHIP_TYPES[type].length, startingCoordinate, vertical);
+    this.addShip(new Ship(SHIP_TYPES[type], []), startingCoordinate, vertical);
+  }
+
+  #clearUnknownShip(length: number, startCoordinate: Coordinate, vertical: boolean) {
+    for (let i = 0; i < length; i++) {
+      const tile: Tile | undefined =
+        this.tiles[startCoordinate.y + (vertical ? i : 0)]?.[
+          startCoordinate.x + (vertical ? 0 : i)
+        ];
+      if (tile && tile.placedShip?.type === SHIP_TYPES.UNKNOWN) {
+        tile.placedShip = null;
+      }
+    }
   }
 }

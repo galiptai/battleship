@@ -1,14 +1,37 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { resolve } from 'path';
+import { defineConfig, loadEnv } from "vite";
+import react from "@vitejs/plugin-react";
+import svgr from "vite-plugin-svgr";
 
+const env = loadEnv("all", process.cwd());
 
 // https://vitejs.dev/config/
-export default defineConfig(({mode}) => ({
-  plugins: [react()],
+export default defineConfig(({ mode }) => ({
+  plugins: [react(), svgr()],
   resolve: {
     alias: {
-      $fonts: mode === 'dev' ? '../fonts'  : './public/fonts'
-    }
-  }
-}))
+      $fonts: mode === "development" ? "../fonts" : "./public/fonts",
+    },
+  },
+  server: {
+    port: 3000,
+    proxy: {
+      "/api": {
+        target: `http://${env.VITE_ADDRESS}`,
+      },
+      "/ws": {
+        target: `http://${env.VITE_ADDRESS}`,
+      },
+    },
+  },
+  preview: {
+    port: 4000,
+    proxy: {
+      "/api": {
+        target: `http://${env.VITE_ADDRESS}`,
+      },
+      "/ws": {
+        target: `http://${env.VITE_ADDRESS}`,
+      },
+    },
+  },
+}));

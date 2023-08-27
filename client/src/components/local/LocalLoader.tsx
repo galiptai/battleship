@@ -1,16 +1,15 @@
 import { useCallback, useState, useRef } from "react";
-import { GameSave, PlainGameSave } from "../../logic/GameSave";
+import { GameSave } from "../../logic/GameSave";
 import { LocalGame } from "./LocalGame";
-import { ChooseSave } from "./ChooseSave";
-
-export type Choice = "Yes" | "No" | "Undecided";
+import { SaveInfo } from "./SaveInfo";
+import { getGame, saveGame } from "../../logic/storageFunctions";
+import { Choice, ChoiceModal } from "../general/ChoiceModal";
 
 function load(): GameSave | null {
-  const json = localStorage.getItem("save");
-  if (json === null) {
-    return json;
+  const data = getGame();
+  if (data === null) {
+    return null;
   } else {
-    const data = JSON.parse(json) as PlainGameSave;
     return GameSave.fromJSON(data);
   }
 }
@@ -20,21 +19,25 @@ export function LocalLoader() {
   const [useSave, setUseSave] = useState<Choice>("Undecided");
 
   const updateSave = useCallback((save: GameSave) => {
-    console.log(save);
     if (save.isValid()) {
-      localStorage.setItem("save", JSON.stringify(save));
-      console.log("saved");
+      saveGame(save);
     }
   }, []);
 
   const deleteSave = useCallback(() => {
-    localStorage.removeItem("save");
+    deleteSave();
   }, []);
 
-  console.log(save.current);
-
   if (save.current !== null && save.current.isValid() && useSave === "Undecided") {
-    return <ChooseSave saveData={save.current.getSaveData()} setUseSave={setUseSave} />;
+    return (
+      <ChoiceModal
+        display
+        question="Save data found. Load?"
+        description={<SaveInfo saveData={save.current.getSaveData()} />}
+        onConfirm={() => setUseSave("Yes")}
+        onCancel={() => setUseSave("No")}
+      />
+    );
   } else if (save.current !== null && save.current.isValid() && useSave === "Yes") {
     return <LocalGame save={save.current} updateSave={updateSave} deleteSave={deleteSave} />;
   } else {

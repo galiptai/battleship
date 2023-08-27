@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { BoardSetup } from "../setup/BoardSetup";
 import { LocalPlay } from "./LocalPlay";
-import { ResultsScreen } from "../gameplay/ResultsScreen";
+import { ResultsScreen } from "../general/ResultsScreen";
 import { Board } from "../../logic/Board";
 import { Guess } from "../../logic/gameLogic";
 import { GameSave } from "../../logic/GameSave";
@@ -54,6 +54,14 @@ export function LocalGame({ save, updateSave, deleteSave }: LocalGameProps) {
       />
     );
   } else if (winner) {
-    return <ResultsScreen p1Board={p1Board} p2Board={p2Board} winner={winner} guesses={guesses} />;
+    return (
+      <ResultsScreen
+        p1Board={p1Board}
+        p2Board={p2Board}
+        winner={winner}
+        guesses={guesses}
+        playerIs="PLAYER1"
+      />
+    );
   }
 }

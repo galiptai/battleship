@@ -9,10 +9,17 @@ import { ShipPlacement } from "./ShipSelector";
 
 type BoardSetupProps = {
   starterName: string;
-  setVerifiedBoard: (board: Board) => void;
+  setVerifiedBoard: (board: Board) => void | Promise<void>;
+  disabled?: boolean;
+  readyBtnText?: string;
 };
 
-export function BoardSetup({ starterName, setVerifiedBoard }: BoardSetupProps) {
+export function BoardSetup({
+  starterName,
+  setVerifiedBoard,
+  disabled,
+  readyBtnText,
+}: BoardSetupProps) {
   const [board, setBoard] = useState<Board>(createEmptyBoard(10, 10, starterName));
   const [shipsToPlace] = useState<Ship[]>(getShips());
   const [verified, setVerified] = useState<boolean>(false);
@@ -28,8 +35,9 @@ export function BoardSetup({ starterName, setVerifiedBoard }: BoardSetupProps) {
         setHighlight(highlight);
         return;
       }
-      highlight.tiles = board.getTiles(startCoordinate, placement);
-      if (board.canAddShip(startCoordinate, placement)) {
+      const { ship, vertical } = placement;
+      highlight.tiles = board.getTiles(ship.type.length, startCoordinate, vertical);
+      if (board.canAddShip(ship, startCoordinate, vertical)) {
         highlight.type = "valid";
       } else {
         highlight.type = "invalid";
@@ -40,16 +48,19 @@ export function BoardSetup({ starterName, setVerifiedBoard }: BoardSetupProps) {
   );
 
   function onDrop(startCoordinate: Coordinate, placement: ShipPlacement) {
-    board.addShip(startCoordinate, placement);
+    board.addShip(placement.ship, startCoordinate, placement.vertical);
     setBoard(board.makeCopy());
     setVerified(board.isValid());
   }
 
   function dropCheck(startCoordinate: Coordinate, placement: ShipPlacement): boolean {
-    return board.canAddShip(startCoordinate, placement);
+    return board.canAddShip(placement.ship, startCoordinate, placement.vertical);
   }
 
   function onBoardClick(coordinate: Coordinate) {
+    if (disabled) {
+      return;
+    }
     const tile = board.tiles[coordinate.y][coordinate.x];
     if (tile.placedShip === null) {
       return;
@@ -62,13 +73,16 @@ export function BoardSetup({ starterName, setVerifiedBoard }: BoardSetupProps) {
   }
 
   function clickCheck(coordinate: Coordinate): boolean {
+    if (disabled) {
+      return false;
+    }
     const tile = board.tiles[coordinate.y][coordinate.x];
     return tile.placedShip !== null;
   }
 
   function onReadyClick() {
     if (board.isValid()) {
-      setVerifiedBoard(board);
+      void setVerifiedBoard(board);
     }
   }
 
@@ -80,6 +94,7 @@ export function BoardSetup({ starterName, setVerifiedBoard }: BoardSetupProps) {
           setBoard={setBoard}
           shipsToPlace={shipsToPlace}
           setVerified={setVerified}
+          disabled={disabled}
         />
       </div>
       <div className="board-setup-board">
@@ -95,8 +110,8 @@ export function BoardSetup({ starterName, setVerifiedBoard }: BoardSetupProps) {
         />
       </div>
       <div className="board-setup-ready">
-        <button disabled={!verified} onClick={onReadyClick}>
-          READY
+        <button disabled={!verified || disabled} onClick={onReadyClick}>
+          {readyBtnText ? readyBtnText : "READY"}
         </button>
       </div>
     </div>

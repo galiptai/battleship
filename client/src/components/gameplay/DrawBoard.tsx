@@ -28,7 +28,7 @@ type DrawBoardProps = {
   board: Board;
   showShips: ShowShips;
   highlight?: Highlight;
-  onClick?: (coordinate: Coordinate) => void;
+  onClick?: (coordinate: Coordinate) => void | Promise<void>;
   clickCheck?: (coordinate: Coordinate) => boolean;
   onDrop?: (startCoordinate: Coordinate, placement: ShipPlacement) => void;
   dropCheck?: (startCoordinate: Coordinate, placement: ShipPlacement) => boolean;

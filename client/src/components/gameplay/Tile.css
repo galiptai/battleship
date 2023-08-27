@@ -1,5 +1,4 @@
 .tile {
-  user-select: none;
   aspect-ratio: 1/1;
   min-width: 0;
   min-height: 0;
@@ -39,7 +38,11 @@
   background-color: gray;
 }
 
-.tile-hit {
+.tile-sunk-ship {
+  background-color: red;
+}
+
+.tile-guessed {
   position: absolute;
   pointer-events: none;
   height: 100%;
@@ -54,9 +57,9 @@
   font-size: 1em;
 }
 
-.tile-hit img {
-  height: 80%;
-  width: 80%;
+.tile-guessed svg {
+  height: 90%;
+  width: 90%;
 }
 
 .tile-data {

@@ -1,5 +1,4 @@
 .ship-selector {
-  user-select: none;
   display: flex;
   flex-direction: column;
   gap: 4vh;

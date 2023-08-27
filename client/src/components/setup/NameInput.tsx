@@ -5,9 +5,10 @@ export type NameInputProps = {
   board: Board;
   setBoard: (board: Board) => void;
   setVerified: (verified: boolean) => void;
+  disabled?: boolean;
 };
 
-export function NameInput({ board, setBoard, setVerified }: NameInputProps) {
+export function NameInput({ board, setBoard, setVerified, disabled }: NameInputProps) {
   function onChange(event: React.ChangeEvent<HTMLInputElement>) {
     board.player = event.target.value;
     setBoard(board.makeCopy());
@@ -30,6 +31,13 @@ export function NameInput({ board, setBoard, setVerified }: NameInputProps) {
         onChange={onChange}
         onFocus={onFocus}
         maxLength={30}
+        disabled={disabled}
+        onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
+          if (event.key === "Enter") {
+            const target = event.target as HTMLInputElement;
+            target.blur();
+          }
+        }}
       />
     </div>
   );

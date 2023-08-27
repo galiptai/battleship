@@ -1,13 +1,15 @@
+/// <reference types="vite-plugin-svgr/client" />
 import { Coordinate, HighlightType, ShowShips } from "./DrawBoard";
 import { Ship } from "../../logic/Ship";
 import "./Tile.css";
 import { useDrop } from "react-dnd";
 import { ShipPlacement } from "../setup/ShipSelector";
 import { useEffect } from "react";
+import { ReactComponent as XSvg } from "../../assets/X.svg";
 
 export type Tile = {
   coordinate: Coordinate;
-  hit: boolean;
+  guessed: boolean;
   placedShip: Ship | null;
 };
 
@@ -15,7 +17,7 @@ type DrawTileProps = {
   tile: Tile;
   highlighted: HighlightType;
   showShip: ShowShips;
-  onClick?: (coordinate: Coordinate) => void;
+  onClick?: (coordinate: Coordinate) => void | Promise<void>;
   clickCheck?: (coordinate: Coordinate) => boolean;
   onDrop?: (startCoordinate: Coordinate, placement: ShipPlacement) => void;
   dropCheck?: (startCoordinate: Coordinate, placement: ShipPlacement) => boolean;
@@ -51,10 +53,16 @@ export function DrawTile({
     return () => highlighter?.(null, null);
   }, [isOver, highlighter, tile, item]);
 
-  let hasShip = "";
+  const hasShip = tile.placedShip !== null;
+  const isSank = hasShip ? tile.placedShip!.isSank() : false;
+  let shipColoring = "";
 
-  if (tile.placedShip !== null && (showShip === "all" || (showShip === "hit" && tile.hit))) {
-    hasShip = "tile-ship";
+  if (hasShip && (showShip === "all" || (showShip === "hit" && tile.guessed))) {
+    if (isSank) {
+      shipColoring = "tile-sunk-ship";
+    } else {
+      shipColoring = "tile-ship";
+    }
   }
 
   let overlay = "tile-overlay";
@@ -72,22 +80,16 @@ export function DrawTile({
 
   return (
     <div
-      onClick={() => onClick?.(tile.coordinate)}
-      className={`tile play-tile ${hasShip}`}
+      onClick={() => void onClick?.(tile.coordinate)}
+      className={`tile play-tile ${shipColoring}`}
       ref={drop}
     >
-      {tile.hit && (
-        <div className="tile-hit">
-          <img src="/images/X.svg" alt="X" />
+      {tile.guessed && (
+        <div className="tile-guessed">
+          <XSvg stroke={hasShip ? (isSank ? "black" : "red") : "blue"} />
         </div>
       )}
       <div className={overlay}></div>
-      {/* <div className="tile-data">
-        <div>
-          Y:{tile.coordinate.y} X:{tile.coordinate.x}
-        </div>
-        <div>{hasShip ? tile.placedShip?.type.name : ""}</div>
-      </div> */}
     </div>
   );
 }

@@ -11,15 +11,16 @@ export type ShipPlacement = {
 
 export type ShipSelectorProps = {
   shipsToPlace: Ship[];
+  disabled?: boolean;
 };
 
-export function ShipSelector({ shipsToPlace }: ShipSelectorProps) {
+export function ShipSelector({ shipsToPlace, disabled }: ShipSelectorProps) {
   const [vertical, setVertical] = useState<boolean>(true);
   return (
     <div className="ship-selector">
       <DraggedShipPreview />
       <div className="ship-sel-vertical">
-        <button onClick={() => setVertical(!vertical)}>
+        <button onClick={() => setVertical(!vertical)} disabled={disabled}>
           {vertical ? "VERTICAL" : "HORIZONTAL"}
         </button>
       </div>
@@ -27,7 +28,7 @@ export function ShipSelector({ shipsToPlace }: ShipSelectorProps) {
         <div className="ship-sel-opts-instruction">↓&nbsp;Drag ships to the board&nbsp;↓</div>
         <div className="ship-sel-opts">
           {shipsToPlace.map((ship, i) => (
-            <ShipSelectOption key={i} ship={ship} vertical={vertical} />
+            <ShipSelectOption key={i} ship={ship} vertical={vertical} disabled={disabled} />
           ))}
         </div>
       </div>
@@ -38,9 +39,10 @@ export function ShipSelector({ shipsToPlace }: ShipSelectorProps) {
 type ShipSelectOptionProps = {
   ship: Ship;
   vertical: boolean;
+  disabled?: boolean;
 };
 
-function ShipSelectOption({ ship, vertical }: ShipSelectOptionProps) {
+function ShipSelectOption({ ship, vertical, disabled }: ShipSelectOptionProps) {
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: "ship",
@@ -52,7 +54,7 @@ function ShipSelectOption({ ship, vertical }: ShipSelectOptionProps) {
     [ship, vertical]
   );
 
-  const placed = ship.tiles.length !== 0;
+  const placed = ship.tiles.length !== 0 || disabled;
   let classes = "ship-sel-opt";
   if (placed) {
     classes = classes + " ship-sel-placed";

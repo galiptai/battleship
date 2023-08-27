@@ -1,7 +1,8 @@
 import { Coordinate } from "../components/gameplay/DrawBoard";
 import { Tile } from "../components/gameplay/Tile";
 import { Board } from "./Board";
-import { Ship, ShipType } from "./Ship";
+import { WhichPlayer } from "./OnlineGame";
+import { SHIP_TYPES, Ship, ShipTypeKey } from "./Ship";
 import { Guess } from "./gameLogic";
 
 export class GameSave {
@@ -74,7 +75,7 @@ export class GameSave {
       return this.p1Board;
     } else {
       const p1Board = this.p1Board.getBoard();
-      this.#registerHits(p1Board);
+      this.#registerGuesses(p1Board, "PLAYER1");
       return p1Board;
     }
   }
@@ -84,7 +85,7 @@ export class GameSave {
       return this.p2Board;
     } else {
       const p2Board = this.p2Board.getBoard();
-      this.#registerHits(p2Board);
+      this.#registerGuesses(p2Board, "PLAYER2");
       return p2Board;
     }
   }
@@ -93,10 +94,10 @@ export class GameSave {
     return this.guesses.length % 2 === 0;
   }
 
-  #registerHits(board: Board) {
+  #registerGuesses(board: Board, whichPlayer: WhichPlayer) {
     for (const guess of this.guesses) {
-      if (guess.player !== board.player) {
-        board.tiles[guess.coordinate.y][guess.coordinate.x].hit = true;
+      if (guess.player !== whichPlayer) {
+        board.tiles[guess.coordinate.y][guess.coordinate.x].guessed = true;
       }
     }
   }
@@ -141,27 +142,24 @@ export class BoardData {
     for (let y = 0; y < this.height; y++) {
       const row: Tile[] = [];
       for (let x = 0; x < this.width; x++) {
-        row[x] = { coordinate: { y, x }, hit: false, placedShip: null };
+        row[x] = { coordinate: { y, x }, guessed: false, placedShip: null };
       }
       tiles[y] = row;
     }
     const board = new Board(this.player, this.height, this.width, new Set(), tiles);
     for (const ship of this.ships) {
-      board.addShip(ship.startingCoordinate, {
-        vertical: ship.vertical,
-        ship: new Ship(ship.type, []),
-      });
+      board.addShip(new Ship(SHIP_TYPES[ship.type], []), ship.startingCoordinate, ship.vertical);
     }
     return board;
   }
 }
 
 class ShipData {
-  type: ShipType;
+  type: ShipTypeKey;
   startingCoordinate: Coordinate;
   vertical: boolean;
 
-  constructor(type: ShipType, startingCoordinate: Coordinate, vertical: boolean) {
+  constructor(type: ShipTypeKey, startingCoordinate: Coordinate, vertical: boolean) {
     this.type = type;
     this.startingCoordinate = startingCoordinate;
     this.vertical = vertical;
@@ -175,7 +173,7 @@ class ShipData {
         vertical = true;
       }
     }
-    return new ShipData(ship.type, startingCoordinate, vertical);
+    return new ShipData(ship.type.name.toUpperCase() as ShipTypeKey, startingCoordinate, vertical);
   }
 }
 
@@ -192,15 +190,15 @@ export type SaveData = {
   date: Date;
 };
 
-type PlainBoardData = {
+export type PlainBoardData = {
   player: string;
   height: number;
   width: number;
   ships: PlainShipData[];
 };
 
-type PlainShipData = {
-  type: ShipType;
+export type PlainShipData = {
+  type: ShipTypeKey;
   startingCoordinate: Coordinate;
   vertical: boolean;
 };

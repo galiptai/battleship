@@ -28,33 +28,40 @@ export class Ship {
   }
 
   isSank(): boolean {
-    return this.tiles.every((tile) => tile.hit);
+    if (this.type == SHIP_TYPES.UNKNOWN) {
+      return false;
+    }
+    return this.tiles.every((tile) => tile.guessed);
   }
 }
 
 export const SHIP_TYPES = {
-  CAR: {
+  CARRIER: {
     name: "Carrier",
     length: 5,
   },
-  BAT: {
+  BATTLESHIP: {
     name: "Battleship",
     length: 4,
   },
-  CRU: {
+  CRUISER: {
     name: "Cruiser",
     length: 3,
   },
-  SUB: {
+  SUBMARINE: {
     name: "Submarine",
     length: 3,
   },
-  DES: {
+  DESTROYER: {
     name: "Destroyer",
     length: 2,
   },
+  UNKNOWN: {
+    name: "Unknown",
+    length: 1,
+  },
 } as const;
 
-type ObjectValues<T> = T[keyof T];
+export type ShipTypeKey = keyof typeof SHIP_TYPES;
 
-export type ShipType = ObjectValues<typeof SHIP_TYPES>;
+export type ShipType = (typeof SHIP_TYPES)[ShipTypeKey];

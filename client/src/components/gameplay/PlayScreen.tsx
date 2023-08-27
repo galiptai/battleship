@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, ReactNode } from "react";
 import { Board } from "../../logic/Board";
 import { Coordinate, DrawBoard } from "./DrawBoard";
 import "./PlayScreen.css";
@@ -6,9 +6,9 @@ import "./PlayScreen.css";
 type PlayScreenProps = {
   playerBoard: Board;
   opponentBoard: Board;
-  onOppBoardClick: (coordinate: Coordinate) => void;
+  onOppBoardClick: (coordinate: Coordinate) => void | Promise<void>;
   oppBoardClickCheck: (coordinate: Coordinate) => boolean;
-  children?: JSX.Element;
+  playMenu: ReactNode;
 };
 
 export function PlayScreen({
@@ -16,7 +16,7 @@ export function PlayScreen({
   opponentBoard,
   onOppBoardClick,
   oppBoardClickCheck,
-  children,
+  playMenu,
 }: PlayScreenProps) {
   const [showPlayerBoard, setShowPlayerBoard] = useState<boolean>(false);
 
@@ -42,7 +42,7 @@ export function PlayScreen({
       <div className={`play-player-board-container ${!showPlayerBoard ? "play-hide" : ""}`}>
         <DrawBoard board={playerBoard} showShips="all" />
       </div>
-      <div className="play-menu-container">{children}</div>
+      <div className="play-menu-container">{playMenu}</div>
     </div>
   );
 }

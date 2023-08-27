@@ -1,0 +1,26 @@
+.loading::after {
+  content: "";
+  font-size: 1.5em;
+  animation: 1.5s ease-in-out 0s infinite normal loading;
+}
+
+@keyframes loading {
+  0% {
+    content: "○○○";
+  }
+  5% {
+    content: "○○○";
+  }
+  33% {
+    content: "●○○";
+  }
+  66% {
+    content: "●●○";
+  }
+  95% {
+    content: "●●●";
+  }
+  100% {
+    content: "●●●";
+  }
+}
