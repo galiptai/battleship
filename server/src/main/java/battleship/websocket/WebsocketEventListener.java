@@ -2,6 +2,7 @@ package battleship.websocket;
 
 import battleship.config.CustomScheduledExecutorService;
 import battleship.service.GameConnectionService;
+import battleship.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
@@ -20,6 +21,7 @@ public class WebsocketEventListener {
 
     private final GameConnectionService gameConnectionService;
     private final CustomScheduledExecutorService executorService;
+    private final UserService userService;
 
     @EventListener
     public void connectListener(SessionConnectEvent event) {
@@ -29,6 +31,7 @@ public class WebsocketEventListener {
             return;
         }
         Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("userId", userId);
+        userService.connectUser(UUID.fromString(userId), headerAccessor.getSessionId());
     }
 
     @EventListener
@@ -52,12 +55,13 @@ public class WebsocketEventListener {
     @EventListener
     public void disconnectListener(SessionDisconnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-        String userId = (String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("userId");
-        String gameId = (String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("gameId");
+        UUID userId = UUID.fromString((String) Objects.requireNonNull(headerAccessor
+                .getSessionAttributes()).get("userId"));
+        String gameId = (String) headerAccessor.getSessionAttributes().get("gameId");
+        userService.disconnectUser(userId, headerAccessor.getSessionId());
 
-        if (gameId != null && userId != null) {
-            headerAccessor.getSessionAttributes().remove("gameId");
-            gameConnectionService.leaveGame(UUID.fromString(gameId), UUID.fromString(userId));
+        if (gameId != null && !userService.isConnected(userId)) {
+            gameConnectionService.leaveGame(UUID.fromString(gameId), userId);
         }
     }
 

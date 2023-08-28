@@ -34,33 +34,6 @@ public class WebsocketController {
         gameConnectionService.findGame(UUID.fromString(userId));
     }
 
-//    @MessageMapping("/join/new")
-//    public void joinNewGame(SimpMessageHeaderAccessor headerAccessor) {
-//        String userId = null;
-//        try {
-//            userId = (String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("userId");
-//        } catch (Exception exception) {
-//            handleException(exception, userId);
-//            return;
-//        }
-//
-//        gameConnectionService.findNewGame(UUID.fromString(userId));
-//    }
-//
-//    @MessageMapping("/join/rejoin")
-//    public void rejoinGame(SimpMessageHeaderAccessor headerAccessor) {
-//        String userId = null, gameId;
-//        try {
-//            userId = (String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("userId");
-//            gameId = getGameIdFromHeader(headerAccessor);
-//        } catch (Exception exception) {
-//            handleException(exception, userId);
-//            return;
-//        }
-//
-//        gameConnectionService.attemptRejoin(UUID.fromString(gameId), UUID.fromString(userId));
-//    }
-
     @MessageMapping("/forfeit")
     public void forfeitGame(SimpMessageHeaderAccessor headerAccessor) {
         String userId = null, gameId;

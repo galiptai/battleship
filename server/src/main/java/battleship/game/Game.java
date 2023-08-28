@@ -130,14 +130,19 @@ public class Game {
         state = GameState.P1_TURN;
     }
 
-    public void forfeitGame(Player forfeitingPlayer) throws IllegalRequestException {
+    public void forfeitGame(Player forfeitingPlayer) throws InvalidActionException {
+        if (state == GameState.OVER) {
+            throw new InvalidActionException("Can't forfeit a game that's already over.");
+        }
+        boolean notStarted = !hasStarted();
         state = GameState.OVER;
+        if (notStarted) {
+            return;
+        }
         if (forfeitingPlayer == player1) {
             winner = player2.getWhichPlayer();
-        } else if (forfeitingPlayer == player2) {
-            winner = player1.getWhichPlayer();
         } else {
-            throw new IllegalRequestException("Player is not in this game.");
+            winner = player1.getWhichPlayer();
         }
     }
 
@@ -161,19 +166,11 @@ public class Game {
     }
 
     public boolean isJoinable() {
-        return player2 == null;
-    }
-
-    public boolean isRejoinable() {
-        return state == GameState.SUSPENDED;
+        return player2 == null && state == GameState.JOINING;
     }
 
     public boolean allConnected() {
         return player2 != null && player1.isConnected() && player2.isConnected();
-    }
-
-    public boolean anyConnected() {
-            return player1.isConnected() || (player2 != null && player2.isConnected());
     }
 
     public boolean isGameReady() {
@@ -182,6 +179,10 @@ public class Game {
 
     public boolean isRunning() {
         return state == GameState.P1_TURN || state == GameState.P2_TURN;
+    }
+
+    public boolean hasStarted() {
+        return state != GameState.JOINING && state != GameState.SETUP;
     }
 
     public boolean isOver() {
@@ -205,7 +206,7 @@ public class Game {
             state = GameState.OVER;
             winner = WhichPlayer.PLAYER2;
             return true;
-        } else if (player2.allShipsSank()){
+        } else if (player2.allShipsSank()) {
             state = GameState.OVER;
             winner = WhichPlayer.PLAYER1;
             return true;

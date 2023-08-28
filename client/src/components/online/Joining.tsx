@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Client, Message } from "stompjs";
-import { getGameId, getId, deleteGameId, saveGameId } from "../../logic/storageFunctions";
+import { getId } from "../../logic/storageFunctions";
 import { MessageOverlay } from "../general/MessageOverlay";
 import { Loading } from "../general/Loading";
 import { Choice, ChoiceModal } from "../general/ChoiceModal";
@@ -8,6 +8,7 @@ import { Choice, ChoiceModal } from "../general/ChoiceModal";
 type JoinData = {
   joinable: boolean;
   gameId: string;
+  rejoin: boolean;
 };
 
 type JoiningProps = {
@@ -17,29 +18,16 @@ type JoiningProps = {
 
 export function Joining({ stompClient, setGameId }: JoiningProps) {
   const [displayRejoinModal, setDisplayRejoinModal] = useState<boolean>(false);
+  const [joinData, setJoinData] = useState<JoinData | null>(null);
   const [rejoin, setRejoin] = useState<Choice>("Undecided");
-  const [receivedGameId, setReceivedGameID] = useState<string | null>(null);
 
-  const onJoinMessageReceived = useCallback(
-    (message: Message) => {
-      const joinData = JSON.parse(message.body) as JoinData;
-      if (!joinData.joinable) {
-        deleteGameId();
-        stompClient.send("/app/join/new");
-      } else {
-        setReceivedGameID(joinData.gameId);
-      }
-    },
-    [stompClient]
-  );
+  const onJoinMessageReceived = useCallback((message: Message) => {
+    const joinData = JSON.parse(message.body) as JoinData;
+    setJoinData(joinData);
+  }, []);
 
   const join = useCallback(() => {
-    const gameId = getGameId();
-    if (gameId) {
-      stompClient.send("/app/join/rejoin", { gameId });
-    } else {
-      stompClient.send("/app/join/new");
-    }
+    stompClient.send("/app/join");
   }, [stompClient]);
 
   useEffect(() => {
@@ -52,26 +40,24 @@ export function Joining({ stompClient, setGameId }: JoiningProps) {
   }, [stompClient, join, onJoinMessageReceived]);
 
   useEffect(() => {
-    if (receivedGameId) {
-      if (receivedGameId === getGameId()) {
+    if (joinData) {
+      if (joinData.rejoin) {
         switch (rejoin) {
           case "Undecided":
             setDisplayRejoinModal(true);
             return;
           case "Yes":
-            setGameId(receivedGameId);
+            setGameId(joinData.gameId);
             return;
           case "No":
-            deleteGameId();
-            stompClient.send("/app/forfeit", { userId: getId(), gameId: receivedGameId });
+            stompClient.send("/app/forfeit", { userId: getId(), gameId: joinData.gameId });
             join();
         }
       } else {
-        saveGameId(receivedGameId);
-        setGameId(receivedGameId);
+        setGameId(joinData.gameId);
       }
     }
-  }, [receivedGameId, rejoin, setGameId, join, stompClient]);
+  }, [joinData, rejoin, setGameId, join, stompClient]);
 
   return (
     <>

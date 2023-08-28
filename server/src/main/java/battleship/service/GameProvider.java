@@ -48,8 +48,8 @@ public class GameProvider {
         return game;
     }
 
-    public void closeGame(UUID gameId) {
-        games.remove(gameId);
-        log.info("GAME-%s closed".formatted(gameId));
+    public void closeGame(Game game) {
+        games.remove(game.getId());
+        log.info("GAME-%s closed".formatted(game.getId()));
     }
 }
