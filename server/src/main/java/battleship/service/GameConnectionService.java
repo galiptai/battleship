@@ -5,7 +5,6 @@ import battleship.dtos.messages.ErrorDTO;
 import battleship.dtos.messages.ErrorType;
 import battleship.exceptions.GameNotFoundException;
 import battleship.exceptions.IllegalRequestException;
-import battleship.exceptions.InvalidRequestException;
 import battleship.game.Game;
 import battleship.game.Player;
 import battleship.game.WhichPlayer;
@@ -15,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -26,43 +26,87 @@ public class GameConnectionService {
 
     private final GameProvider gameProvider;
 
-    public void findNewGame(@NonNull UUID playerId) {
-        try {
-            UUID gameId;
-            Game game = gameProvider.getJoinableGame().orElse(null);
-            if (game != null) {
-                Player player = new Player(playerId, WhichPlayer.PLAYER2);
+    public void findGame(@NonNull UUID playerId) {
+        if (findExistingGameWithPlayer(playerId)) {
+            return;
+        }
+        if (joinGame(playerId)) {
+            return;
+        }
+        startNewGame(playerId);
+    }
+
+    private boolean findExistingGameWithPlayer(UUID playerId) {
+        Optional<Game> gamePlayerIsIn = gameProvider.getGamePlayerIsIn(playerId);
+        if (gamePlayerIsIn.isPresent()) {
+            Game game = gamePlayerIsIn.get();
+            websocketMessenger.sendJoinDataUser(playerId, game.getId(), true);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean joinGame(UUID playerId) {
+        Optional<Game> joinableGame = gameProvider.getJoinableGame();
+        if (joinableGame.isPresent()) {
+            Game game = joinableGame.get();
+            Player player = new Player(playerId, WhichPlayer.PLAYER2);
+            try {
                 game.addSecondPlayer(player);
-                gameId = game.getId();
-            } else {
-                Player player = new Player(playerId, WhichPlayer.PLAYER1);
-                gameId = gameProvider.startNewGame(player);
+                websocketMessenger.sendJoinDataUser(playerId, game.getId(), false);
+            } catch (Exception exception) {
+                log.error(exception.getMessage(), exception);
+                websocketMessenger.sendErrorUser(playerId, new ErrorDTO(ErrorType.ERROR, 500,
+                        "Something went wrong.", exception.getMessage()));
             }
-
-            websocketMessenger.sendJoinDataUser(playerId, gameId);
-        } catch (InvalidRequestException exception) {
-            log.error(exception.getMessage(), exception);
-            websocketMessenger.sendErrorUser(playerId, new ErrorDTO(ErrorType.ERROR, 400,
-                    "You are already in this game.", exception.getMessage()));
-        } catch (Exception exception) {
-            log.error(exception.getMessage(), exception);
-            websocketMessenger.sendErrorUser(playerId, new ErrorDTO(ErrorType.ERROR, 500,
-                    "Something went wrong.", exception.getMessage()));
+            return true;
         }
+        return false;
     }
 
-    public void attemptRejoin(@NonNull UUID gameId, @NonNull UUID playerId) {
-        try {
-            Game game = gameProvider.getGame(gameId);
-            if (game.hasPlayerWithId(playerId) && game.isRejoinable()) {
-                websocketMessenger.sendJoinDataUser(playerId, gameId);
-            } else {
-                websocketMessenger.sendJoinDataUser(playerId, null);
-            }
-        } catch (Exception exception) {
-            websocketMessenger.sendJoinDataUser(playerId, null);
-        }
+    private void startNewGame(UUID playerId) {
+        Player player = new Player(playerId, WhichPlayer.PLAYER1);
+        Game game = gameProvider.startNewGame(player);
+        websocketMessenger.sendJoinDataUser(playerId, game.getId(), false);
     }
+
+//    public void findNewGame(@NonNull UUID playerId) {
+//        try {
+//            UUID gameId;
+//            Game game = gameProvider.getJoinableGame().orElse(null);
+//            if (game != null) {
+//                Player player = new Player(playerId, WhichPlayer.PLAYER2);
+//                game.addSecondPlayer(player);
+//                gameId = game.getId();
+//            } else {
+//                Player player = new Player(playerId, WhichPlayer.PLAYER1);
+//                gameId = gameProvider.startNewGame(player);
+//            }
+//
+//            websocketMessenger.sendJoinDataUser(playerId, gameId);
+//        } catch (InvalidRequestException exception) {
+//            log.error(exception.getMessage(), exception);
+//            websocketMessenger.sendErrorUser(playerId, new ErrorDTO(ErrorType.ERROR, 400,
+//                    "You are already in this game.", exception.getMessage()));
+//        } catch (Exception exception) {
+//            log.error(exception.getMessage(), exception);
+//            websocketMessenger.sendErrorUser(playerId, new ErrorDTO(ErrorType.ERROR, 500,
+//                    "Something went wrong.", exception.getMessage()));
+//        }
+//    }
+//
+//    public void attemptRejoin(@NonNull UUID gameId, @NonNull UUID playerId) {
+//        try {
+//            Game game = gameProvider.getGame(gameId);
+//            if (game.hasPlayerWithId(playerId) && game.isRejoinable()) {
+//                websocketMessenger.sendJoinDataUser(playerId, gameId);
+//            } else {
+//                websocketMessenger.sendJoinDataUser(playerId, null);
+//            }
+//        } catch (Exception exception) {
+//            websocketMessenger.sendJoinDataUser(playerId, null);
+//        }
+//    }
 
     public GameDTO getGame(@NonNull UUID gameId, @NonNull UUID playerId) throws IllegalRequestException, GameNotFoundException {
         Game game = gameProvider.getGame(gameId);

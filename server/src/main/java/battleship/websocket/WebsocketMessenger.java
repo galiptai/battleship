@@ -19,13 +19,13 @@ public class WebsocketMessenger {
 
     private final SimpMessageSendingOperations messagingTemplate;
 
-    public void sendJoinDataUser(@NonNull UUID playerId, UUID gameId) {
+    public void sendJoinDataUser(@NonNull UUID playerId, UUID gameId, boolean rejoin) {
         if (gameId != null) {
             messagingTemplate.convertAndSendToUser(playerId.toString(), "/join",
-                    new JoinDTO(true, gameId.toString()));
+                    new JoinDTO(true, gameId.toString(), rejoin));
         } else {
             messagingTemplate.convertAndSendToUser(playerId.toString(), "/join",
-                    new JoinDTO(false, null));
+                    new JoinDTO(false, null, rejoin));
         }
     }
 

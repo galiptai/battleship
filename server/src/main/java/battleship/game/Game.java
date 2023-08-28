@@ -6,7 +6,6 @@ import battleship.dtos.messages.GuessDTO;
 import battleship.exceptions.GameStateException;
 import battleship.exceptions.IllegalRequestException;
 import battleship.exceptions.InvalidActionException;
-import battleship.exceptions.InvalidRequestException;
 import battleship.game.board.Coordinate;
 import battleship.game.ship.Ship;
 import lombok.Getter;
@@ -84,10 +83,10 @@ public class Game {
         }
     }
 
-    public void addSecondPlayer(@NonNull Player player) throws InvalidRequestException, GameStateException {
+    public void addSecondPlayer(@NonNull Player player) throws GameStateException {
         if (isJoinable()) {
             if (player1.getId().equals(player.getId())) {
-                throw new InvalidRequestException("Player is trying to join game they are already in.");
+                throw new GameStateException("Player is trying to join game they are already in.");
             }
             player2 = player;
             state = GameState.SETUP;
@@ -194,7 +193,7 @@ public class Game {
     }
 
     public boolean hasPlayerWithId(UUID id) {
-        return player1.getId().equals(id) || player2.getId().equals(id);
+        return player1.getId().equals(id) || (player2 != null && player2.getId().equals(id));
     }
 
     private boolean isPlayersTurn(Player player) {

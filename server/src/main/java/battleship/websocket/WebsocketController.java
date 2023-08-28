@@ -21,8 +21,8 @@ public class WebsocketController {
     private final GameConnectionService gameConnectionService;
     private final WebsocketMessenger websocketMessenger;
 
-    @MessageMapping("/join/new")
-    public void joinNewGame(SimpMessageHeaderAccessor headerAccessor) {
+    @MessageMapping("/join")
+    public void  joinGame(SimpMessageHeaderAccessor headerAccessor) {
         String userId = null;
         try {
             userId = (String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("userId");
@@ -31,22 +31,35 @@ public class WebsocketController {
             return;
         }
 
-        gameConnectionService.findNewGame(UUID.fromString(userId));
+        gameConnectionService.findGame(UUID.fromString(userId));
     }
 
-    @MessageMapping("/join/rejoin")
-    public void rejoinGame(SimpMessageHeaderAccessor headerAccessor) {
-        String userId = null, gameId;
-        try {
-            userId = (String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("userId");
-            gameId = getGameIdFromHeader(headerAccessor);
-        } catch (Exception exception) {
-            handleException(exception, userId);
-            return;
-        }
-
-        gameConnectionService.attemptRejoin(UUID.fromString(gameId), UUID.fromString(userId));
-    }
+//    @MessageMapping("/join/new")
+//    public void joinNewGame(SimpMessageHeaderAccessor headerAccessor) {
+//        String userId = null;
+//        try {
+//            userId = (String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("userId");
+//        } catch (Exception exception) {
+//            handleException(exception, userId);
+//            return;
+//        }
+//
+//        gameConnectionService.findNewGame(UUID.fromString(userId));
+//    }
+//
+//    @MessageMapping("/join/rejoin")
+//    public void rejoinGame(SimpMessageHeaderAccessor headerAccessor) {
+//        String userId = null, gameId;
+//        try {
+//            userId = (String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("userId");
+//            gameId = getGameIdFromHeader(headerAccessor);
+//        } catch (Exception exception) {
+//            handleException(exception, userId);
+//            return;
+//        }
+//
+//        gameConnectionService.attemptRejoin(UUID.fromString(gameId), UUID.fromString(userId));
+//    }
 
     @MessageMapping("/forfeit")
     public void forfeitGame(SimpMessageHeaderAccessor headerAccessor) {
