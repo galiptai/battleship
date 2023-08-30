@@ -29,6 +29,7 @@
 
 .overlay-description {
   font-size: 2vw;
+  user-select: text;
 }
 
 .overlay-buttons {

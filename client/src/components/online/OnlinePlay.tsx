@@ -89,7 +89,7 @@ export function OnlinePlay({
     }
     setSubmitting(true);
     try {
-      const res = await fetch(`api/v1/game/${game.id}/guess?playerId=${getId()}`, {
+      const res = await fetch(`/api/v1/game/${game.id}/guess?playerId=${getId()}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(coordinate),

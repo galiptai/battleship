@@ -91,7 +91,7 @@ export function OnlineGame({ stompClient, gameId, displayError }: OnlineGameProp
   const fetchGameAndJoin = useCallback(
     async (signal: AbortSignal, subscriptions: OnlineGameSubscriptions) => {
       try {
-        const res = await fetch(`api/v1/game/${gameId}?playerId=${getId()}`, { signal });
+        const res = await fetch(`/api/v1/game/${gameId}?playerId=${getId()}`, { signal });
         if (res.ok) {
           const gameData = (await res.json()) as GameData;
           setGame(Game.fromGameData(gameData));
@@ -140,7 +140,13 @@ export function OnlineGame({ stompClient, gameId, displayError }: OnlineGameProp
 
   switch (game.gameState) {
     case "JOINING":
-      return <MessageOverlay display message="Waiting for another player to join" />;
+      return (
+        <MessageOverlay
+          display
+          message="Waiting for another player to join"
+          description={updateMessage}
+        />
+      );
     case "SETUP":
       return (
         <OnlineSetup

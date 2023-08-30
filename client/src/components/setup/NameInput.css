@@ -7,9 +7,6 @@
 }
 
 .name-input > input {
-  all: unset;
-  border: 2px solid var(--main-blue);
-  padding: 3px;
   text-align: end;
   box-sizing: border-box;
   max-width: 100%;

@@ -47,6 +47,12 @@ button:active:not(:disabled) {
   background-color: var(--blue-active);
 }
 
+input {
+  all: unset;
+  border: 2px solid var(--main-blue);
+  padding: 3px;
+}
+
 @media (hover: hover) {
   button:hover:not(:disabled, :active) {
     color: white;

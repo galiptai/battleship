@@ -1,22 +1,22 @@
 import { useCallback, useEffect, useState } from "react";
 import { Client, Message } from "stompjs";
-import { getId } from "../../logic/storageFunctions";
-import { MessageOverlay } from "../general/MessageOverlay";
-import { Loading } from "../general/Loading";
-import { Choice, ChoiceModal } from "../general/ChoiceModal";
+import { getId } from "../../../logic/storageFunctions";
+import { MessageOverlay } from "../../general/MessageOverlay";
+import { Loading } from "../../general/Loading";
+import { Choice, ChoiceModal } from "../../general/ChoiceModal";
 
-type JoinData = {
+export type JoinData = {
   joinable: boolean;
   gameId: string;
   rejoin: boolean;
 };
 
-type JoiningProps = {
+export type JoiningProps = {
   stompClient: Client;
   setGameId: (gameId: string | null) => void;
 };
 
-export function Joining({ stompClient, setGameId }: JoiningProps) {
+export function JoinQuick({ stompClient, setGameId }: JoiningProps) {
   const [displayRejoinModal, setDisplayRejoinModal] = useState<boolean>(false);
   const [joinData, setJoinData] = useState<JoinData | null>(null);
   const [rejoin, setRejoin] = useState<Choice>("Undecided");
@@ -50,7 +50,7 @@ export function Joining({ stompClient, setGameId }: JoiningProps) {
             setGameId(joinData.gameId);
             return;
           case "No":
-            stompClient.send("/app/forfeit", { userId: getId(), gameId: joinData.gameId });
+            stompClient.send("/app/forfeit", {}, joinData.gameId);
             join();
         }
       } else {

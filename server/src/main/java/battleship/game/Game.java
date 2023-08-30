@@ -20,14 +20,16 @@ public class Game {
     private final UUID id;
     private final Player player1;
     private Player player2;
+    private final boolean privateGame;
     private WhichPlayer currentTurn;
     private final List<Guess> guesses;
     @Getter
     private GameState state;
     private WhichPlayer winner;
 
-    public Game(Player player1) {
+    public Game(boolean privateGame, Player player1) {
         this.id = UUID.randomUUID();
+        this.privateGame = privateGame;
         this.player1 = player1;
         this.player2 = null;
         this.currentTurn = null;
@@ -163,6 +165,10 @@ public class Game {
             changeTurn();
         }
         return guess;
+    }
+
+    public boolean isPrivate() {
+        return privateGame;
     }
 
     public boolean isJoinable() {

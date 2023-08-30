@@ -4,6 +4,7 @@ import battleship.dtos.GameDTO;
 import battleship.dtos.messages.ErrorDTO;
 import battleship.dtos.messages.ErrorType;
 import battleship.exceptions.GameNotFoundException;
+import battleship.exceptions.GameStateException;
 import battleship.exceptions.IllegalRequestException;
 import battleship.game.Game;
 import battleship.game.Player;
@@ -30,10 +31,10 @@ public class GameConnectionService {
         if (findExistingGameWithPlayer(playerId)) {
             return;
         }
-        if (joinGame(playerId)) {
+        if (addToGame(playerId)) {
             return;
         }
-        startNewGame(playerId);
+        startNewGame(false, playerId);
     }
 
     private boolean findExistingGameWithPlayer(UUID playerId) {
@@ -46,8 +47,8 @@ public class GameConnectionService {
         return false;
     }
 
-    private boolean joinGame(UUID playerId) {
-        Optional<Game> joinableGame = gameProvider.getJoinableGame();
+    private boolean addToGame(UUID playerId) {
+        Optional<Game> joinableGame = gameProvider.getJoinablePublicGame();
         if (joinableGame.isPresent()) {
             Game game = joinableGame.get();
             Player player = new Player(playerId, WhichPlayer.PLAYER2);
@@ -64,9 +65,9 @@ public class GameConnectionService {
         return false;
     }
 
-    private void startNewGame(UUID playerId) {
+    public void startNewGame(boolean privateGame, UUID playerId) {
         Player player = new Player(playerId, WhichPlayer.PLAYER1);
-        Game game = gameProvider.startNewGame(player);
+        Game game = gameProvider.startNewGame(privateGame, player);
         websocketMessenger.sendJoinDataUser(playerId, game.getId(), false);
     }
 
@@ -82,7 +83,11 @@ public class GameConnectionService {
             Player player = game.getPlayerById(playerId);
             game.connect(player);
             log.info("USER-%s joined GAME-%s".formatted(playerId, gameId));
-            websocketMessenger.sendStateUpdateGlobal(game, null);
+            String message = null;
+            if (game.isPrivate() && !game.isGameReady()) {
+                message = "Game ID: %s".formatted(gameId);
+            }
+            websocketMessenger.sendStateUpdateGlobal(game, message);
         } catch (GameNotFoundException exception) {
             websocketMessenger.sendErrorUser(playerId, new ErrorDTO(ErrorType.ERROR, 400,
                     "Game is no longer available.", exception.getMessage()));
@@ -106,7 +111,7 @@ public class GameConnectionService {
             } else {
                 websocketMessenger.sendStateUpdateGlobal(game, "Other player left. Wait for them to rejoin.");
             }
-        } catch (GameNotFoundException ignore){
+        } catch (GameNotFoundException ignore) {
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception);
         }
@@ -134,5 +139,19 @@ public class GameConnectionService {
             websocketMessenger.sendStateUpdateGlobal(game, "One of the players left.");
         }
         gameProvider.closeGame(game);
+    }
+
+    public void findSpecificGame(@NonNull UUID gameId, @NonNull UUID playerId) {
+        try {
+            Game game = gameProvider.getGame(gameId);
+            game.addSecondPlayer(new Player(playerId, WhichPlayer.PLAYER2));
+            websocketMessenger.sendJoinDataUser(playerId, gameId, false);
+        } catch (GameNotFoundException exception) {
+            websocketMessenger.sendErrorUser(playerId, new ErrorDTO(ErrorType.WARNING, 400,
+                    "No game found with this ID.", exception.getMessage()));
+        } catch (GameStateException exception) {
+            websocketMessenger.sendErrorUser(playerId, new ErrorDTO(ErrorType.ERROR, 400,
+                    "You can't join this game.", exception.getMessage()));
+        }
     }
 }

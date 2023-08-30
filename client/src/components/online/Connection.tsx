@@ -2,14 +2,18 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import SockJS from "sockjs-client";
 import { Client, Frame, Message, over } from "stompjs";
 import { getId } from "../../logic/storageFunctions";
-import { Joining } from "./Joining";
+import { JoiningProps } from "./join/JoinQuick";
 import { OnlineGame } from "./OnlineGame";
 import { MessageOverlay } from "../general/MessageOverlay";
 import { Loading } from "../general/Loading";
 import { useNavigate } from "react-router-dom";
 import { CustomError, ErrorMessage } from "../../logic/CustomError";
 
-export function Connection() {
+type ConnectionProps = {
+  JoinComponent: React.FC<JoiningProps>;
+};
+
+export function Connection({ JoinComponent }: ConnectionProps) {
   const navigate = useNavigate();
   const stompClient = useRef<Client | null>(null);
   const [connected, setConnected] = useState<boolean>(false);
@@ -70,12 +74,22 @@ export function Connection() {
   function onError(error: string | Frame) {
     setConnected(false);
     console.error(error);
-    setConnectionError("Failed to connect.");
+    let message = "Connection error.";
+    if (((error as Frame)?.headers as { [key: string]: string })?.message) {
+      message = ((error as Frame)?.headers as { [key: string]: string })?.message;
+    }
+    setConnectionError((error) => {
+      if (!error) {
+        return message;
+      } else {
+        return error;
+      }
+    });
   }
 
   if (!connected) {
     if (connectionError) {
-      return <MessageOverlay display message={connectionError} />;
+      return <MessageOverlay display message="Failed to connect" description={connectionError} />;
     } else {
       return <MessageOverlay display message="Connecting" description={<Loading />} />;
     }
@@ -86,7 +100,7 @@ export function Connection() {
     return (
       <>
         {gameId === null ? (
-          <Joining stompClient={stompClient.current} setGameId={setGameId} />
+          <JoinComponent stompClient={stompClient.current} setGameId={setGameId} />
         ) : (
           <OnlineGame
             stompClient={stompClient.current}

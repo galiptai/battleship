@@ -45,7 +45,7 @@ export function OnlineSetup({ stompClient, game, setGame, displayError }: Online
   async function sendPlayerBoard(board: Board) {
     setSubmitting(true);
     try {
-      const res = await fetch(`api/v1/game/${game.id}/setBoard?playerId=${getId()}`, {
+      const res = await fetch(`/api/v1/game/${game.id}/setBoard?playerId=${getId()}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(BoardData.getDataFromBoard(board)),

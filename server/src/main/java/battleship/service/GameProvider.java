@@ -37,12 +37,12 @@ public class GameProvider {
                 .findFirst();
     }
 
-    public Optional<Game> getJoinableGame() {
-        return games.values().stream().filter(Game::isJoinable).findFirst();
+    public Optional<Game> getJoinablePublicGame() {
+        return games.values().stream().filter(game -> game.isJoinable() && !game.isPrivate()).findFirst();
     }
 
-    public Game startNewGame(Player player) {
-        Game game = new Game(player);
+    public Game startNewGame(boolean privateGame, Player player) {
+        Game game = new Game(privateGame, player);
         games.put(game.getId(), game);
         log.info("Created GAME-%s for PLAYER-%s".formatted(game.getId(), player.getId()));
         return game;
