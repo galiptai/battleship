@@ -18,6 +18,13 @@ public class WebsocketController {
 
     private final GameConnectionService gameConnectionService;
 
+    @MessageMapping("/rejoin")
+    public void getRejoinableGame(SimpMessageHeaderAccessor headerAccessor) {
+        String userId = (String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("userId");
+
+        gameConnectionService.findRejoinableGame(UUID.fromString(userId));
+    }
+
     @MessageMapping("/join")
     public void joinGame(SimpMessageHeaderAccessor headerAccessor) {
         String userId = (String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("userId");

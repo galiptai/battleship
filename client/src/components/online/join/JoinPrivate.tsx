@@ -1,31 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
-import { JoinData, JoiningProps } from "./JoinQuick";
-import { getId } from "../../../logic/storageFunctions";
-import { Client, Message } from "stompjs";
-import { MessageOverlay } from "../../general/MessageOverlay";
+import { useState } from "react";
 import { Loading } from "../../general/Loading";
+import { MessageOverlay } from "../../general/MessageOverlay";
+import { useConnection } from "../ConnectionProvider";
 
 type StartMode = "CREATE" | "JOIN";
 
-export function JoinPrivate({ stompClient, setGameId }: JoiningProps) {
+export function JoinPrivate() {
+  const { stompClient } = useConnection();
   const [startMode, setStartMode] = useState<StartMode | null>(null);
-
-  const onJoinMessageReceived = useCallback(
-    (message: Message) => {
-      const joinData = JSON.parse(message.body) as JoinData;
-      if (joinData.joinable) {
-        setGameId(joinData.gameId);
-      }
-    },
-    [setGameId]
-  );
-
-  useEffect(() => {
-    const subscription = stompClient.subscribe(`/user/${getId()}/join`, onJoinMessageReceived);
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [stompClient, onJoinMessageReceived]);
 
   function onCreateClick() {
     setStartMode("CREATE");
@@ -44,15 +26,12 @@ export function JoinPrivate({ stompClient, setGameId }: JoiningProps) {
   if (startMode === "CREATE") {
     return <MessageOverlay display message="Creating" description={<Loading />} />;
   } else {
-    return <JoinInput stompClient={stompClient} />;
+    return <JoinInput />;
   }
 }
 
-type JoinInputProps = {
-  stompClient: Client;
-};
-
-function JoinInput({ stompClient }: JoinInputProps) {
+function JoinInput() {
+  const { stompClient } = useConnection();
   const [gameId, setGameId] = useState<string>("");
 
   function onChange(event: React.ChangeEvent<HTMLInputElement>) {

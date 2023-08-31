@@ -1,19 +1,18 @@
+import { HTML5toTouch } from "rdndmb-html5-to-touch";
+import { DndProvider } from "react-dnd-multi-backend";
 import {
-  createBrowserRouter,
-  createRoutesFromElements,
+  Navigate,
   Route,
   RouterProvider,
-  Navigate,
+  createBrowserRouter,
+  createRoutesFromElements,
 } from "react-router-dom";
-import { DndProvider } from "react-dnd-multi-backend";
-import { HTML5toTouch } from "rdndmb-html5-to-touch";
-import { LocalLoader } from "./components/local/LocalLoader.tsx";
-import { Connection } from "./components/online/Connection.tsx";
-import { Layout } from "./components/general/Layout.tsx";
-import { Home } from "./components/general/Home.tsx";
 import { ErrorBoundary } from "./components/general/ErrorBoundary.tsx";
-import { JoinQuick } from "./components/online/join/JoinQuick.tsx";
-import { JoinPrivate } from "./components/online/join/JoinPrivate.tsx";
+import { Home } from "./components/general/Home.tsx";
+import { Layout } from "./components/general/Layout.tsx";
+import { LocalLoader } from "./components/local/LocalLoader.tsx";
+import { ConnectionProvider } from "./components/online/ConnectionProvider.tsx";
+import { Online } from "./components/online/Online.tsx";
 
 export default function App() {
   const router = createBrowserRouter(
@@ -21,8 +20,24 @@ export default function App() {
       <Route element={<Layout />} errorElement={<ErrorBoundary />}>
         <Route index element={<Home />} />,
         <Route path="/local" element={<LocalLoader />} />,
-        <Route path="/online/quick" element={<Connection JoinComponent={JoinQuick} />} />,
-        <Route path="/online/private" element={<Connection JoinComponent={JoinPrivate} />} />,
+        <Route
+          path="/online/public"
+          element={
+            <ConnectionProvider>
+              <Online joinMode="PUBLIC" />
+            </ConnectionProvider>
+          }
+        />
+        ,
+        <Route
+          path="/online/private"
+          element={
+            <ConnectionProvider>
+              <Online joinMode="PRIVATE" />
+            </ConnectionProvider>
+          }
+        />
+        ,
       </Route>,
       <Route path="*" element={<Navigate to="/" />} />,
     ])

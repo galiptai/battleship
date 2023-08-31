@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
-import { Client, Message, Subscription } from "stompjs";
-import { getId } from "../../logic/storageFunctions";
-import { OnlineSetup } from "./OnlineSetup";
-import { OnlinePlay } from "./OnlinePlay";
-import { OnlineGame as Game, GameData, GameState, WhichPlayer } from "../../logic/OnlineGame";
-import { OnlineOver } from "./OnlineOver";
-import { BoardData } from "../../logic/GameSave";
-import { MessageOverlay } from "../general/MessageOverlay";
-import { Loading } from "../general/Loading";
+import { Message, Subscription } from "stompjs";
 import { CustomError, isErrorMessage } from "../../logic/CustomError";
+import { BoardData } from "../../logic/GameSave";
+import { OnlineGame as Game, GameData, GameState, WhichPlayer } from "../../logic/OnlineGame";
+import { getId } from "../../logic/storageFunctions";
+import { Loading } from "../general/Loading";
+import { MessageOverlay } from "../general/MessageOverlay";
+import { useConnection } from "./ConnectionProvider";
+import { OnlineOver } from "./OnlineOver";
+import { OnlinePlay } from "./OnlinePlay";
+import { OnlineSetup } from "./OnlineSetup";
 
 type StateUpdate = {
   gameState: GameState;
@@ -26,13 +27,13 @@ type OnlineGameSubscriptions = {
   winSub: Subscription | null;
 };
 
-type OnlineGameProps = {
-  stompClient: Client;
+type OnlineGameFlowProps = {
   gameId: string;
   displayError: (error: unknown) => void;
 };
 
-export function OnlineGame({ stompClient, gameId, displayError }: OnlineGameProps) {
+export function OnlineGameFlow({ gameId, displayError }: OnlineGameFlowProps) {
+  const { stompClient } = useConnection();
   const [game, setGame] = useState<Game | null>(null);
   const [updateMessage, setUpdateMessage] = useState<string | null>(null);
 
@@ -148,21 +149,13 @@ export function OnlineGame({ stompClient, gameId, displayError }: OnlineGameProp
         />
       );
     case "SETUP":
-      return (
-        <OnlineSetup
-          stompClient={stompClient}
-          game={game}
-          setGame={setGame}
-          displayError={displayError}
-        />
-      );
+      return <OnlineSetup game={game} setGame={setGame} displayError={displayError} />;
     case "P1_TURN":
     case "P2_TURN":
     case "SUSPENDED": {
       if (game.player && game.opponent) {
         return (
           <OnlinePlay
-            stompClient={stompClient}
             game={game}
             setGame={setGame}
             updateMessage={updateMessage}
@@ -176,7 +169,6 @@ export function OnlineGame({ stompClient, gameId, displayError }: OnlineGameProp
     case "OVER":
       return (
         <OnlineOver
-          stompClient={stompClient}
           game={game}
           setGame={setGame}
           updateMessage={updateMessage}

@@ -10,7 +10,7 @@ export function Home() {
         <div className="home-option" onClick={() => navigate("/local")}>
           Local game
         </div>
-        <div className="home-option" onClick={() => navigate("/online/quick")}>
+        <div className="home-option" onClick={() => navigate("/online/public")}>
           Online quick game
         </div>
         <div className="home-option" onClick={() => navigate("/online/private")}>

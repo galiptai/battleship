@@ -27,24 +27,21 @@ public class GameConnectionService {
 
     private final GameProvider gameProvider;
 
-    public void findGame(@NonNull UUID playerId) {
-        if (findExistingGameWithPlayer(playerId)) {
-            return;
-        }
-        if (addToGame(playerId)) {
-            return;
-        }
-        startNewGame(false, playerId);
-    }
-
-    private boolean findExistingGameWithPlayer(UUID playerId) {
+    public void findRejoinableGame(UUID playerId) {
         Optional<Game> gamePlayerIsIn = gameProvider.getGamePlayerIsIn(playerId);
         if (gamePlayerIsIn.isPresent()) {
             Game game = gamePlayerIsIn.get();
             websocketMessenger.sendJoinDataUser(playerId, game.getId(), true);
-            return true;
+        } else {
+            websocketMessenger.sendJoinDataUser(playerId, null, true);
         }
-        return false;
+    }
+
+    public void findGame(@NonNull UUID playerId) {
+        if (addToGame(playerId)) {
+            return;
+        }
+        startNewGame(false, playerId);
     }
 
     private boolean addToGame(UUID playerId) {
@@ -154,4 +151,5 @@ public class GameConnectionService {
                     "You can't join this game.", exception.getMessage()));
         }
     }
+
 }
