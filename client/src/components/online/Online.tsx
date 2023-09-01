@@ -55,16 +55,12 @@ export function Online({ joinMode }: OnlineProps) {
           display
           background
           message={`Error: ${errorMessage.userMessage}`}
-          description={
-            errorMessage.type === "WARNING"
-              ? "If you keep getting this error, try reloading the game."
-              : undefined
-          }
           buttons={
             errorMessage.type === "ERROR"
               ? [<button onClick={() => navigate("/")}>MAIN MENU</button>]
               : [<button onClick={() => setErrorMessage(null)}>OK</button>]
           }
+          zIndex={400}
         />
       )}
     </>

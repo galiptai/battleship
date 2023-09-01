@@ -131,7 +131,7 @@ export function OnlinePlay({ game, setGame, updateMessage, displayError }: Onlin
                 ? submitting
                   ? "Processing..."
                   : "It's your turn!"
-                : "It's your opponents turn!"
+                : "It's your opponent's turn!"
             }
           />
         }
