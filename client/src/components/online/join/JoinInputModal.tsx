@@ -3,12 +3,13 @@ import { useConnection } from "../ConnectionProvider";
 import { ChoiceModal } from "../../general/ChoiceModal";
 import { validate } from "uuid";
 import "./JoinInputModal.css";
+import { JoinPrivateProps } from "./JoinPrivate";
 
 type JoinInputModalProps = {
   onCancel: () => void;
-};
+} & JoinPrivateProps;
 
-export function JoinInputModal({ onCancel }: JoinInputModalProps) {
+export function JoinInputModal({ joining, setJoining, onCancel }: JoinInputModalProps) {
   const { stompClient } = useConnection();
   const [gameId, setGameId] = useState<string>("");
   const [message, setMessage] = useState<string>("");
@@ -33,6 +34,7 @@ export function JoinInputModal({ onCancel }: JoinInputModalProps) {
       return;
     }
     stompClient.send("/app/join-private", {}, gameId);
+    setJoining(true);
   }
 
   return (
@@ -54,13 +56,14 @@ export function JoinInputModal({ onCancel }: JoinInputModalProps) {
               }
             }}
           />
-          <div>{message}</div>
+          <div className="join-input-message">{message}</div>
         </div>
       }
       onConfirm={join}
       confirmText="JOIN"
       onCancel={onCancel}
       cancelText="CANCEL"
+      disableButtons={joining}
     />
   );
 }

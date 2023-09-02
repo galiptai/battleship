@@ -3,11 +3,11 @@ import { Loading } from "../../general/Loading";
 import { MessageOverlay } from "../../general/MessageOverlay";
 import { useConnection } from "../ConnectionProvider";
 
-export type JoiningProps = {
+type JoinPrivateProps = {
   joinSubscribed: boolean;
 };
 
-export function JoinPublic({ joinSubscribed }: JoiningProps) {
+export function JoinPublic({ joinSubscribed }: JoinPrivateProps) {
   const { stompClient } = useConnection();
   const joinRequestSent = useRef<boolean>(false);
 

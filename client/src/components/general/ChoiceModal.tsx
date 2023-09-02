@@ -12,6 +12,7 @@ type ChoiceModalProps = {
   onConfirm: () => void;
   cancelText?: string;
   onCancel: () => void;
+  disableButtons?: boolean;
 };
 
 export function ChoiceModal({
@@ -23,6 +24,7 @@ export function ChoiceModal({
   onConfirm,
   cancelText,
   onCancel,
+  disableButtons,
 }: ChoiceModalProps) {
   confirmText = confirmText ?? "YES";
   cancelText = cancelText ?? "NO";
@@ -34,8 +36,12 @@ export function ChoiceModal({
           <div className="choice-modal-question">{question}</div>
           {description && <div className="choice-modal-description">{description}</div>}
           <div className="choice-modal-buttons">
-            <button onClick={onConfirm}>{confirmText}</button>
-            <button onClick={onCancel}>{cancelText}</button>
+            <button onClick={onConfirm} disabled={disableButtons}>
+              {confirmText}
+            </button>
+            <button onClick={onCancel} disabled={disableButtons}>
+              {cancelText}
+            </button>
           </div>
         </div>
       </div>

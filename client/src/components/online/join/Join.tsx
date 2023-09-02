@@ -1,11 +1,10 @@
 import { Dispatch, useCallback, useEffect, useState } from "react";
-import { JoinPrivate } from "./JoinPrivate";
-import { useConnection } from "../ConnectionProvider";
-import { Choice } from "../../general/ChoiceModal";
 import { Message } from "stompjs";
 import { getId } from "../../../logic/storageFunctions";
-import { Rejoin } from "./Rejoin";
+import { useConnection } from "../ConnectionProvider";
+import { JoinPrivate } from "./JoinPrivate";
 import { JoinPublic } from "./JoinPublic";
+import { Rejoin } from "./Rejoin";
 
 export type JoinMode = "PUBLIC" | "PRIVATE";
 
@@ -24,6 +23,7 @@ export function Join({ joinMode, setGameId }: JoinProps) {
   const { stompClient } = useConnection();
   const [subscribed, setSubscribed] = useState<boolean>(false);
   const [rejoinCheck, setRejoinCheck] = useState<boolean>(false);
+  const [joining, setJoining] = useState<boolean>(false);
   const [joinData, setRejoinData] = useState<JoinData | null>(null);
 
   const onJoinMessageReceived = useCallback(
@@ -38,15 +38,19 @@ export function Join({ joinMode, setGameId }: JoinProps) {
       } else {
         setGameId(joinData.gameId);
       }
+      setJoining(false);
     },
     [setGameId]
   );
 
   useEffect(() => {
     const subscription = stompClient.subscribe(`/user/${getId()}/join`, onJoinMessageReceived);
+    const subscription2 = stompClient.subscribe(`/topic`, onJoinMessageReceived);
     setSubscribed(true);
     return () => {
       subscription.unsubscribe();
+      subscription2.unsubscribe();
+      setSubscribed(false);
     };
   }, [stompClient, onJoinMessageReceived]);
 
@@ -70,7 +74,7 @@ export function Join({ joinMode, setGameId }: JoinProps) {
     );
   } else {
     if (joinMode === "PRIVATE") {
-      return <JoinPrivate />;
+      return <JoinPrivate joining={joining} setJoining={setJoining} />;
     } else {
       return <JoinPublic joinSubscribed={subscribed} />;
     }

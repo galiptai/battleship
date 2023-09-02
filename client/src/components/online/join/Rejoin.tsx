@@ -1,9 +1,9 @@
-import { Dispatch, useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import { ChoiceModal } from "../../general/ChoiceModal";
 import { Loading } from "../../general/Loading";
 import { MessageOverlay } from "../../general/MessageOverlay";
 import { useConnection } from "../ConnectionProvider";
 import { JoinData } from "./Join";
-import { ChoiceModal } from "../../general/ChoiceModal";
 
 export type RejoinProps = {
   joinSubscribed: boolean;

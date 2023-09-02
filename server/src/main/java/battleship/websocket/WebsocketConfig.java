@@ -13,6 +13,8 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @RequiredArgsConstructor
 public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    private final WebsocketChannelInterceptor websocketChannelInterceptor;
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
@@ -25,12 +27,14 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes("/app");
-        registry.enableSimpleBroker("/game", "/user");
+        registry.enableSimpleBroker( "/game", "/user");
         registry.setPreservePublishOrder(true);
     }
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new WebsocketChannelInterceptor());
+        registration.interceptors(websocketChannelInterceptor);
     }
+
+
 }

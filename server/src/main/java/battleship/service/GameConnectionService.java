@@ -37,11 +37,27 @@ public class GameConnectionService {
         }
     }
 
-    public void findGame(@NonNull UUID playerId) {
+    public void findNewGame(@NonNull UUID playerId) {
         if (addToGame(playerId)) {
             return;
         }
         startNewGame(false, playerId);
+    }
+
+    public void findSpecificGame(@NonNull UUID gameId, @NonNull UUID playerId) {
+        try {
+            Game game = gameProvider.getGame(gameId);
+            game.addSecondPlayer(new Player(playerId, WhichPlayer.PLAYER2));
+            websocketMessenger.sendJoinDataUser(playerId, gameId, false);
+            return;
+        } catch (GameNotFoundException exception) {
+            websocketMessenger.sendErrorUser(playerId, new ErrorDTO(ErrorType.WARNING, 400,
+                    "No game found with this ID.", exception.getMessage()));
+        } catch (GameStateException exception) {
+            websocketMessenger.sendErrorUser(playerId, new ErrorDTO(ErrorType.ERROR, 400,
+                    "You can't join this game.", exception.getMessage()));
+        }
+        websocketMessenger.sendJoinDataUser(playerId, null, false);
     }
 
     private boolean addToGame(UUID playerId) {
@@ -74,7 +90,7 @@ public class GameConnectionService {
         return game.getGame(player);
     }
 
-    public void joinGame(@NonNull UUID gameId, @NonNull UUID playerId) {
+    public void connectToGame(@NonNull UUID gameId, @NonNull UUID playerId) {
         try {
             Game game = gameProvider.getGame(gameId);
             Player player = game.getPlayerById(playerId);
@@ -96,7 +112,7 @@ public class GameConnectionService {
         }
     }
 
-    public void leaveGame(@NonNull UUID gameId, @NonNull UUID playerId) {
+    public void disconnectFromGame(@NonNull UUID gameId, @NonNull UUID playerId) {
         try {
             Game game = gameProvider.getGame(gameId);
             Player player = game.getPlayerById(playerId);
@@ -136,20 +152,6 @@ public class GameConnectionService {
             websocketMessenger.sendStateUpdateGlobal(game, "One of the players left.");
         }
         gameProvider.closeGame(game);
-    }
-
-    public void findSpecificGame(@NonNull UUID gameId, @NonNull UUID playerId) {
-        try {
-            Game game = gameProvider.getGame(gameId);
-            game.addSecondPlayer(new Player(playerId, WhichPlayer.PLAYER2));
-            websocketMessenger.sendJoinDataUser(playerId, gameId, false);
-        } catch (GameNotFoundException exception) {
-            websocketMessenger.sendErrorUser(playerId, new ErrorDTO(ErrorType.WARNING, 400,
-                    "No game found with this ID.", exception.getMessage()));
-        } catch (GameStateException exception) {
-            websocketMessenger.sendErrorUser(playerId, new ErrorDTO(ErrorType.ERROR, 400,
-                    "You can't join this game.", exception.getMessage()));
-        }
     }
 
 }
