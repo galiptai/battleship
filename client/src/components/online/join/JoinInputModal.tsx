@@ -4,6 +4,7 @@ import { ChoiceModal } from "../../general/ChoiceModal";
 import { validate } from "uuid";
 import "./JoinInputModal.css";
 import { JoinPrivateProps } from "./JoinPrivate";
+import shortUUID from "short-uuid";
 
 type JoinInputModalProps = {
   onCancel: () => void;
@@ -29,11 +30,12 @@ export function JoinInputModal({ joining, setJoining, onCancel }: JoinInputModal
       setMessage("ID can't be empty.");
       return;
     }
-    if (!validate(gameId)) {
+    const convertedID = shortUUID().toUUID(gameId);
+    if (!validate(convertedID)) {
       setMessage("ID format not valid.");
       return;
     }
-    stompClient.send("/app/join-private", {}, gameId);
+    stompClient.send("/app/join-private", {}, convertedID);
     setJoining(true);
   }
 
@@ -49,7 +51,7 @@ export function JoinInputModal({ joining, setJoining, onCancel }: JoinInputModal
             value={gameId}
             onChange={onChange}
             onFocus={onFocus}
-            maxLength={36}
+            maxLength={22}
             onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
               if (event.key === "Enter") {
                 join();

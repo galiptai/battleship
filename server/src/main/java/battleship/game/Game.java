@@ -45,6 +45,7 @@ public class Game {
         return new GameDTO(
                 id,
                 player.getWhichPlayer(),
+                privateGame,
                 playerData,
                 opponentData,
                 guesses.stream().map(GuessDTO::new).toList(),

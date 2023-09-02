@@ -96,11 +96,7 @@ public class GameConnectionService {
             Player player = game.getPlayerById(playerId);
             game.connect(player);
             log.info("USER-%s joined GAME-%s".formatted(playerId, gameId));
-            String message = null;
-            if (game.isPrivate() && !game.isGameReady()) {
-                message = "Game ID: %s".formatted(gameId);
-            }
-            websocketMessenger.sendStateUpdateGlobal(game, message);
+            websocketMessenger.sendStateUpdateGlobal(game, null);
         } catch (GameNotFoundException exception) {
             websocketMessenger.sendErrorUser(playerId, new ErrorDTO(ErrorType.ERROR, 400,
                     "Game is no longer available.", exception.getMessage()));
