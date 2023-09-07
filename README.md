@@ -43,9 +43,9 @@ What you need: JDK 17
 What you need: Node.js and npm (latest versions recommended)
 
 - In a different terminal navigate to the **client** directory of the app
+- Create a .env.local file, and place a VITE_ADDRESS variable in it, with the value being the address of the server on your network. *(For example: VITE_ADDRESS=192.168.0.255:8080)*
 - Run `npm ci` to install the dependencies
 - Run `npm run build` to build the frontend
-- Create a .env.local file (in the client directory), and place a VITE_ADDRESS variable in it, with the value being the address of the server on your network. *(For example: VITE_ADDRESS=192.168.0.255:8080)*
 - Run `npm run preview` to start the frontend
 - The frontend will be reachable on port **4000** on your network, if you wish to change that, you can do so in the vite.config.ts file, by changing the port value in the preview section before starting it
 
