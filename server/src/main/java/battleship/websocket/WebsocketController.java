@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
 
 import java.util.Objects;
@@ -53,13 +52,4 @@ public class WebsocketController {
         gameConnectionService.forfeitGame(UUID.fromString(gameId), UUID.fromString(userId));
     }
 
-    @SubscribeMapping("/topic")
-    public void test1() {
-        System.out.println("test1");
-    }
-
-    @SubscribeMapping("/game/{gameId}/state")
-    public void test2() {
-        System.out.println("test2");
-    }
 }
