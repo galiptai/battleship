@@ -1,4 +1,4 @@
-import { Dispatch, useState } from "react";
+import { useState } from "react";
 import { Loading } from "../../general/Loading";
 import { MessageOverlay } from "../../general/MessageOverlay";
 import { useConnection } from "../ConnectionProvider";
@@ -7,18 +7,13 @@ import "./JoinPrivate.css";
 
 type StartMode = "CREATE" | "JOIN";
 
-export type JoinPrivateProps = {
-  joining: boolean;
-  setJoining: Dispatch<React.SetStateAction<boolean>>;
-};
-
-export function JoinPrivate({ joining, setJoining }: JoinPrivateProps) {
+export function JoinPrivate() {
   const { stompClient } = useConnection();
   const [startMode, setStartMode] = useState<StartMode | null>(null);
 
   function onCreateClick() {
     setStartMode("CREATE");
-    stompClient.send("/app/create-private");
+    stompClient.publish({ destination: "/app/create-private" });
   }
 
   if (startMode !== "CREATE") {
@@ -29,13 +24,7 @@ export function JoinPrivate({ joining, setJoining }: JoinPrivateProps) {
           <div onClick={onCreateClick}>Start new game</div>
           <div onClick={() => setStartMode("JOIN")}>Join game</div>
         </div>
-        {startMode === "JOIN" && (
-          <JoinInputModal
-            joining={joining}
-            setJoining={setJoining}
-            onCancel={() => setStartMode(null)}
-          />
-        )}
+        {startMode === "JOIN" && <JoinInputModal onCancel={() => setStartMode(null)} />}
       </div>
     );
   } else {

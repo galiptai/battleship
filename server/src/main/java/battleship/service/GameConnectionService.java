@@ -49,7 +49,6 @@ public class GameConnectionService {
             Game game = gameProvider.getGame(gameId);
             game.addSecondPlayer(new Player(playerId, WhichPlayer.PLAYER2));
             websocketMessenger.sendJoinDataUser(playerId, gameId, false);
-            return;
         } catch (GameNotFoundException exception) {
             websocketMessenger.sendErrorUser(playerId, new ErrorDTO(ErrorType.WARNING, 400,
                     "No game found with this ID.", exception.getMessage()));
@@ -57,7 +56,6 @@ public class GameConnectionService {
             websocketMessenger.sendErrorUser(playerId, new ErrorDTO(ErrorType.ERROR, 400,
                     "You can't join this game.", exception.getMessage()));
         }
-        websocketMessenger.sendJoinDataUser(playerId, null, false);
     }
 
     private boolean addToGame(UUID playerId) {

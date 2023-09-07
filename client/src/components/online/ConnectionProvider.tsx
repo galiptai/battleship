@@ -7,11 +7,10 @@ import {
   useRef,
   useState,
 } from "react";
-import SockJS from "sockjs-client";
-import { Client, Frame, over } from "stompjs";
 import { getId } from "../../logic/storageFunctions";
 import { Loading } from "../general/Loading";
 import { MessageOverlay } from "../general/MessageOverlay";
+import { Client, IFrame } from "@stomp/stompjs";
 
 type ConnectionContextType = {
   stompClient: Client;
@@ -32,16 +31,24 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
 
   const connect = useCallback(() => {
     if (!stompClient.current) {
-      const sock = new SockJS(`/ws`);
-      stompClient.current = over(sock);
-      if (import.meta.env.PROD) {
-        stompClient.current.debug = () => {
-          return;
-        };
-      }
+      stompClient.current = new Client({
+        brokerURL: `ws://${import.meta.env.VITE_ADDRESS}/ws`,
+        connectHeaders: {
+          userId: getId(),
+        },
+        reconnectDelay: 0,
+        debug: import.meta.env.PROD
+          ? undefined
+          : function (str) {
+              console.log(str);
+            },
+        onConnect: onConnected,
+        onStompError: onError,
+        onWebSocketError: onError,
+      });
     }
     if (!stompClient.current.connected) {
-      stompClient.current.connect({ userId: getId() }, onConnected, onError);
+      stompClient.current.activate();
     }
   }, [onConnected]);
 
@@ -49,18 +56,16 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
     connect();
 
     return () => {
-      if (stompClient.current?.connected) {
-        stompClient.current.disconnect(() => undefined);
-      }
+      void stompClient.current?.deactivate();
     };
   }, [connect]);
 
-  function onError(error: string | Frame) {
+  function onError(error: IFrame | Event) {
     setConnected(false);
     console.error(error);
     let message = "Connection error.";
-    if (((error as Frame)?.headers as { [key: string]: string })?.message) {
-      message = ((error as Frame)?.headers as { [key: string]: string })?.message;
+    if (!(error instanceof Event) && error.headers.message) {
+      message = error.headers.message;
     }
     setConnectionError((error) => {
       if (!error) {

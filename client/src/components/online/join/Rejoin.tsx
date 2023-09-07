@@ -23,7 +23,7 @@ export function Rejoin({
 
   useEffect(() => {
     if (joinSubscribed && !rejoinRequestSent.current) {
-      stompClient.send("/app/rejoin");
+      stompClient.publish({ destination: "/app/rejoin" });
       rejoinRequestSent.current = true;
     }
   }, [stompClient, joinSubscribed]);

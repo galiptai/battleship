@@ -2,8 +2,10 @@ package battleship.websocket;
 
 import battleship.exceptions.ConnectionRejectionException;
 import org.springframework.messaging.Message;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
 
+@Component
 public class WebsocketErrorHandler extends StompSubProtocolErrorHandler {
 
     @Override

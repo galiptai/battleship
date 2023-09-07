@@ -3,7 +3,7 @@ import { useConnection } from "./ConnectionProvider";
 import { Join, JoinMode } from "./join/Join";
 import { OnlineGameFlow } from "./OnlineGameFlow";
 import { CustomError, ErrorMessage } from "../../logic/CustomError";
-import { Message } from "stompjs";
+import { Message } from "@stomp/stompjs";
 import { getId } from "../../logic/storageFunctions";
 import { MessageOverlay } from "../general/MessageOverlay";
 import { useNavigate } from "react-router-dom";

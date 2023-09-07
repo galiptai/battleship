@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Message } from "stompjs";
+import { Message } from "@stomp/stompjs";
 import { CustomError, isErrorMessage } from "../../logic/CustomError";
 import { PlainShipData } from "../../logic/GameSave";
 import { OnlineGame } from "../../logic/OnlineGame";

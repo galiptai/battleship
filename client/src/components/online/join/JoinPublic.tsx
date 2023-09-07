@@ -13,7 +13,7 @@ export function JoinPublic({ joinSubscribed }: JoinPrivateProps) {
 
   useEffect(() => {
     if (joinSubscribed && !joinRequestSent.current) {
-      stompClient.send("/app/join");
+      stompClient.publish({ destination: "/app/join" });
       joinRequestSent.current = true;
     }
   }, [stompClient, joinSubscribed]);

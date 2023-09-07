@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Message, Subscription } from "stompjs";
+import { Message, StompSubscription } from "@stomp/stompjs";
 import { CustomError, isErrorMessage } from "../../logic/CustomError";
 import { BoardData } from "../../logic/GameSave";
 import { OnlineGame, GameData, GameState, WhichPlayer } from "../../logic/OnlineGame";
@@ -23,9 +23,9 @@ type WinnerUpdate = {
 };
 
 type OnlineGameSubscriptions = {
-  gameStateSub: Subscription | null;
-  oppDataSub: Subscription | null;
-  winSub: Subscription | null;
+  gameStateSub: StompSubscription | null;
+  oppDataSub: StompSubscription | null;
+  winSub: StompSubscription | null;
 };
 
 type OnlineGameFlowProps = {

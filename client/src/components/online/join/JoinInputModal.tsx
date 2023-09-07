@@ -3,17 +3,17 @@ import { useConnection } from "../ConnectionProvider";
 import { ChoiceModal } from "../../general/ChoiceModal";
 import { validate } from "uuid";
 import "./JoinInputModal.css";
-import { JoinPrivateProps } from "./JoinPrivate";
 import shortUUID from "short-uuid";
 
 type JoinInputModalProps = {
   onCancel: () => void;
-} & JoinPrivateProps;
+};
 
-export function JoinInputModal({ joining, setJoining, onCancel }: JoinInputModalProps) {
+export function JoinInputModal({ onCancel }: JoinInputModalProps) {
   const { stompClient } = useConnection();
   const [gameId, setGameId] = useState<string>("");
   const [message, setMessage] = useState<string>("");
+  const [joining, setJoining] = useState<boolean>(false);
 
   function onChange(event: React.ChangeEvent<HTMLInputElement>) {
     setGameId(event.target.value);
@@ -30,12 +30,21 @@ export function JoinInputModal({ joining, setJoining, onCancel }: JoinInputModal
       setMessage("ID can't be empty.");
       return;
     }
-    const convertedID = shortUUID().toUUID(gameId);
+    const translator = shortUUID();
+    const convertedID = translator.toUUID(gameId);
     if (!validate(convertedID)) {
       setMessage("ID format not valid.");
       return;
     }
-    stompClient.send("/app/join-private", {}, convertedID);
+    const receiptId = translator.generate();
+    stompClient.watchForReceipt(receiptId, () => {
+      setJoining(false);
+    });
+    stompClient.publish({
+      destination: "/app/join-private",
+      headers: { receipt: receiptId },
+      body: convertedID,
+    });
     setJoining(true);
   }
 

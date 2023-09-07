@@ -22,6 +22,7 @@ public class WebsocketEventListener {
     @EventListener
     public void connectListener(SessionConnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+
         String userId = headerAccessor.getFirstNativeHeader("userId");
         if (userId == null) {
             return;
@@ -33,11 +34,16 @@ public class WebsocketEventListener {
     @EventListener
     public void disconnectListener(SessionDisconnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-        UUID userId = UUID.fromString((String) Objects.requireNonNull(headerAccessor
-                .getSessionAttributes()).get("userId"));
-        String gameId = (String) headerAccessor.getSessionAttributes().get("gameId");
+
+        String userIdString = (String) Objects.requireNonNull(headerAccessor
+                .getSessionAttributes()).get("userId");
+        if (userIdString == null) {
+            return;
+        }
+        UUID userId = UUID.fromString((userIdString));
         userService.disconnectUser(userId, headerAccessor.getSessionId());
 
+        String gameId = (String) headerAccessor.getSessionAttributes().get("gameId");
         if (gameId != null && !userService.isConnected(userId)) {
             gameConnectionService.disconnectFromGame(UUID.fromString(gameId), userId);
         }

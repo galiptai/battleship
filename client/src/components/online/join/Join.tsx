@@ -1,10 +1,16 @@
 import { Dispatch, useCallback, useEffect, useState } from "react";
-import { Message } from "stompjs";
+import { Message } from "@stomp/stompjs";
 import { getId } from "../../../logic/storageFunctions";
 import { useConnection } from "../ConnectionProvider";
 import { JoinPrivate } from "./JoinPrivate";
 import { JoinPublic } from "./JoinPublic";
 import { Rejoin } from "./Rejoin";
+import shortUUID from "short-uuid";
+
+export type ConfirmSub = {
+  receiptId: string;
+  confirmed: boolean;
+};
 
 export type JoinMode = "PUBLIC" | "PRIVATE";
 
@@ -21,9 +27,11 @@ type JoinProps = {
 
 export function Join({ joinMode, setGameId }: JoinProps) {
   const { stompClient } = useConnection();
-  const [subscribed, setSubscribed] = useState<boolean>(false);
+  const [joinSubConfirm, setJoinSubConfirm] = useState<ConfirmSub>({
+    receiptId: "",
+    confirmed: false,
+  });
   const [rejoinCheck, setRejoinCheck] = useState<boolean>(false);
-  const [joining, setJoining] = useState<boolean>(false);
   const [joinData, setRejoinData] = useState<JoinData | null>(null);
 
   const onJoinMessageReceived = useCallback(
@@ -38,19 +46,28 @@ export function Join({ joinMode, setGameId }: JoinProps) {
       } else {
         setGameId(joinData.gameId);
       }
-      setJoining(false);
     },
     [setGameId]
   );
 
   useEffect(() => {
-    const subscription = stompClient.subscribe(`/user/${getId()}/join`, onJoinMessageReceived);
-    const subscription2 = stompClient.subscribe(`/topic`, onJoinMessageReceived);
-    setSubscribed(true);
+    const receiptId = shortUUID().generate().toString();
+    stompClient.watchForReceipt(receiptId, () => {
+      setJoinSubConfirm((subscribed) => {
+        if (receiptId === subscribed.receiptId) {
+          return { receiptId, confirmed: true };
+        } else {
+          return subscribed;
+        }
+      });
+    });
+    const subscription = stompClient.subscribe(`/user/${getId()}/join`, onJoinMessageReceived, {
+      receipt: receiptId,
+    });
+    setJoinSubConfirm({ receiptId, confirmed: false });
     return () => {
       subscription.unsubscribe();
-      subscription2.unsubscribe();
-      setSubscribed(false);
+      setJoinSubConfirm({ receiptId: "", confirmed: false });
     };
   }, [stompClient, onJoinMessageReceived]);
 
@@ -59,14 +76,14 @@ export function Join({ joinMode, setGameId }: JoinProps) {
   }
 
   function onRejoinDecline() {
-    stompClient.send("/app/forfeit", {}, joinData!.gameId);
+    stompClient.publish({ destination: "/app/forfeit", body: joinData!.gameId });
     setRejoinCheck(true);
   }
 
   if (!rejoinCheck) {
     return (
       <Rejoin
-        joinSubscribed={subscribed}
+        joinSubscribed={joinSubConfirm.confirmed}
         rejoinData={joinData}
         onRejoinAccept={onRejoinAccept}
         onRejoinDecline={onRejoinDecline}
@@ -74,9 +91,9 @@ export function Join({ joinMode, setGameId }: JoinProps) {
     );
   } else {
     if (joinMode === "PRIVATE") {
-      return <JoinPrivate joining={joining} setJoining={setJoining} />;
+      return <JoinPrivate />;
     } else {
-      return <JoinPublic joinSubscribed={subscribed} />;
+      return <JoinPublic joinSubscribed={joinSubConfirm.confirmed} />;
     }
   }
 }
