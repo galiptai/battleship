@@ -20,7 +20,7 @@
   justify-content: flex-end;
   font-size: 3vh;
   font-weight: 700;
-  width: 60% !important;
+  max-width: 220px;
 }
 
 .ship-sel-vertical > button {
@@ -89,6 +89,7 @@
     justify-content: center;
     height: 100%;
     width: 100% !important;
+    max-width: unset;
   }
 
   .ship-sel-vertical > button {

@@ -114,6 +114,21 @@ export function OnlinePlay({ game, setGame, updateMessage, displayError }: Onlin
     return !game.opponent!.tiles[coordinate.y][coordinate.x].guessed;
   }
 
+  let gameStatusMessage: string;
+  if (isPlayersTurn) {
+    if (submitting) {
+      gameStatusMessage = "Processing...";
+    } else {
+      gameStatusMessage = "It's your turn!";
+    }
+  } else if (game.gameState === "SUSPENDED") {
+    gameStatusMessage = "Game is suspended.";
+  } else if (game.gameState === "OVER") {
+    gameStatusMessage = "Game is over.";
+  } else {
+    gameStatusMessage = "It's your opponent's turn!";
+  }
+
   return (
     <>
       <PlayScreen
@@ -126,13 +141,7 @@ export function OnlinePlay({ game, setGame, updateMessage, displayError }: Onlin
             guesses={game.guesses}
             player1={game.playerIs === "PLAYER1" ? game.player!.player : game.opponent!.player}
             player2={game.playerIs === "PLAYER1" ? game.opponent!.player : game.player!.player}
-            info={
-              isPlayersTurn
-                ? submitting
-                  ? "Processing..."
-                  : "It's your turn!"
-                : "It's your opponent's turn!"
-            }
+            info={gameStatusMessage}
           />
         }
       />

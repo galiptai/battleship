@@ -34,6 +34,7 @@ export function Rejoin({
       {rejoinData && (
         <ChoiceModal
           display
+          background
           question="Running unfinished game found. Rejoin?"
           description='Picking "NO" will forfeit the running game.'
           onConfirm={onRejoinAccept}
