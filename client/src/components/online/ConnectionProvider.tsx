@@ -32,16 +32,16 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
   const connect = useCallback(() => {
     if (!stompClient.current) {
       stompClient.current = new Client({
-        brokerURL: `ws://${import.meta.env.VITE_ADDRESS}/ws`,
+        brokerURL: `ws://${import.meta.env.VITE_ADDRESS ?? "localhost:8080"}/ws`,
         connectHeaders: {
           userId: getId(),
         },
         reconnectDelay: 0,
-        debug: import.meta.env.PROD
-          ? undefined
-          : function (str) {
-              console.log(str);
-            },
+        debug: function (str) {
+          if (import.meta.env.DEV) {
+            console.log(str);
+          }
+        },
         onConnect: onConnected,
         onStompError: onError,
         onWebSocketError: onError,
