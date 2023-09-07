@@ -142,7 +142,7 @@ public class GameConnectionService {
     }
 
     private void shutdownGame(Game game, boolean unfinished) {
-        if (unfinished) {
+        if (unfinished && game.anyConnected()) {
             websocketMessenger.sendStateUpdateGlobal(game, "One of the players left.");
         }
         gameProvider.closeGame(game);

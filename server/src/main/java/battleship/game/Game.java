@@ -180,6 +180,8 @@ public class Game {
         return player2 != null && player1.isConnected() && player2.isConnected();
     }
 
+    public boolean anyConnected() { return player1.isConnected() || (player2 != null && player2.isConnected()); }
+
     public boolean isGameReady() {
         return allConnected() && player1.isGameReady() && player2.isGameReady();
     }
