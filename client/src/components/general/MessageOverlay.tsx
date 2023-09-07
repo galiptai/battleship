@@ -7,6 +7,7 @@ type MessageOverlayProps = {
   message: string;
   description?: string | ReactNode;
   buttons?: ReactNode[];
+  zIndex?: number;
 };
 
 export function MessageOverlay({
@@ -15,11 +16,13 @@ export function MessageOverlay({
   message,
   description,
   buttons,
+  zIndex,
 }: MessageOverlayProps) {
   buttons = buttons ?? [];
+  zIndex = zIndex ?? 200;
   if (display) {
     return (
-      <div className={`overlay ${background ? "overlay-background" : ""}`}>
+      <div className={`overlay ${background ? "overlay-background" : ""}`} style={{ zIndex }}>
         <div className="overlay-placeholder"></div>
         <div className="overlay-text">
           <div className="overlay-message">{message}</div>

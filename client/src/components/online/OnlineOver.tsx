@@ -7,13 +7,7 @@ import { deleteGameId } from "../../logic/storageFunctions";
 
 type OnlineOverProps = OnlinePlayProps;
 
-export function OnlineOver({
-  stompClient,
-  game,
-  setGame,
-  updateMessage,
-  displayError,
-}: OnlineOverProps) {
+export function OnlineOver({ game, setGame, updateMessage, displayError }: OnlineOverProps) {
   const [displayResults, setDisplayResults] = useState<boolean>(false);
   const navigate = useNavigate();
 
@@ -46,7 +40,6 @@ export function OnlineOver({
       return (
         <>
           <OnlinePlay
-            stompClient={stompClient}
             game={game}
             setGame={setGame}
             updateMessage={updateMessage}

@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
-import { Client, Message, Subscription } from "stompjs";
-import { getId } from "../../logic/storageFunctions";
-import { OnlineSetup } from "./OnlineSetup";
-import { OnlinePlay } from "./OnlinePlay";
-import { OnlineGame as Game, GameData, GameState, WhichPlayer } from "../../logic/OnlineGame";
-import { OnlineOver } from "./OnlineOver";
-import { BoardData } from "../../logic/GameSave";
-import { MessageOverlay } from "../general/MessageOverlay";
-import { Loading } from "../general/Loading";
+import { Message, StompSubscription } from "@stomp/stompjs";
 import { CustomError, isErrorMessage } from "../../logic/CustomError";
+import { BoardData } from "../../logic/GameSave";
+import { OnlineGame, GameData, GameState, WhichPlayer } from "../../logic/OnlineGame";
+import { getId } from "../../logic/storageFunctions";
+import { Loading } from "../general/Loading";
+import { MessageOverlay } from "../general/MessageOverlay";
+import { useConnection } from "./ConnectionProvider";
+import { OnlineOver } from "./OnlineOver";
+import { OnlinePlay } from "./OnlinePlay";
+import { OnlineSetup } from "./OnlineSetup";
+import shortUUID from "short-uuid";
 
 type StateUpdate = {
   gameState: GameState;
@@ -21,19 +23,19 @@ type WinnerUpdate = {
 };
 
 type OnlineGameSubscriptions = {
-  gameStateSub: Subscription | null;
-  oppDataSub: Subscription | null;
-  winSub: Subscription | null;
+  gameStateSub: StompSubscription | null;
+  oppDataSub: StompSubscription | null;
+  winSub: StompSubscription | null;
 };
 
-type OnlineGameProps = {
-  stompClient: Client;
+type OnlineGameFlowProps = {
   gameId: string;
   displayError: (error: unknown) => void;
 };
 
-export function OnlineGame({ stompClient, gameId, displayError }: OnlineGameProps) {
-  const [game, setGame] = useState<Game | null>(null);
+export function OnlineGameFlow({ gameId, displayError }: OnlineGameFlowProps) {
+  const { stompClient } = useConnection();
+  const [game, setGame] = useState<OnlineGame | null>(null);
   const [updateMessage, setUpdateMessage] = useState<string | null>(null);
 
   const onGameStateUpdateReceived = useCallback((message: Message) => {
@@ -91,10 +93,10 @@ export function OnlineGame({ stompClient, gameId, displayError }: OnlineGameProp
   const fetchGameAndJoin = useCallback(
     async (signal: AbortSignal, subscriptions: OnlineGameSubscriptions) => {
       try {
-        const res = await fetch(`api/v1/game/${gameId}?playerId=${getId()}`, { signal });
+        const res = await fetch(`/api/v1/game/${gameId}?playerId=${getId()}`, { signal });
         if (res.ok) {
           const gameData = (await res.json()) as GameData;
-          setGame(Game.fromGameData(gameData));
+          setGame(OnlineGame.fromGameData(gameData));
           startSubscriptions(subscriptions);
         } else {
           const error = (await res.json()) as unknown;
@@ -140,23 +142,21 @@ export function OnlineGame({ stompClient, gameId, displayError }: OnlineGameProp
 
   switch (game.gameState) {
     case "JOINING":
-      return <MessageOverlay display message="Waiting for another player to join" />;
-    case "SETUP":
       return (
-        <OnlineSetup
-          stompClient={stompClient}
-          game={game}
-          setGame={setGame}
-          displayError={displayError}
+        <MessageOverlay
+          display
+          message="Waiting for another player to join"
+          description={game.privateGame ? `Game ID: ${shortUUID().fromUUID(gameId)}` : undefined}
         />
       );
+    case "SETUP":
+      return <OnlineSetup game={game} setGame={setGame} displayError={displayError} />;
     case "P1_TURN":
     case "P2_TURN":
     case "SUSPENDED": {
       if (game.player && game.opponent) {
         return (
           <OnlinePlay
-            stompClient={stompClient}
             game={game}
             setGame={setGame}
             updateMessage={updateMessage}
@@ -170,7 +170,6 @@ export function OnlineGame({ stompClient, gameId, displayError }: OnlineGameProp
     case "OVER":
       return (
         <OnlineOver
-          stompClient={stompClient}
           game={game}
           setGame={setGame}
           updateMessage={updateMessage}

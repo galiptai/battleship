@@ -6,7 +6,6 @@ import battleship.dtos.messages.GuessDTO;
 import battleship.exceptions.GameStateException;
 import battleship.exceptions.IllegalRequestException;
 import battleship.exceptions.InvalidActionException;
-import battleship.exceptions.InvalidRequestException;
 import battleship.game.board.Coordinate;
 import battleship.game.ship.Ship;
 import lombok.Getter;
@@ -21,14 +20,16 @@ public class Game {
     private final UUID id;
     private final Player player1;
     private Player player2;
+    private final boolean privateGame;
     private WhichPlayer currentTurn;
     private final List<Guess> guesses;
     @Getter
     private GameState state;
     private WhichPlayer winner;
 
-    public Game(Player player1) {
+    public Game(boolean privateGame, Player player1) {
         this.id = UUID.randomUUID();
+        this.privateGame = privateGame;
         this.player1 = player1;
         this.player2 = null;
         this.currentTurn = null;
@@ -44,6 +45,7 @@ public class Game {
         return new GameDTO(
                 id,
                 player.getWhichPlayer(),
+                privateGame,
                 playerData,
                 opponentData,
                 guesses.stream().map(GuessDTO::new).toList(),
@@ -84,10 +86,10 @@ public class Game {
         }
     }
 
-    public void addSecondPlayer(@NonNull Player player) throws InvalidRequestException, GameStateException {
+    public void addSecondPlayer(@NonNull Player player) throws GameStateException {
         if (isJoinable()) {
             if (player1.getId().equals(player.getId())) {
-                throw new InvalidRequestException("Player is trying to join game they are already in.");
+                throw new GameStateException("Player is trying to join game they are already in.");
             }
             player2 = player;
             state = GameState.SETUP;
@@ -131,14 +133,19 @@ public class Game {
         state = GameState.P1_TURN;
     }
 
-    public void forfeitGame(Player forfeitingPlayer) throws IllegalRequestException {
+    public void forfeitGame(Player forfeitingPlayer) throws InvalidActionException {
+        if (state == GameState.OVER) {
+            throw new InvalidActionException("Can't forfeit a game that's already over.");
+        }
+        boolean notStarted = !hasStarted();
         state = GameState.OVER;
+        if (notStarted) {
+            return;
+        }
         if (forfeitingPlayer == player1) {
             winner = player2.getWhichPlayer();
-        } else if (forfeitingPlayer == player2) {
-            winner = player1.getWhichPlayer();
         } else {
-            throw new IllegalRequestException("Player is not in this game.");
+            winner = player1.getWhichPlayer();
         }
     }
 
@@ -161,21 +168,19 @@ public class Game {
         return guess;
     }
 
-    public boolean isJoinable() {
-        return player2 == null;
+    public boolean isPrivate() {
+        return privateGame;
     }
 
-    public boolean isRejoinable() {
-        return state == GameState.SUSPENDED;
+    public boolean isJoinable() {
+        return player2 == null && state == GameState.JOINING;
     }
 
     public boolean allConnected() {
         return player2 != null && player1.isConnected() && player2.isConnected();
     }
 
-    public boolean anyConnected() {
-            return player1.isConnected() || (player2 != null && player2.isConnected());
-    }
+    public boolean anyConnected() { return player1.isConnected() || (player2 != null && player2.isConnected()); }
 
     public boolean isGameReady() {
         return allConnected() && player1.isGameReady() && player2.isGameReady();
@@ -183,6 +188,10 @@ public class Game {
 
     public boolean isRunning() {
         return state == GameState.P1_TURN || state == GameState.P2_TURN;
+    }
+
+    public boolean hasStarted() {
+        return state != GameState.JOINING && state != GameState.SETUP;
     }
 
     public boolean isOver() {
@@ -194,7 +203,7 @@ public class Game {
     }
 
     public boolean hasPlayerWithId(UUID id) {
-        return player1.getId().equals(id) || player2.getId().equals(id);
+        return player1.getId().equals(id) || (player2 != null && player2.getId().equals(id));
     }
 
     private boolean isPlayersTurn(Player player) {
@@ -206,7 +215,7 @@ public class Game {
             state = GameState.OVER;
             winner = WhichPlayer.PLAYER2;
             return true;
-        } else if (player2.allShipsSank()){
+        } else if (player2.allShipsSank()) {
             state = GameState.OVER;
             winner = WhichPlayer.PLAYER1;
             return true;

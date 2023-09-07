@@ -1,51 +1,25 @@
-import { Client, Message } from "stompjs";
+import { useState } from "react";
 import { Board } from "../../logic/Board";
+import { CustomError, isErrorMessage } from "../../logic/CustomError";
 import { BoardData } from "../../logic/GameSave";
 import { OnlineGame } from "../../logic/OnlineGame";
 import { getId, getLastUsedName, saveName } from "../../logic/storageFunctions";
-import { BoardSetup } from "../setup/BoardSetup";
-import { useCallback, useEffect, useState } from "react";
 import { MessageOverlay } from "../general/MessageOverlay";
-import { CustomError, isErrorMessage } from "../../logic/CustomError";
+import { BoardSetup } from "../setup/BoardSetup";
 
 type OnlineSetupProps = {
-  stompClient: Client;
   game: OnlineGame;
   setGame: React.Dispatch<React.SetStateAction<OnlineGame | null>>;
   displayError: (error: unknown) => void;
 };
 
-export function OnlineSetup({ stompClient, game, setGame, displayError }: OnlineSetupProps) {
+export function OnlineSetup({ game, setGame, displayError }: OnlineSetupProps) {
   const [submitting, setSubmitting] = useState<boolean>(false);
-
-  const onSetupReceived = useCallback(
-    (message: Message) => {
-      const opponentBoard = JSON.parse(message.body) as BoardData;
-      setGame((game) => {
-        if (!game) {
-          throw Error("Game is not set!");
-        }
-        const newGame = game.makeCopy();
-        newGame.opponent = BoardData.fromJSON(opponentBoard).getBoard();
-        return newGame;
-      });
-      return;
-    },
-    [setGame]
-  );
-
-  useEffect(() => {
-    const setupSub = stompClient.subscribe(`/user/${getId()}/game/setup`, onSetupReceived);
-
-    return () => {
-      setupSub.unsubscribe();
-    };
-  }, [stompClient, onSetupReceived]);
 
   async function sendPlayerBoard(board: Board) {
     setSubmitting(true);
     try {
-      const res = await fetch(`api/v1/game/${game.id}/setBoard?playerId=${getId()}`, {
+      const res = await fetch(`/api/v1/game/${game.id}/setBoard?playerId=${getId()}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(BoardData.getDataFromBoard(board)),

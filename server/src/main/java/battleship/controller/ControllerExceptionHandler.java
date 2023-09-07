@@ -3,14 +3,28 @@ package battleship.controller;
 import battleship.dtos.messages.ErrorDTO;
 import battleship.dtos.messages.ErrorType;
 import battleship.exceptions.*;
+import battleship.websocket.WebsocketMessenger;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.converter.MessageConversionException;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
+import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.util.Objects;
+import java.util.UUID;
+
 @ControllerAdvice
-public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
+@RequiredArgsConstructor
+@Slf4j
+public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
+
+    private final WebsocketMessenger websocketMessenger;
 
     @ExceptionHandler(value = InvalidRequestException.class)
     public ResponseEntity<ErrorDTO> handleInvalidRequest(Exception exception) {
@@ -47,10 +61,29 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
                 "You can't do that now.", errorMessage), HttpStatusCode.valueOf(400));
     }
 
-    @ExceptionHandler(value = Exception.class)
+    @ExceptionHandler()
     public ResponseEntity<ErrorDTO> handleGenericException(Exception exception) {
+        log.error(exception.getMessage(), exception);
         String errorMessage = exception.getMessage() == null ? "Internal error." : exception.getMessage();
         return new ResponseEntity<>(new ErrorDTO(ErrorType.ERROR, 500,
                 "Something went wrong.", errorMessage), HttpStatusCode.valueOf(500));
+    }
+
+
+    @MessageExceptionHandler({MethodArgumentNotValidException.class, MessageConversionException.class,
+            IllegalArgumentException.class})
+    public void handleBadMessageRequest(SimpMessageHeaderAccessor headerAccessor,
+                                        Exception exception) {
+        String userId = (String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("userId");
+        websocketMessenger.sendErrorUser(UUID.fromString(userId), new ErrorDTO(ErrorType.ERROR, 400,
+                "Missing or invalid request parameters.", exception.getMessage()));
+    }
+
+    @MessageExceptionHandler()
+    public void handleGenericMessageException(SimpMessageHeaderAccessor headerAccessor, Exception exception) {
+        log.error(exception.getMessage(), exception);
+        String userId = (String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("userId");
+        websocketMessenger.sendErrorUser(UUID.fromString(userId), new ErrorDTO(ErrorType.ERROR, 500,
+                "Server error.", exception.getMessage()));
     }
 }

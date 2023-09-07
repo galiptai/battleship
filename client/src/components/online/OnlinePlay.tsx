@@ -1,15 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
-import { PlayScreen } from "../gameplay/PlayScreen";
-import { PlayMenu } from "../gameplay/PlayMenu";
-import { Guess } from "../../logic/gameLogic";
-import { Coordinate } from "../gameplay/DrawBoard";
-import { getId } from "../../logic/storageFunctions";
-import { Client, Message } from "stompjs";
+import { useNavigate } from "react-router-dom";
+import { Message } from "@stomp/stompjs";
+import { CustomError, isErrorMessage } from "../../logic/CustomError";
 import { PlainShipData } from "../../logic/GameSave";
 import { OnlineGame } from "../../logic/OnlineGame";
+import { Guess } from "../../logic/gameLogic";
+import { getId } from "../../logic/storageFunctions";
+import { Coordinate } from "../gameplay/DrawBoard";
+import { PlayMenu } from "../gameplay/PlayMenu";
+import { PlayScreen } from "../gameplay/PlayScreen";
 import { MessageOverlay } from "../general/MessageOverlay";
-import { useNavigate } from "react-router-dom";
-import { CustomError, isErrorMessage } from "../../logic/CustomError";
+import { useConnection } from "./ConnectionProvider";
 
 type GuessSunk = {
   guess: Guess;
@@ -17,20 +18,14 @@ type GuessSunk = {
 };
 
 export type OnlinePlayProps = {
-  stompClient: Client;
   game: OnlineGame;
   setGame: React.Dispatch<React.SetStateAction<OnlineGame | null>>;
   updateMessage: string | null;
   displayError: (error: unknown) => void;
 };
 
-export function OnlinePlay({
-  stompClient,
-  game,
-  setGame,
-  updateMessage,
-  displayError,
-}: OnlinePlayProps) {
+export function OnlinePlay({ game, setGame, updateMessage, displayError }: OnlinePlayProps) {
+  const { stompClient } = useConnection();
   const [submitting, setSubmitting] = useState<boolean>(false);
   const navigate = useNavigate();
 
@@ -89,7 +84,7 @@ export function OnlinePlay({
     }
     setSubmitting(true);
     try {
-      const res = await fetch(`api/v1/game/${game.id}/guess?playerId=${getId()}`, {
+      const res = await fetch(`/api/v1/game/${game.id}/guess?playerId=${getId()}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(coordinate),
@@ -119,6 +114,21 @@ export function OnlinePlay({
     return !game.opponent!.tiles[coordinate.y][coordinate.x].guessed;
   }
 
+  let gameStatusMessage: string;
+  if (isPlayersTurn) {
+    if (submitting) {
+      gameStatusMessage = "Processing...";
+    } else {
+      gameStatusMessage = "It's your turn!";
+    }
+  } else if (game.gameState === "SUSPENDED") {
+    gameStatusMessage = "Game is suspended.";
+  } else if (game.gameState === "OVER") {
+    gameStatusMessage = "Game is over.";
+  } else {
+    gameStatusMessage = "It's your opponent's turn!";
+  }
+
   return (
     <>
       <PlayScreen
@@ -131,13 +141,7 @@ export function OnlinePlay({
             guesses={game.guesses}
             player1={game.playerIs === "PLAYER1" ? game.player!.player : game.opponent!.player}
             player2={game.playerIs === "PLAYER1" ? game.opponent!.player : game.player!.player}
-            info={
-              isPlayersTurn
-                ? submitting
-                  ? "Processing..."
-                  : "It's your turn!"
-                : "It's your opponents turn!"
-            }
+            info={gameStatusMessage}
           />
         }
       />

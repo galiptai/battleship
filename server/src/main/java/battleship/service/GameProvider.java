@@ -3,6 +3,7 @@ package battleship.service;
 import battleship.exceptions.GameNotFoundException;
 import battleship.game.Game;
 import battleship.game.Player;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
@@ -30,19 +31,25 @@ public class GameProvider {
         return game;
     }
 
-    public Optional<Game> getJoinableGame() {
-        return games.values().stream().filter(Game::isJoinable).findFirst();
+    public Optional<Game> getGamePlayerIsIn(@NonNull UUID playerID) {
+        return games.values().stream()
+                .filter(game -> game.hasPlayerWithId(playerID) && !game.isOver())
+                .findFirst();
     }
 
-    public UUID startNewGame(Player player) {
-        Game game = new Game(player);
+    public Optional<Game> getJoinablePublicGame() {
+        return games.values().stream().filter(game -> game.isJoinable() && !game.isPrivate()).findFirst();
+    }
+
+    public Game startNewGame(boolean privateGame, Player player) {
+        Game game = new Game(privateGame, player);
         games.put(game.getId(), game);
         log.info("Created GAME-%s for PLAYER-%s".formatted(game.getId(), player.getId()));
-        return game.getId();
+        return game;
     }
 
-    public void closeGame(UUID gameId) {
-        games.remove(gameId);
-        log.info("GAME-%s closed".formatted(gameId));
+    public void closeGame(Game game) {
+        games.remove(game.getId());
+        log.info("GAME-%s closed".formatted(game.getId()));
     }
 }

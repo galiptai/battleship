@@ -5,6 +5,7 @@ import { Guess } from "./gameLogic";
 export type GameData = {
   id: string;
   playerIs: WhichPlayer;
+  privateGame: boolean;
   player: PlainBoardData | null;
   opponent: PlainBoardData | null;
   guesses: Guess[];
@@ -19,6 +20,7 @@ export type WhichPlayer = "PLAYER1" | "PLAYER2";
 export class OnlineGame {
   readonly id: string;
   gameState: GameState;
+  readonly privateGame: boolean;
   player: Board | null;
   opponent: Board | null;
   readonly playerIs: WhichPlayer;
@@ -28,6 +30,7 @@ export class OnlineGame {
   constructor(
     id: string,
     gameState: GameState,
+    privateGame: boolean,
     player: Board | null,
     opponent: Board | null,
     playerIs: WhichPlayer,
@@ -36,6 +39,7 @@ export class OnlineGame {
   ) {
     this.id = id;
     this.gameState = gameState;
+    this.privateGame = privateGame;
     this.player = player;
     this.opponent = opponent;
     this.playerIs = playerIs;
@@ -56,6 +60,7 @@ export class OnlineGame {
     return new OnlineGame(
       gameData.id,
       gameData.gameState,
+      gameData.privateGame,
       player,
       opponent,
       gameData.playerIs,
@@ -68,6 +73,7 @@ export class OnlineGame {
     return new OnlineGame(
       this.id,
       this.gameState,
+      this.privateGame,
       this.player,
       this.opponent,
       this.playerIs,

@@ -10,10 +10,12 @@ export function Home() {
         <div className="home-option" onClick={() => navigate("/local")}>
           Local game
         </div>
-        <div className="home-option" onClick={() => navigate("/online")}>
-          Online random
+        <div className="home-option" onClick={() => navigate("/online/public")}>
+          Online quick game
         </div>
-        <div className="home-option not-implemented">Online custom</div>
+        <div className="home-option" onClick={() => navigate("/online/private")}>
+          Online private game
+        </div>
       </div>
       <div className="home-footer">Made by Gabor Liptai</div>
     </div>
