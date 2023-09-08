@@ -1,8 +1,8 @@
 import { useCallback, useState, useRef } from "react";
 import { GameSave } from "../../logic/GameSave";
-import { LocalGame } from "./LocalGame";
+import { LocalGameFlow } from "./LocalGameFlow";
 import { SaveInfo } from "./SaveInfo";
-import { getGame, saveGame } from "../../logic/storageFunctions";
+import { deleteGame, getGame, saveGame } from "../../logic/storageFunctions";
 import { Choice, ChoiceModal } from "../general/ChoiceModal";
 
 function load(): GameSave | null {
@@ -25,7 +25,7 @@ export function LocalLoader() {
   }, []);
 
   const deleteSave = useCallback(() => {
-    deleteSave();
+    deleteGame();
   }, []);
 
   if (save.current !== null && save.current.isValid() && useSave === "Undecided") {
@@ -39,11 +39,11 @@ export function LocalLoader() {
       />
     );
   } else if (save.current !== null && save.current.isValid() && useSave === "Yes") {
-    return <LocalGame save={save.current} updateSave={updateSave} deleteSave={deleteSave} />;
+    return <LocalGameFlow save={save.current} updateSave={updateSave} deleteSave={deleteSave} />;
   } else {
     return (
-      <LocalGame
-        save={new GameSave(null, null, [], new Date())}
+      <LocalGameFlow
+        save={new GameSave(null, null, "PLAYER1", [], new Date())}
         updateSave={updateSave}
         deleteSave={deleteSave}
       />

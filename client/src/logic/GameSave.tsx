@@ -1,6 +1,7 @@
 import { Coordinate } from "../components/gameplay/DrawBoard";
 import { Tile } from "../components/gameplay/Tile";
 import { Board } from "./Board";
+import { LocalGame } from "./LocalGame";
 import { WhichPlayer } from "./OnlineGame";
 import { SHIP_TYPES, Ship, ShipTypeKey } from "./Ship";
 import { Guess } from "./gameLogic";
@@ -8,31 +9,34 @@ import { Guess } from "./gameLogic";
 export class GameSave {
   p1Board: BoardData | null;
   p2Board: BoardData | null;
+  currentTurn: WhichPlayer;
   guesses: Guess[];
   saveDate: Date;
 
   constructor(
     p1Board: BoardData | null,
     p2Board: BoardData | null,
+    currentTurn: WhichPlayer,
     guesses: Guess[],
     saveDate: Date
   ) {
     this.p1Board = p1Board;
     this.p2Board = p2Board;
+    this.currentTurn = currentTurn;
     this.guesses = guesses;
     this.saveDate = saveDate;
   }
 
-  static fromGameObjects(
-    p1Board: Board | null,
-    p2Board: Board | null,
-    guesses: Guess[],
-    saveDate: Date
-  ): GameSave {
+  static fromLocalGame(game: LocalGame, saveDate: Date): GameSave {
+    let currentTurn: WhichPlayer = "PLAYER1";
+    if (game.guesses.length > 0) {
+      currentTurn = game.guesses.at(-1)!.player === "PLAYER1" ? "PLAYER2" : "PLAYER1";
+    }
     return new GameSave(
-      BoardData.getDataFromBoard(p1Board),
-      BoardData.getDataFromBoard(p2Board),
-      guesses,
+      BoardData.getDataFromBoard(game.player1),
+      BoardData.getDataFromBoard(game.player2),
+      currentTurn,
+      game.guesses,
       saveDate
     );
   }
@@ -41,6 +45,7 @@ export class GameSave {
     return new GameSave(
       json.p1Board === null ? json.p1Board : BoardData.fromJSON(json.p1Board),
       json.p2Board === null ? json.p2Board : BoardData.fromJSON(json.p2Board),
+      json.currentTurn,
       json.guesses,
       new Date(json.saveDate)
     );
@@ -56,18 +61,22 @@ export class GameSave {
     return true;
   }
 
-  update(p1Board: Board | null, p2Board: Board | null, guesses: Guess[]) {
-    this.p1Board = BoardData.getDataFromBoard(p1Board);
-    this.p2Board = BoardData.getDataFromBoard(p2Board);
-    this.guesses = guesses;
-  }
-
   getSaveData(): SaveData {
     return {
       player1: this.p1Board?.player || "Player 1",
       player2: this.p2Board?.player || "Player 2",
       date: this.saveDate,
     };
+  }
+
+  getGame(): LocalGame {
+    return new LocalGame(
+      this.getP1Board(),
+      this.getP2Board(),
+      this.currentTurn,
+      this.guesses,
+      null
+    );
   }
 
   getP1Board(): Board | null {
@@ -180,6 +189,7 @@ class ShipData {
 export type PlainGameSave = {
   p1Board: PlainBoardData | null;
   p2Board: PlainBoardData | null;
+  currentTurn: WhichPlayer;
   guesses: Guess[];
   saveDate: string;
 };
