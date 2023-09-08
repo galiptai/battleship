@@ -42,7 +42,7 @@ export class LocalGame extends Game {
     }
   }
 
-  canGuess(coordinate: Coordinate) {
+  canGuess(coordinate: Coordinate): boolean {
     const opponentBoard = this.currentTurn === "PLAYER1" ? this.player2! : this.player1!;
     return opponentBoard.canGuess(coordinate);
   }

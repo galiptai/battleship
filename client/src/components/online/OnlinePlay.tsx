@@ -38,12 +38,7 @@ export function OnlinePlay({ game, setGame, updateMessage, displayError }: Onlin
       const guess = JSON.parse(message.body) as Guess;
       setGame((game) => {
         const newGame = game!.makeCopy();
-        newGame.guesses = [...newGame.guesses, guess];
-        if (newGame.playerIs === guess.player) {
-          newGame.opponent!.processGuess(guess);
-        } else {
-          newGame.player!.processGuess(guess);
-        }
+        newGame.processGuess(guess);
         return newGame;
       });
     },
@@ -55,8 +50,7 @@ export function OnlinePlay({ game, setGame, updateMessage, displayError }: Onlin
       const { guess, ship } = JSON.parse(message.body) as GuessSunk;
       setGame((game) => {
         const newGame = game!.makeCopy();
-        newGame.guesses = [...newGame.guesses, guess];
-        newGame.opponent!.processGuessSunk(guess, ship);
+        newGame.processGuessSunk(guess, ship);
         return newGame;
       });
     },
@@ -111,7 +105,7 @@ export function OnlinePlay({ game, setGame, updateMessage, displayError }: Onlin
     if (!isPlayersTurn || submitting) {
       return false;
     }
-    return !game.opponent!.tiles[coordinate.y][coordinate.x].guessed;
+    return game.canGuess(coordinate);
   }
 
   let gameStatusMessage: string;
@@ -132,15 +126,15 @@ export function OnlinePlay({ game, setGame, updateMessage, displayError }: Onlin
   return (
     <>
       <PlayScreen
-        playerBoard={game.player!}
-        opponentBoard={game.opponent!}
+        playerBoard={game.getPlayerBoard()!}
+        opponentBoard={game.getOpponentBoard()!}
         onOppBoardClick={onOppBoardClick}
         oppBoardClickCheck={oppBoardClickCheck}
         playMenu={
           <PlayMenu
             guesses={game.guesses}
-            player1={game.playerIs === "PLAYER1" ? game.player!.player : game.opponent!.player}
-            player2={game.playerIs === "PLAYER1" ? game.opponent!.player : game.player!.player}
+            player1={game.player1!.player}
+            player2={game.player2!.player}
             info={gameStatusMessage}
           />
         }

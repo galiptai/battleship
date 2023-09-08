@@ -20,8 +20,8 @@ export function OnlineOver({ game, setGame, updateMessage, displayError }: Onlin
       return (
         <ResultsScreen
           winner={game.getWinnerName()}
-          p1Board={game.player!}
-          p2Board={game.opponent!}
+          p1Board={game.player1!}
+          p2Board={game.player2!}
           guesses={game.guesses}
           playerIs={game.playerIs}
         />

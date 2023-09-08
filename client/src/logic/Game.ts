@@ -1,3 +1,4 @@
+import { Coordinate } from "../components/gameplay/DrawBoard";
 import { Board } from "./Board";
 import { WhichPlayer } from "./OnlineGame";
 import { Guess } from "./gameLogic";
@@ -31,4 +32,6 @@ export abstract class Game {
   }
 
   abstract makeCopy(): Game;
+
+  abstract canGuess(coordinate: Coordinate): boolean;
 }
