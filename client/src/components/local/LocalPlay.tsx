@@ -4,6 +4,7 @@ import { Coordinate } from "../gameplay/DrawBoard";
 import { PlayMenu } from "../gameplay/PlayMenu";
 import { PlayScreen } from "../gameplay/PlayScreen";
 import { MessageOverlay } from "../general/MessageOverlay";
+import { useSave } from "./SaveProvider";
 
 type LocalPlayProps = {
   game: LocalGame;
@@ -11,6 +12,7 @@ type LocalPlayProps = {
 };
 
 export function LocalPlay({ game, setGame }: LocalPlayProps) {
+  const { manageSave } = useSave();
   const [displaySwitch, setDisplaySwitch] = useState<boolean>(true);
   const [canGuess, setCanGuess] = useState<boolean>(false);
 
@@ -25,6 +27,7 @@ export function LocalPlay({ game, setGame }: LocalPlayProps) {
     setGame((game) => {
       const newGame = game.makeCopy();
       newGame.makeGuess(coordinate);
+      manageSave(newGame);
       return newGame;
     });
     setCanGuess(false);

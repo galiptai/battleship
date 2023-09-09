@@ -1,22 +1,17 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Board } from "../../logic/Board";
-import { GameSave } from "../../logic/GameSave";
 import { LocalGame } from "../../logic/LocalGame";
+import { MessageOverlay } from "../general/MessageOverlay";
 import { ResultsScreen } from "../general/ResultsScreen";
 import { BoardSetup } from "../setup/BoardSetup";
 import { LocalPlay } from "./LocalPlay";
-import { MessageOverlay } from "../general/MessageOverlay";
-import { useNavigate } from "react-router-dom";
+import { useSave } from "./SaveProvider";
 
-type LocalGameProps = {
-  save: GameSave;
-  updateSave: (save: GameSave) => void;
-  deleteSave: () => void;
-};
-
-export function LocalGameFlow({ save, updateSave, deleteSave }: LocalGameProps) {
+export function LocalGameFlow() {
   const navigate = useNavigate();
-  const [game, setGame] = useState<LocalGame>(save.getGame());
+  const { getSavedGame, manageSave } = useSave();
+  const [game, setGame] = useState<LocalGame>(() => getSavedGame());
   const [displayResults, setDisplayResults] = useState<boolean>(false);
 
   function setPlayer1Board(board: Board) {
@@ -31,17 +26,10 @@ export function LocalGameFlow({ save, updateSave, deleteSave }: LocalGameProps) 
     setGame((game) => {
       const newGame = game.makeCopy();
       newGame.setBoard("PLAYER2", board);
+      manageSave(newGame);
       return newGame;
     });
   }
-
-  useEffect(() => {
-    if (game.winner === null) {
-      updateSave(GameSave.fromLocalGame(game, new Date()));
-    } else {
-      deleteSave();
-    }
-  }, [updateSave, game, deleteSave]);
 
   if (game.player1 === null) {
     return <BoardSetup key="P1" starterName={"Player 1"} setVerifiedBoard={setPlayer1Board} />;

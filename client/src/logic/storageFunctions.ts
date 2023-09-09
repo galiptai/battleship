@@ -23,7 +23,7 @@ export function saveName(name: string) {
   localStorage.setItem(NAME_KEY, name);
 }
 
-export function getGame(): PlainGameSave | null {
+export function getGameSave(): PlainGameSave | null {
   const data = localStorage.getItem(GAME_SAVE_KEY);
   if (data) {
     return JSON.parse(data) as PlainGameSave;
