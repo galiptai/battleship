@@ -27,7 +27,7 @@ export function OnlineSetup({ game, setGame, displayError }: OnlineSetupProps) {
       if (res.ok) {
         setGame((game) => {
           const newGame = game!.makeCopy();
-          newGame.player = board;
+          newGame.setPlayerBoard(board);
           return newGame;
         });
         saveName(board.player);
@@ -49,7 +49,7 @@ export function OnlineSetup({ game, setGame, displayError }: OnlineSetupProps) {
     setSubmitting(false);
   }
 
-  const boardSet = game.player != null;
+  const boardSet = game.getPlayerBoard() != null;
   return (
     <>
       <BoardSetup

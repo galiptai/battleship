@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Message, StompSubscription } from "@stomp/stompjs";
 import { CustomError, isErrorMessage } from "../../logic/CustomError";
 import { BoardData } from "../../logic/GameSave";
-import { OnlineGame, GameData, GameState, WhichPlayer } from "../../logic/OnlineGame";
+import { OnlineGame, OnlineGameData, GameState, WhichPlayer } from "../../logic/OnlineGame";
 import { getId } from "../../logic/storageFunctions";
 import { Loading } from "../general/Loading";
 import { MessageOverlay } from "../general/MessageOverlay";
@@ -58,7 +58,7 @@ export function OnlineGameFlow({ gameId, displayError }: OnlineGameFlowProps) {
         throw Error("Game is not set!");
       }
       const newGame = game.makeCopy();
-      newGame.setOpponent(BoardData.fromJSON(opponentBoard).getBoard());
+      newGame.setOpponentBoard(BoardData.fromJSON(opponentBoard).getBoard());
       return newGame;
     });
     return;
@@ -95,7 +95,7 @@ export function OnlineGameFlow({ gameId, displayError }: OnlineGameFlowProps) {
       try {
         const res = await fetch(`/api/v1/game/${gameId}?playerId=${getId()}`, { signal });
         if (res.ok) {
-          const gameData = (await res.json()) as GameData;
+          const gameData = (await res.json()) as OnlineGameData;
           setGame(OnlineGame.fromGameData(gameData));
           startSubscriptions(subscriptions);
         } else {
@@ -154,7 +154,7 @@ export function OnlineGameFlow({ gameId, displayError }: OnlineGameFlowProps) {
     case "P1_TURN":
     case "P2_TURN":
     case "SUSPENDED": {
-      if (game.player && game.opponent) {
+      if (game.player1 && game.player2) {
         return (
           <OnlinePlay
             game={game}

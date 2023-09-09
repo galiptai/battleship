@@ -39,15 +39,22 @@ public class Game {
     }
 
     public GameDTO getGame(Player player) {
-        BoardDTO playerData = player.getPlayerDataFull();
-        Player opponent = getOpponent(player);
-        BoardDTO opponentData = opponent != null ? opponent.getPlayerDataRevealed() : null;
+        BoardDTO player1Data = player.getWhichPlayer() == WhichPlayer.PLAYER1
+                ? player1.getPlayerDataFull()
+                : player1.getPlayerDataRevealed();
+        BoardDTO player2Data = null;
+        if (player2 != null) {
+            player2Data = player.getWhichPlayer() == WhichPlayer.PLAYER2
+                    ? player2.getPlayerDataFull()
+                    : player2.getPlayerDataRevealed();
+        }
+
         return new GameDTO(
                 id,
                 player.getWhichPlayer(),
                 privateGame,
-                playerData,
-                opponentData,
+                player1Data,
+                player2Data,
                 guesses.stream().map(GuessDTO::new).toList(),
                 state,
                 winner

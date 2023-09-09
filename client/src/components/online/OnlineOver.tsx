@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MessageOverlay } from "../general/MessageOverlay";
 import { OnlinePlay, OnlinePlayProps } from "./OnlinePlay";
 import { ResultsScreen } from "../general/ResultsScreen";
-import { deleteGameId } from "../../logic/storageFunctions";
 
 type OnlineOverProps = OnlinePlayProps;
 
@@ -11,17 +10,13 @@ export function OnlineOver({ game, setGame, updateMessage, displayError }: Onlin
   const [displayResults, setDisplayResults] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    deleteGameId();
-  }, []);
-
   if (game.winner) {
     if (displayResults) {
       return (
         <ResultsScreen
           winner={game.getWinnerName()}
-          p1Board={game.player!}
-          p2Board={game.opponent!}
+          p1Board={game.player1!}
+          p2Board={game.player2!}
           guesses={game.guesses}
           playerIs={game.playerIs}
         />

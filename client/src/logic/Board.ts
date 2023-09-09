@@ -90,8 +90,15 @@ export class Board {
     return [...neighbors].every((tile) => tile.placedShip === null);
   }
 
+  canGuess(coordinate: Coordinate): boolean {
+    return !this.tiles[coordinate.y][coordinate.x].guessed;
+  }
+
   submitGuess(coordinate: Coordinate): boolean {
     const tile = this.tiles[coordinate.y][coordinate.x];
+    if (tile.guessed) {
+      throw new Error("This tile was already guessed!");
+    }
     tile.guessed = true;
     return tile.placedShip !== null;
   }

@@ -3,7 +3,6 @@ import { GameSave, PlainGameSave } from "./GameSave";
 
 const USER_ID_KEY = "userId";
 const NAME_KEY = "name";
-const GAME_ID_KEY = "gameId";
 const GAME_SAVE_KEY = "gameSave";
 
 export function getId(): string {
@@ -24,19 +23,7 @@ export function saveName(name: string) {
   localStorage.setItem(NAME_KEY, name);
 }
 
-export function getGameId(): string | null {
-  return localStorage.getItem(GAME_ID_KEY);
-}
-
-export function saveGameId(gameId: string) {
-  localStorage.setItem(GAME_ID_KEY, gameId);
-}
-
-export function deleteGameId() {
-  localStorage.removeItem(GAME_ID_KEY);
-}
-
-export function getGame(): PlainGameSave | null {
+export function getGameSave(): PlainGameSave | null {
   const data = localStorage.getItem(GAME_SAVE_KEY);
   if (data) {
     return JSON.parse(data) as PlainGameSave;
