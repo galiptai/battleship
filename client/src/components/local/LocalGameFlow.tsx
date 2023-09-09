@@ -5,6 +5,8 @@ import { LocalGame } from "../../logic/LocalGame";
 import { ResultsScreen } from "../general/ResultsScreen";
 import { BoardSetup } from "../setup/BoardSetup";
 import { LocalPlay } from "./LocalPlay";
+import { MessageOverlay } from "../general/MessageOverlay";
+import { useNavigate } from "react-router-dom";
 
 type LocalGameProps = {
   save: GameSave;
@@ -13,6 +15,7 @@ type LocalGameProps = {
 };
 
 export function LocalGameFlow({ save, updateSave, deleteSave }: LocalGameProps) {
+  const navigate = useNavigate();
   const [game, setGame] = useState<LocalGame>(save.getGame());
   const [displayResults, setDisplayResults] = useState<boolean>(false);
 
@@ -46,17 +49,34 @@ export function LocalGameFlow({ save, updateSave, deleteSave }: LocalGameProps) 
     return <BoardSetup key="P2" starterName={"Player 2"} setVerifiedBoard={setPlayer2Board} />;
   }
 
-  if (!displayResults) {
-    return <LocalPlay game={game} setGame={setGame} setDisplayResults={setDisplayResults} />;
-  } else if (game.winner !== null) {
+  const over = game.winner !== null;
+  if (over && displayResults) {
     return (
       <ResultsScreen
         p1Board={game.player1}
         p2Board={game.player2}
-        winner={game.winner}
+        winner={game.getWinnerName()}
         guesses={game.guesses}
         playerIs="PLAYER1"
       />
+    );
+  } else {
+    return (
+      <>
+        <LocalPlay game={game} setGame={setGame} />
+        {over && (
+          <MessageOverlay
+            display
+            background
+            message="You win!"
+            description={`Congratulations, ${game.getWinnerName()}!`}
+            buttons={[
+              <button onClick={() => setDisplayResults(true)}>SEE RESULTS</button>,
+              <button onClick={() => navigate("/")}>MAIN MENU</button>,
+            ]}
+          />
+        )}
+      </>
     );
   }
 }

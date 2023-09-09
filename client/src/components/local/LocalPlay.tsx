@@ -1,5 +1,4 @@
 import { Dispatch, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { LocalGame } from "../../logic/LocalGame";
 import { Coordinate } from "../gameplay/DrawBoard";
 import { PlayMenu } from "../gameplay/PlayMenu";
@@ -9,11 +8,9 @@ import { MessageOverlay } from "../general/MessageOverlay";
 type LocalPlayProps = {
   game: LocalGame;
   setGame: Dispatch<React.SetStateAction<LocalGame>>;
-  setDisplayResults: (displayResults: boolean) => void;
 };
 
-export function LocalPlay({ game, setGame, setDisplayResults }: LocalPlayProps) {
-  const navigate = useNavigate();
+export function LocalPlay({ game, setGame }: LocalPlayProps) {
   const [displaySwitch, setDisplaySwitch] = useState<boolean>(true);
   const [canGuess, setCanGuess] = useState<boolean>(false);
 
@@ -69,37 +66,25 @@ export function LocalPlay({ game, setGame, setDisplayResults }: LocalPlayProps) 
     );
   } else {
     return (
-      <>
-        <PlayScreen
-          playerBoard={playerBoard}
-          opponentBoard={opponentBoard}
-          onOppBoardClick={onOppBoardClick}
-          oppBoardClickCheck={oppBoardClickCheck}
-          playMenu={
-            <PlayMenu
-              guesses={game.guesses}
-              player1={game.player1!.player}
-              player2={game.player2!.player}
-              info="It's your turn!"
-              actions={[
-                <button onClick={onPassClick} disabled={canGuess || over}>
-                  PASS
-                </button>,
-              ]}
-            />
-          }
-        />
-        <MessageOverlay
-          display={over}
-          background
-          message="You win!"
-          description={`Congratulations, ${playerBoard.player}!`}
-          buttons={[
-            <button onClick={() => setDisplayResults(true)}>SEE RESULTS</button>,
-            <button onClick={() => navigate("/")}>MAIN MENU</button>,
-          ]}
-        />
-      </>
+      <PlayScreen
+        playerBoard={playerBoard}
+        opponentBoard={opponentBoard}
+        onOppBoardClick={onOppBoardClick}
+        oppBoardClickCheck={oppBoardClickCheck}
+        playMenu={
+          <PlayMenu
+            guesses={game.guesses}
+            player1={game.player1!.player}
+            player2={game.player2!.player}
+            info={over ? "Game is over." : "It's your turn!"}
+            actions={[
+              <button onClick={onPassClick} disabled={canGuess || over}>
+                PASS
+              </button>,
+            ]}
+          />
+        }
+      />
     );
   }
 }

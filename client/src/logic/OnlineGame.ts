@@ -139,16 +139,4 @@ export class OnlineGame extends Game {
       throw new Error("Game is not yet won");
     }
   }
-
-  getWinnerName(): string {
-    if (this.winner) {
-      if (this.winner === "PLAYER1") {
-        return this.player1!.player;
-      } else {
-        return this.player2!.player;
-      }
-    } else {
-      throw new Error("Game is not yet won");
-    }
-  }
 }
