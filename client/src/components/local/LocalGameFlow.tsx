@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Dispatch, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Board } from "../../logic/Board";
 import { LocalGame } from "../../logic/LocalGame";
@@ -8,15 +8,19 @@ import { BoardSetup } from "../setup/BoardSetup";
 import { LocalPlay } from "./LocalPlay";
 import { useSave } from "./SaveProvider";
 
-export function LocalGameFlow() {
+type LocalGameFlowProps = {
+  game: LocalGame;
+  setGame: Dispatch<React.SetStateAction<LocalGame | null>>;
+};
+
+export function LocalGameFlow({ game, setGame }: LocalGameFlowProps) {
+  const { manageSave } = useSave();
   const navigate = useNavigate();
-  const { getSavedGame, manageSave } = useSave();
-  const [game, setGame] = useState<LocalGame>(() => getSavedGame());
   const [displayResults, setDisplayResults] = useState<boolean>(false);
 
   function setPlayer1Board(board: Board) {
     setGame((game) => {
-      const newGame = game.makeCopy();
+      const newGame = game!.makeCopy();
       newGame.setBoard("PLAYER1", board);
       return newGame;
     });
@@ -24,7 +28,7 @@ export function LocalGameFlow() {
 
   function setPlayer2Board(board: Board) {
     setGame((game) => {
-      const newGame = game.makeCopy();
+      const newGame = game!.makeCopy();
       newGame.setBoard("PLAYER2", board);
       manageSave(newGame);
       return newGame;
@@ -32,9 +36,23 @@ export function LocalGameFlow() {
   }
 
   if (game.player1 === null) {
-    return <BoardSetup key="P1" starterName={"Player 1"} setVerifiedBoard={setPlayer1Board} />;
+    return (
+      <BoardSetup
+        key="P1"
+        rules={game.rules}
+        starterName={"Player 1"}
+        setVerifiedBoard={setPlayer1Board}
+      />
+    );
   } else if (game.player2 === null) {
-    return <BoardSetup key="P2" starterName={"Player 2"} setVerifiedBoard={setPlayer2Board} />;
+    return (
+      <BoardSetup
+        key="P2"
+        rules={game.rules}
+        starterName={"Player 2"}
+        setVerifiedBoard={setPlayer2Board}
+      />
+    );
   }
 
   const over = game.winner !== null;

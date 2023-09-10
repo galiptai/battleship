@@ -13,7 +13,7 @@ import { Layout } from "./components/general/Layout.tsx";
 import { SaveProvider } from "./components/local/SaveProvider.tsx";
 import { ConnectionProvider } from "./components/online/ConnectionProvider.tsx";
 import { Online } from "./components/online/Online.tsx";
-import { LocalGameFlow } from "./components/local/LocalGameFlow.tsx";
+import { Local } from "./components/local/Local.tsx";
 
 export default function App() {
   const router = createBrowserRouter(
@@ -24,7 +24,7 @@ export default function App() {
           path="/local"
           element={
             <SaveProvider>
-              <LocalGameFlow />
+              <Local />
             </SaveProvider>
           }
         />

@@ -53,6 +53,7 @@ export function OnlineSetup({ game, setGame, displayError }: OnlineSetupProps) {
   return (
     <>
       <BoardSetup
+        rules={game.rules}
         setVerifiedBoard={sendPlayerBoard}
         starterName={getLastUsedName()}
         disabled={submitting || boardSet}

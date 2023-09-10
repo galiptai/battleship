@@ -8,7 +8,7 @@ import { useSave } from "./SaveProvider";
 
 type LocalPlayProps = {
   game: LocalGame;
-  setGame: Dispatch<React.SetStateAction<LocalGame>>;
+  setGame: Dispatch<React.SetStateAction<LocalGame | null>>;
 };
 
 export function LocalPlay({ game, setGame }: LocalPlayProps) {
@@ -25,7 +25,7 @@ export function LocalPlay({ game, setGame }: LocalPlayProps) {
       return;
     }
     setGame((game) => {
-      const newGame = game.makeCopy();
+      const newGame = game!.makeCopy();
       newGame.makeGuess(coordinate);
       manageSave(newGame);
       return newGame;
@@ -42,7 +42,7 @@ export function LocalPlay({ game, setGame }: LocalPlayProps) {
 
   function onPassClick() {
     setGame((game) => {
-      const newGame = game.makeCopy();
+      const newGame = game!.makeCopy();
       newGame.pass();
       return newGame;
     });

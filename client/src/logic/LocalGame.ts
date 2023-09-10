@@ -3,33 +3,43 @@ import { Board } from "./Board";
 import { Game } from "./Game";
 import { BoardData, PlainGameSave } from "./GameSave";
 import { WhichPlayer } from "./OnlineGame";
+import { RuleData, Rules } from "./Rules";
 import { Guess } from "./gameLogic";
 
 export class LocalGame extends Game {
   currentTurn: WhichPlayer;
 
   constructor(
+    rules: RuleData,
     player1: Board | null,
     player2: Board | null,
     currentTurn: WhichPlayer,
     guesses: Guess[],
     winner: WhichPlayer | null
   ) {
-    super(player1, player2, guesses, winner);
+    super(rules, player1, player2, guesses, winner);
     this.currentTurn = currentTurn;
   }
 
   static fromPlainGameSave(save: PlainGameSave): LocalGame {
+    const rules = save.rules ? save.rules : Rules.CLASSIC_RULES;
     const player1 = save.p1Board !== null ? BoardData.fromJSON(save.p1Board).getBoard() : null;
     const player2 = save.p2Board !== null ? BoardData.fromJSON(save.p2Board).getBoard() : null;
     if (player1 !== null && player2 !== null) {
       this.processGuesses(player1, player2, save.guesses);
     }
-    return new LocalGame(player1, player2, save.currentTurn, save.guesses, null);
+    return new LocalGame(rules, player1, player2, save.currentTurn, save.guesses, null);
   }
 
   makeCopy(): LocalGame {
-    return new LocalGame(this.player1, this.player2, this.currentTurn, this.guesses, this.winner);
+    return new LocalGame(
+      this.rules,
+      this.player1,
+      this.player2,
+      this.currentTurn,
+      this.guesses,
+      this.winner
+    );
   }
 
   setBoard(whichPlayer: WhichPlayer, board: Board) {

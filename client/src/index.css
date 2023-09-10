@@ -51,6 +51,21 @@ input {
   all: unset;
   border: 2px solid var(--main-blue);
   padding: 3px;
+  box-sizing: border-box;
+}
+
+input:disabled {
+  border: 2px solid var(--blue-disabled);
+  color: var(--blue-disabled);
+}
+
+input::selection {
+  background-color: var(--blue-active);
+  color: black;
+}
+
+.input-invalid {
+  border-color: red !important;
 }
 
 @media (hover: hover) {

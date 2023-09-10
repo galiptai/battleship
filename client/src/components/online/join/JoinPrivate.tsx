@@ -3,7 +3,7 @@ import { Loading } from "../../general/Loading";
 import { MessageOverlay } from "../../general/MessageOverlay";
 import { useConnection } from "../ConnectionProvider";
 import { JoinInputModal } from "./JoinInputModal";
-import "./JoinPrivate.css";
+import { Menu } from "../../general/Menu";
 
 type StartMode = "CREATE" | "JOIN";
 
@@ -18,14 +18,16 @@ export function JoinPrivate() {
 
   if (startMode !== "CREATE") {
     return (
-      <div className="join-private">
-        <div className="join-private-title">Private game</div>
-        <div className="join-private-options">
-          <div onClick={onCreateClick}>Start new game</div>
-          <div onClick={() => setStartMode("JOIN")}>Join game</div>
-        </div>
+      <>
+        <Menu
+          title="Private Game"
+          options={[
+            <div onClick={onCreateClick}>Start new game</div>,
+            <div onClick={() => setStartMode("JOIN")}>Join game</div>,
+          ]}
+        />
         {startMode === "JOIN" && <JoinInputModal onCancel={() => setStartMode(null)} />}
-      </div>
+      </>
     );
   } else {
     return <MessageOverlay display message="Creating" description={<Loading />} />;

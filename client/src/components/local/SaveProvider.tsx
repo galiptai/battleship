@@ -14,10 +14,10 @@ function load(): GameSave | null {
   }
 }
 
-function getSavedGame(): LocalGame {
+function getSavedGame(): LocalGame | null {
   const save = load();
   if (save === null || !save.isValid()) {
-    return new GameSave(null, null, "PLAYER1", [], new Date()).getGame();
+    return null;
   } else {
     return save.getGame();
   }
@@ -35,7 +35,7 @@ function manageSave(game: LocalGame) {
 }
 
 type SaveContextType = {
-  getSavedGame: () => LocalGame;
+  getSavedGame: () => LocalGame | null;
   manageSave: (game: LocalGame) => void;
 };
 

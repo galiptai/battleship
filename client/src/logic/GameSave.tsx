@@ -3,10 +3,13 @@ import { Tile } from "../components/gameplay/Tile";
 import { Board } from "./Board";
 import { LocalGame } from "./LocalGame";
 import { WhichPlayer } from "./OnlineGame";
+import { RuleData, Rules } from "./Rules";
 import { SHIP_TYPES, Ship, ShipTypeKey } from "./Ship";
 import { Guess } from "./gameLogic";
+import deepEqual from "deep-eql";
 
 export class GameSave {
+  rules?: RuleData;
   p1Board: BoardData | null;
   p2Board: BoardData | null;
   currentTurn: WhichPlayer;
@@ -18,13 +21,15 @@ export class GameSave {
     p2Board: BoardData | null,
     currentTurn: WhichPlayer,
     guesses: Guess[],
-    saveDate: Date
+    saveDate: Date,
+    rules?: RuleData
   ) {
     this.p1Board = p1Board;
     this.p2Board = p2Board;
     this.currentTurn = currentTurn;
     this.guesses = guesses;
     this.saveDate = saveDate;
+    this.rules = rules;
   }
 
   static fromLocalGame(game: LocalGame, saveDate: Date): GameSave {
@@ -32,12 +37,14 @@ export class GameSave {
     if (game.guesses.length > 0) {
       currentTurn = game.guesses.at(-1)!.player === "PLAYER1" ? "PLAYER2" : "PLAYER1";
     }
+    const rules = deepEqual(game.rules, Rules.CLASSIC_RULES) ? undefined : game.rules;
     return new GameSave(
       BoardData.getDataFromBoard(game.player1),
       BoardData.getDataFromBoard(game.player2),
       currentTurn,
       game.guesses,
-      saveDate
+      saveDate,
+      rules
     );
   }
 
@@ -47,7 +54,8 @@ export class GameSave {
       json.p2Board === null ? json.p2Board : BoardData.fromJSON(json.p2Board),
       json.currentTurn,
       json.guesses,
-      new Date(json.saveDate)
+      new Date(json.saveDate),
+      json.rules
     );
   }
 
@@ -71,6 +79,7 @@ export class GameSave {
 
   getGame(): LocalGame {
     return new LocalGame(
+      this.rules ? this.rules : Rules.CLASSIC_RULES,
       this.getP1Board(),
       this.getP2Board(),
       this.currentTurn,
@@ -187,6 +196,7 @@ class ShipData {
 }
 
 export type PlainGameSave = {
+  rules?: RuleData;
   p1Board: PlainBoardData | null;
   p2Board: PlainBoardData | null;
   currentTurn: WhichPlayer;

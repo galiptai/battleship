@@ -6,8 +6,10 @@ import "./BoardSetup.css";
 import { SetupMenu } from "./SetupMenu";
 import { Board } from "../../logic/Board";
 import { ShipPlacement } from "./ShipSelector";
+import { RuleData } from "../../logic/Rules";
 
 type BoardSetupProps = {
+  rules: RuleData;
   starterName: string;
   setVerifiedBoard: (board: Board) => void | Promise<void>;
   disabled?: boolean;
@@ -15,12 +17,13 @@ type BoardSetupProps = {
 };
 
 export function BoardSetup({
+  rules,
   starterName,
   setVerifiedBoard,
   disabled,
   readyBtnText,
 }: BoardSetupProps) {
-  const [board, setBoard] = useState<Board>(createEmptyBoard(10, 10, starterName));
+  const [board, setBoard] = useState<Board>(createEmptyBoard(rules.dimensions, starterName));
   const [shipsToPlace] = useState<Ship[]>(getShips());
   const [verified, setVerified] = useState<boolean>(false);
   const [highlight, setHighlight] = useState<Highlight>({ type: "none", tiles: [] });

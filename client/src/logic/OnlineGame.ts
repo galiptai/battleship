@@ -2,6 +2,7 @@ import { Coordinate } from "../components/gameplay/DrawBoard";
 import { Board } from "./Board";
 import { Game } from "./Game";
 import { BoardData, PlainBoardData, PlainShipData } from "./GameSave";
+import { Rules } from "./Rules";
 import { Guess } from "./gameLogic";
 
 export type OnlineGameData = {
@@ -35,7 +36,7 @@ export class OnlineGame extends Game {
     guesses: Guess[],
     winner: WhichPlayer | null
   ) {
-    super(player1, player2, guesses, winner);
+    super(Rules.CLASSIC_RULES, player1, player2, guesses, winner);
     this.id = id;
     this.gameState = gameState;
     this.privateGame = privateGame;

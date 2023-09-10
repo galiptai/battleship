@@ -1,0 +1,36 @@
+.rules-form-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2vh;
+  font-size: 3vh;
+}
+
+.rules-form-title {
+  font-size: 5vh;
+  font-weight: 700;
+}
+
+.rules-form-dimensions,
+.rules-form-dimensions-controls {
+  display: flex;
+  gap: 10vw;
+  align-items: center;
+}
+
+.rules-form-start > button {
+  font-weight: 900;
+  font-size: 1.2em;
+  padding: 0.2em 0.5em;
+}
+
+@media all and (max-width: 600px) {
+  .rules-form-dimensions {
+    align-items: center;
+    flex-direction: column;
+    gap: 1vw;
+  }
+}

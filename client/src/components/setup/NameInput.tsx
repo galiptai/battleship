@@ -23,7 +23,7 @@ export function NameInput({ board, setBoard, setVerified, disabled }: NameInputP
     <div className="name-input">
       <label htmlFor="name">Name: </label>
       <input
-        className={`${board.player === "" ? "name-input-invalid" : ""}`}
+        className={`${board.player === "" ? "input-invalid" : ""}`}
         type="text"
         name="name"
         id="name"

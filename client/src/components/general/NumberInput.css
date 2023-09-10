@@ -1,0 +1,36 @@
+.number-input-container {
+  width: fit-content;
+  height: fit-content;
+  text-align: center;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.number-input {
+  display: flex;
+  height: fit-content;
+}
+
+.number-input > button {
+  padding: 0 0.3em;
+  font-size: 1.2em;
+  font-weight: 900;
+  box-sizing: border-box;
+}
+
+.number-input > button:disabled {
+  background-color: var(--blue-disabled);
+  color: black;
+}
+
+.number-input > b .number-input > input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.number-input > input[type="number"] {
+  -moz-appearance: textfield;
+}

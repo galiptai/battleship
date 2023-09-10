@@ -1,20 +1,24 @@
 import { Coordinate } from "../components/gameplay/DrawBoard";
 import { Board } from "./Board";
 import { WhichPlayer } from "./OnlineGame";
+import { RuleData } from "./Rules";
 import { Guess } from "./gameLogic";
 
 export abstract class Game {
+  readonly rules: RuleData;
   player1: Board | null;
   player2: Board | null;
   guesses: Guess[];
   winner: WhichPlayer | null;
 
   constructor(
+    rules: RuleData,
     player1: Board | null,
     player2: Board | null,
     guesses: Guess[],
     winner: WhichPlayer | null
   ) {
+    this.rules = rules;
     this.player1 = player1;
     this.player2 = player2;
     this.guesses = guesses;

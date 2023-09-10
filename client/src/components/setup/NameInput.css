@@ -8,22 +8,7 @@
 
 .name-input > input {
   text-align: end;
-  box-sizing: border-box;
   max-width: 100%;
-}
-
-.name-input > input:disabled {
-  border: 2px solid var(--blue-disabled);
-  color: var(--blue-disabled);
-}
-
-.name-input > input::selection {
-  background-color: var(--blue-active);
-  color: black;
-}
-
-.name-input-invalid {
-  border: 2px solid red !important;
 }
 
 @media all and (max-width: 600px) {
