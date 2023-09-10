@@ -2,8 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { DrawBoard } from "../gameplay/DrawBoard";
 import "./ResultsScreen.css";
 import { Board } from "../../logic/Board";
-import { Guess } from "../../logic/gameLogic";
-import { WhichPlayer } from "../../logic/OnlineGame";
+import { Guess, WhichPlayer } from "../../logic/Game";
 
 type ResultsScreenProps = {
   winner: string;

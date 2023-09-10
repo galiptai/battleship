@@ -1,8 +1,14 @@
 import { Coordinate } from "../components/gameplay/DrawBoard";
 import { Board } from "./Board";
-import { WhichPlayer } from "./OnlineGame";
 import { RuleData } from "./Rules";
-import { Guess } from "./gameLogic";
+
+export type WhichPlayer = "PLAYER1" | "PLAYER2";
+
+export type Guess = {
+  coordinate: Coordinate;
+  hit: boolean;
+  player: WhichPlayer;
+};
 
 export abstract class Game {
   readonly rules: RuleData;

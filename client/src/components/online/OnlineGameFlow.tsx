@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Message, StompSubscription } from "@stomp/stompjs";
 import { CustomError, isErrorMessage } from "../../logic/CustomError";
 import { BoardData } from "../../logic/GameSave";
-import { OnlineGame, OnlineGameData, GameState, WhichPlayer } from "../../logic/OnlineGame";
+import { OnlineGame, OnlineGameData, GameState } from "../../logic/OnlineGame";
 import { getId } from "../../logic/storageFunctions";
 import { Loading } from "../general/Loading";
 import { MessageOverlay } from "../general/MessageOverlay";
@@ -11,6 +11,7 @@ import { OnlineOver } from "./OnlineOver";
 import { OnlinePlay } from "./OnlinePlay";
 import { OnlineSetup } from "./OnlineSetup";
 import shortUUID from "short-uuid";
+import { WhichPlayer } from "../../logic/Game";
 
 type StateUpdate = {
   gameState: GameState;

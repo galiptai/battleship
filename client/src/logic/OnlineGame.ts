@@ -1,9 +1,8 @@
 import { Coordinate } from "../components/gameplay/DrawBoard";
 import { Board } from "./Board";
-import { Game } from "./Game";
+import { Game, Guess, WhichPlayer } from "./Game";
 import { BoardData, PlainBoardData, PlainShipData } from "./GameSave";
 import { Rules } from "./Rules";
-import { Guess } from "./gameLogic";
 
 export type OnlineGameData = {
   id: string;
@@ -17,8 +16,6 @@ export type OnlineGameData = {
 };
 
 export type GameState = "JOINING" | "SETUP" | "P1_TURN" | "P2_TURN" | "OVER" | "SUSPENDED";
-
-export type WhichPlayer = "PLAYER1" | "PLAYER2";
 
 export class OnlineGame extends Game {
   readonly id: string;

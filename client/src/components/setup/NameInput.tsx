@@ -3,16 +3,13 @@ import "./NameInput.css";
 
 export type NameInputProps = {
   board: Board;
-  setBoard: (board: Board) => void;
-  setVerified: (verified: boolean) => void;
+  onNameInput: (value: string) => void;
   disabled?: boolean;
 };
 
-export function NameInput({ board, setBoard, setVerified, disabled }: NameInputProps) {
+export function NameInput({ board, onNameInput: onNameInput, disabled }: NameInputProps) {
   function onChange(event: React.ChangeEvent<HTMLInputElement>) {
-    board.player = event.target.value;
-    setBoard(board.makeCopy());
-    setVerified(board.isValid());
+    onNameInput(event.target.value);
   }
 
   function onFocus(event: React.FocusEvent<HTMLInputElement>) {

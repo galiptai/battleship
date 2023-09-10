@@ -4,17 +4,11 @@ import { NameInput, NameInputProps } from "./NameInput";
 
 type SetupMenuProps = ShipSelectorProps & NameInputProps;
 
-export function SetupMenu({
-  board,
-  setBoard,
-  shipsToPlace,
-  setVerified,
-  disabled,
-}: SetupMenuProps) {
+export function SetupMenu({ board, onNameInput, shipsToPlace, disabled }: SetupMenuProps) {
   return (
     <div className="setup-menu">
       <div className="setup-menu-title">SET YOUR BOARD</div>
-      <NameInput board={board} setBoard={setBoard} setVerified={setVerified} disabled={disabled} />
+      <NameInput board={board} onNameInput={onNameInput} disabled={disabled} />
       <ShipSelector shipsToPlace={shipsToPlace} disabled={disabled} />
     </div>
   );

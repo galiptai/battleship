@@ -1,7 +1,7 @@
 import { useRef, useState, ReactNode } from "react";
 import "./PlayMenu.css";
 import { GuessList } from "./GuessList";
-import { Guess } from "../../logic/gameLogic";
+import { Guess } from "../../logic/Game";
 export type PlayMenuTabs = "Actions" | "Guesses" | "Chat";
 
 type PlayMenuProps = {

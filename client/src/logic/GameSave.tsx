@@ -1,11 +1,10 @@
 import { Coordinate } from "../components/gameplay/DrawBoard";
 import { Tile } from "../components/gameplay/Tile";
 import { Board } from "./Board";
+import { Guess, WhichPlayer } from "./Game";
 import { LocalGame } from "./LocalGame";
-import { WhichPlayer } from "./OnlineGame";
 import { RuleData, Rules } from "./Rules";
 import { SHIP_TYPES, Ship, ShipTypeKey } from "./Ship";
-import { Guess } from "./gameLogic";
 import deepEqual from "deep-eql";
 
 export class GameSave {
@@ -63,7 +62,8 @@ export class GameSave {
     if (this.p1Board === null || this.p2Board === null) {
       return false;
     }
-    if (!this.getP1Board()?.isValid() || !this.getP2Board()?.isValid()) {
+    const rules = this.rules ? this.rules : Rules.CLASSIC_RULES;
+    if (!this.getP1Board()?.isValid(rules) || !this.getP2Board()?.isValid(rules)) {
       return false;
     }
     return true;

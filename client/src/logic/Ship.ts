@@ -1,4 +1,5 @@
 import { Tile } from "../components/gameplay/Tile";
+import { ShipAmount } from "./Rules";
 
 export class Ship {
   type: ShipType;
@@ -65,3 +66,15 @@ export const SHIP_TYPES = {
 export type ShipTypeKey = keyof typeof SHIP_TYPES;
 
 export type ShipType = (typeof SHIP_TYPES)[ShipTypeKey];
+
+export function createShips(shipsToCreate: ShipAmount): Ship[] {
+  const ships: Ship[] = [];
+  for (const typeAndAmount of Object.entries(shipsToCreate)) {
+    const type = typeAndAmount[0] as ShipTypeKey;
+    const amount = typeAndAmount[1];
+    for (let i = 0; i < amount; i++) {
+      ships.push(new Ship(SHIP_TYPES[type], []));
+    }
+  }
+  return ships;
+}

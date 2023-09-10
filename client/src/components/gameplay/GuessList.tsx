@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useRef } from "react";
 import { convertCoordinateToLetter } from "../../logic/renderFunctions";
 import "./GuessList.css";
-import { Guess } from "../../logic/gameLogic";
+import { Guess } from "../../logic/Game";
 
 type GuessListProps = {
   container: HTMLDivElement | null;

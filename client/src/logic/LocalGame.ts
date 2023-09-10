@@ -1,10 +1,8 @@
 import { Coordinate } from "../components/gameplay/DrawBoard";
 import { Board } from "./Board";
-import { Game } from "./Game";
+import { Game, Guess, WhichPlayer } from "./Game";
 import { BoardData, PlainGameSave } from "./GameSave";
-import { WhichPlayer } from "./OnlineGame";
 import { RuleData, Rules } from "./Rules";
-import { Guess } from "./gameLogic";
 
 export class LocalGame extends Game {
   currentTurn: WhichPlayer;

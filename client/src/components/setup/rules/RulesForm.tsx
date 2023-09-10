@@ -3,17 +3,15 @@ import { RuleData, Rules } from "../../../logic/Rules";
 import { NumberInput } from "../../general/NumberInput";
 import { Dimensions } from "../../../logic/renderFunctions";
 import "./RulesForm.css";
+import { ShipSetter } from "./ShipSetter";
 
 type RulesFormProps = {
   onRulesSubmit: (rule: RuleData) => void;
 };
 
 export function RulesForm({ onRulesSubmit }: RulesFormProps) {
-  const [rules, setRules] = useState<Rules>(() =>
-    Rules.fromRuleData(JSON.parse(JSON.stringify(Rules.CLASSIC_RULES)) as RuleData)
-  );
+  const [rules, setRules] = useState<Rules>(() => Rules.fromRuleData(Rules.CLASSIC_RULES));
 
-  console.log(rules);
   function updateDimension(dimension: keyof Dimensions, value: number) {
     setRules((rules) => {
       const newRules = rules.makeCopy();
@@ -57,6 +55,7 @@ export function RulesForm({ onRulesSubmit }: RulesFormProps) {
           />
         </div>
       </div>
+      <ShipSetter rules={rules} setRules={setRules} />
       <div className="rules-form-start">
         <button onClick={onStartClick} disabled={!rules.isValid()}>
           START

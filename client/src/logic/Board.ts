@@ -1,8 +1,10 @@
 import { Coordinate } from "../components/gameplay/DrawBoard";
 import { Tile } from "../components/gameplay/Tile";
+import { Guess } from "./Game";
 import { PlainShipData } from "./GameSave";
+import { RuleData } from "./Rules";
 import { SHIP_TYPES, Ship } from "./Ship";
-import { Guess } from "./gameLogic";
+import { Dimensions } from "./renderFunctions";
 
 export class Board {
   player: string;
@@ -19,15 +21,32 @@ export class Board {
     this.tiles = tiles;
   }
 
+  static createEmptyBoard(dimensions: Dimensions, starterName = "Player"): Board {
+    const tiles: Tile[][] = [];
+    for (let y = 0; y < dimensions.height; y++) {
+      const row: Tile[] = [];
+      for (let x = 0; x < dimensions.width; x++) {
+        row[x] = { coordinate: { y, x }, guessed: false, placedShip: null };
+      }
+      tiles[y] = row;
+    }
+    const ships: Set<Ship> = new Set();
+    return new Board(starterName, dimensions.height, dimensions.width, ships, tiles);
+  }
+
   makeCopy(): Board {
     return new Board(this.player, this.height, this.width, this.ships, this.tiles);
   }
 
-  isValid() {
+  isValid(rules: RuleData) {
     if (this.player === "") {
       return false;
     }
-    if (this.ships.size !== 5) {
+    if (this.height !== rules.dimensions.height || this.width !== rules.dimensions.width) {
+      return false;
+    }
+    const shipCount = Object.values(rules.ships).reduce((sum, next) => sum + next, 0);
+    if (this.ships.size !== shipCount) {
       return false;
     }
     for (const ship of this.ships) {

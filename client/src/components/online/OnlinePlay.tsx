@@ -4,13 +4,13 @@ import { Message } from "@stomp/stompjs";
 import { CustomError, isErrorMessage } from "../../logic/CustomError";
 import { PlainShipData } from "../../logic/GameSave";
 import { OnlineGame } from "../../logic/OnlineGame";
-import { Guess } from "../../logic/gameLogic";
 import { getId } from "../../logic/storageFunctions";
 import { Coordinate } from "../gameplay/DrawBoard";
 import { PlayMenu } from "../gameplay/PlayMenu";
 import { PlayScreen } from "../gameplay/PlayScreen";
 import { MessageOverlay } from "../general/MessageOverlay";
 import { useConnection } from "./ConnectionProvider";
+import { Guess } from "../../logic/Game";
 
 type GuessSunk = {
   guess: Guess;

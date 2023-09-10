@@ -1,7 +1,6 @@
 import { useState, useCallback } from "react";
 import { Coordinate, DrawBoard, Highlight } from "../gameplay/DrawBoard";
-import { Ship } from "../../logic/Ship";
-import { createEmptyBoard, getShips } from "../../logic/gameLogic";
+import { Ship, createShips } from "../../logic/Ship";
 import "./BoardSetup.css";
 import { SetupMenu } from "./SetupMenu";
 import { Board } from "../../logic/Board";
@@ -23,8 +22,8 @@ export function BoardSetup({
   disabled,
   readyBtnText,
 }: BoardSetupProps) {
-  const [board, setBoard] = useState<Board>(createEmptyBoard(rules.dimensions, starterName));
-  const [shipsToPlace] = useState<Ship[]>(getShips());
+  const [board, setBoard] = useState<Board>(Board.createEmptyBoard(rules.dimensions, starterName));
+  const [shipsToPlace] = useState<Ship[]>(createShips(rules.ships));
   const [verified, setVerified] = useState<boolean>(false);
   const [highlight, setHighlight] = useState<Highlight>({ type: "none", tiles: [] });
 
@@ -53,7 +52,7 @@ export function BoardSetup({
   function onDrop(startCoordinate: Coordinate, placement: ShipPlacement) {
     board.addShip(placement.ship, startCoordinate, placement.vertical);
     setBoard(board.makeCopy());
-    setVerified(board.isValid());
+    setVerified(board.isValid(rules));
   }
 
   function dropCheck(startCoordinate: Coordinate, placement: ShipPlacement): boolean {
@@ -72,7 +71,7 @@ export function BoardSetup({
     ship.removeTiles();
     board.ships.delete(ship);
     setBoard(board.makeCopy());
-    setVerified(board.isValid());
+    setVerified(board.isValid(rules));
   }
 
   function clickCheck(coordinate: Coordinate): boolean {
@@ -84,9 +83,15 @@ export function BoardSetup({
   }
 
   function onReadyClick() {
-    if (board.isValid()) {
+    if (board.isValid(rules)) {
       void setVerifiedBoard(board);
     }
+  }
+
+  function onNameInput(value: string) {
+    board.player = value;
+    setBoard(board.makeCopy());
+    setVerified(board.isValid(rules));
   }
 
   return (
@@ -94,9 +99,8 @@ export function BoardSetup({
       <div className="board-setup-menu">
         <SetupMenu
           board={board}
-          setBoard={setBoard}
+          onNameInput={onNameInput}
           shipsToPlace={shipsToPlace}
-          setVerified={setVerified}
           disabled={disabled}
         />
       </div>
