@@ -1,11 +1,11 @@
 import { useState, useCallback } from "react";
 import { Coordinate, DrawBoard, Highlight } from "../gameplay/DrawBoard";
-import { Ship, createShips } from "../../logic/Ship";
+import { Ship, ShipTypeKey, createShips } from "../../logic/Ship";
 import "./BoardSetup.css";
 import { SetupMenu } from "./SetupMenu";
 import { Board } from "../../logic/Board";
-import { ShipPlacement } from "./ShipSelector";
 import { RuleData } from "../../logic/Rules";
+import { ShipPlacement } from "./shipSelector/ShipDrag";
 
 type BoardSetupProps = {
   rules: RuleData;
@@ -23,7 +23,7 @@ export function BoardSetup({
   readyBtnText,
 }: BoardSetupProps) {
   const [board, setBoard] = useState<Board>(Board.createEmptyBoard(rules.dimensions, starterName));
-  const [shipsToPlace] = useState<Ship[]>(createShips(rules.ships));
+  const [shipsToPlace] = useState<Map<ShipTypeKey, Ship[]>>(createShips(rules.ships));
   const [verified, setVerified] = useState<boolean>(false);
   const [highlight, setHighlight] = useState<Highlight>({ type: "none", tiles: [] });
 

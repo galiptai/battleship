@@ -1,4 +1,4 @@
-import { ShipSelector, ShipSelectorProps } from "./ShipSelector";
+import { ShipSelector, ShipSelectorProps } from "./shipSelector/ShipSelector";
 import "./SetupMenu.css";
 import { NameInput, NameInputProps } from "./NameInput";
 

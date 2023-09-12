@@ -1,4 +1,3 @@
-import { HTML5toTouch } from "rdndmb-html5-to-touch";
 import { DndProvider } from "react-dnd-multi-backend";
 import {
   Navigate,
@@ -14,6 +13,7 @@ import { SaveProvider } from "./components/local/SaveProvider.tsx";
 import { ConnectionProvider } from "./components/online/ConnectionProvider.tsx";
 import { Online } from "./components/online/Online.tsx";
 import { Local } from "./components/local/Local.tsx";
+import { HTML5toTouch } from "./logic/DnDBackend.ts";
 
 export default function App() {
   const router = createBrowserRouter(

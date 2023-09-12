@@ -3,9 +3,9 @@ import { Coordinate, HighlightType, ShowShips } from "./DrawBoard";
 import { Ship } from "../../logic/Ship";
 import "./Tile.css";
 import { useDrop } from "react-dnd";
-import { ShipPlacement } from "../setup/ShipSelector";
 import { useEffect } from "react";
 import { ReactComponent as XSvg } from "../../assets/X.svg";
+import { ShipDrop, ShipPlacement } from "../setup/shipSelector/ShipDrag";
 
 export type Tile = {
   coordinate: Coordinate;
@@ -36,8 +36,12 @@ export function DrawTile({
   const [{ isOver, item }, drop] = useDrop(
     () => ({
       accept: "ship",
-      drop: (item: ShipPlacement) => onDrop?.(tile.coordinate, item),
-      canDrop: (item: ShipPlacement) => (dropCheck ? dropCheck(tile.coordinate, item) : false),
+      drop: (item: ShipDrop) => {
+        onDrop?.(tile.coordinate, item.shipPlacement);
+        item.afterDrop();
+      },
+      canDrop: (item: ShipDrop) =>
+        dropCheck ? dropCheck(tile.coordinate, item.shipPlacement) : false,
       collect: (monitor) => ({
         isOver: monitor.isOver(),
         item: monitor.getItem(),
@@ -48,7 +52,7 @@ export function DrawTile({
 
   useEffect(() => {
     if (isOver) {
-      highlighter?.(tile.coordinate, item);
+      highlighter?.(tile.coordinate, item.shipPlacement);
     }
     return () => highlighter?.(null, null);
   }, [isOver, highlighter, tile, item]);

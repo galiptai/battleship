@@ -67,13 +67,17 @@ export type ShipTypeKey = keyof typeof SHIP_TYPES;
 
 export type ShipType = (typeof SHIP_TYPES)[ShipTypeKey];
 
-export function createShips(shipsToCreate: ShipAmount): Ship[] {
-  const ships: Ship[] = [];
+export function createShips(shipsToCreate: ShipAmount): Map<ShipTypeKey, Ship[]> {
+  const ships = new Map<ShipTypeKey, Ship[]>();
   for (const typeAndAmount of Object.entries(shipsToCreate)) {
     const type = typeAndAmount[0] as ShipTypeKey;
     const amount = typeAndAmount[1];
-    for (let i = 0; i < amount; i++) {
-      ships.push(new Ship(SHIP_TYPES[type], []));
+    if (amount > 0) {
+      const shipArr: Ship[] = [];
+      for (let i = 0; i < amount; i++) {
+        shipArr.push(new Ship(SHIP_TYPES[type], []));
+      }
+      ships.set(type, shipArr);
     }
   }
   return ships;

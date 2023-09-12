@@ -60,22 +60,25 @@
   text-align: start;
   font-weight: 600;
   z-index: 100;
+  position: relative;
 }
 
-.ship-sel-dragged {
+.ship-sel-highlight {
   background-color: var(--blue-active) !important;
+  cursor: grab;
 }
 
-.ship-sel-placed {
+.ship-sel-disabled {
   background-color: var(--blue-disabled);
   color: black;
 }
 
-@media (hover: hover) {
-  .ship-sel-opt:hover:not(.ship-sel-placed) {
-    cursor: grab;
-    background-color: var(--blue-active);
-  }
+.ship-drag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
 }
 
 @media all and (max-width: 600px) {

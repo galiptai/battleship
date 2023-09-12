@@ -8,7 +8,7 @@ import {
   createLetterArray,
 } from "../../logic/renderFunctions";
 import { Board } from "../../logic/Board";
-import { ShipPlacement } from "../setup/ShipSelector";
+import { ShipPlacement } from "../setup/shipSelector/ShipDrag";
 
 export type Coordinate = {
   y: number;
