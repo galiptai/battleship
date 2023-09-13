@@ -94,6 +94,9 @@ export class Rules {
     this.valid = this.verifyShips();
   }
 
+  public getTotalShipAmount(): number {
+    return Array.from(this.ships.values()).reduce((sum, next) => sum + next, 0);
+  }
   private verify(): boolean {
     this.valid = this.verifyDimensions() && this.verifyShips();
     return this.valid;

@@ -32,30 +32,32 @@ export function RulesForm({ onRulesSubmit }: RulesFormProps) {
   return (
     <div className="rules-form-container">
       <div className="rules-form-title">Customize rules</div>
-      <div className="rules-form-dimensions">
-        <div>Board dimensions:</div>
-        <div className="rules-form-dimensions-controls">
-          <NumberInput
-            value={rules.getHeight()}
-            setValue={(value) => updateDimension("height", value)}
-            label="Height:"
-            id="height"
-            min={Rules.MIN_HEIGHT}
-            max={Rules.MAX_HEIGHT}
-            align="column"
-          />
-          <NumberInput
-            value={rules.getWidth()}
-            setValue={(value) => updateDimension("width", value)}
-            label="Width:"
-            id="width"
-            min={Rules.MIN_WIDTH}
-            max={Rules.MAX_WIDTH}
-            align="column"
-          />
+      <div className="rules-form-settings">
+        <div className="rules-form-dimensions">
+          <div>Board dimensions:</div>
+          <div className="rules-form-dimensions-controls">
+            <NumberInput
+              value={rules.getHeight()}
+              setValue={(value) => updateDimension("height", value)}
+              label="Height:"
+              id="height"
+              min={Rules.MIN_HEIGHT}
+              max={Rules.MAX_HEIGHT}
+              align="column"
+            />
+            <NumberInput
+              value={rules.getWidth()}
+              setValue={(value) => updateDimension("width", value)}
+              label="Width:"
+              id="width"
+              min={Rules.MIN_WIDTH}
+              max={Rules.MAX_WIDTH}
+              align="column"
+            />
+          </div>
         </div>
+        <ShipSetter rules={rules} setRules={setRules} />
       </div>
-      <ShipSetter rules={rules} setRules={setRules} />
       <div className="rules-form-start">
         <button onClick={onStartClick} disabled={!rules.isValid()}>
           START

@@ -47,6 +47,10 @@ button:active:not(:disabled) {
   background-color: var(--blue-active);
 }
 
+button:focus-visible {
+  outline: 2px solid white;
+}
+
 input {
   all: unset;
   border: 2px solid var(--main-blue);
